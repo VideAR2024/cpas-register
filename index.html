@@ -1,0 +1,227 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400;500&display=swap');
+
+#cpas-wrap *,#cpas-wrap *::before,#cpas-wrap *::after{box-sizing:border-box;margin:0;padding:0}
+#cpas-wrap{
+  font-family:'Barlow',sans-serif;
+  background:#0a1628;
+  color:#cbd5e1;
+  padding:2.5rem 1.5rem;
+  border-radius:12px;
+  position:relative;
+  overflow:hidden;
+}
+#cpas-wrap::before{
+  content:'';
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 100%,rgba(14,116,144,0.18) 0%,transparent 70%),
+    linear-gradient(180deg,#060f1e 0%,#0a1628 100%);
+  pointer-events:none;z-index:0;
+}
+#cpas-wrap::after{
+  content:'';
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(56,189,248,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(56,189,248,0.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;z-index:0;
+}
+#cpas-inner{position:relative;z-index:1;max-width:600px;margin:0 auto}
+
+.ci-brand{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem}
+.ci-mark{width:32px;height:32px;border:1.5px solid #06b6d4;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.ci-mark::before{content:'';width:9px;height:9px;background:#06b6d4;border-radius:50%;box-shadow:0 0 10px #06b6d4;animation:cipulse 2s ease-in-out infinite}
+.ci-brand-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.2em;color:#06b6d4;text-transform:uppercase}
+.ci-h1{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:700;color:#fff;line-height:1.1;margin-bottom:0.6rem}
+.ci-h1 span{color:#38bdf8}
+.ci-sub{font-size:14px;font-weight:300;color:#94a3b8;line-height:1.6;margin-bottom:1.5rem;max-width:480px}
+.ci-divider{height:1px;background:linear-gradient(90deg,#06b6d4,transparent);opacity:0.3;margin-bottom:1.75rem}
+
+.ci-card{background:rgba(17,34,64,0.6);border:1px solid rgba(56,189,248,0.15);border-radius:14px;padding:1.75rem;backdrop-filter:blur(12px)}
+.ci-field{margin-bottom:1.25rem}
+.ci-label{display:block;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#38bdf8;margin-bottom:0.45rem}
+.ci-input{width:100%;background:rgba(10,22,40,0.8);border:1px solid rgba(56,189,248,0.2);border-radius:8px;padding:0.7rem 0.9rem;font-family:'Barlow',sans-serif;font-size:14px;color:#fff;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+.ci-input:focus{border-color:#06b6d4;box-shadow:0 0 0 3px rgba(6,182,212,0.1)}
+.ci-input::placeholder{color:rgba(148,163,184,0.4)}
+.ci-input.error{border-color:rgba(248,113,113,0.5)}
+
+.ci-cbgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ci-cb{display:flex;align-items:center;gap:9px;background:rgba(10,22,40,0.6);border:1px solid rgba(56,189,248,0.12);border-radius:8px;padding:0.55rem 0.8rem;cursor:pointer;transition:border-color 0.15s,background 0.15s;user-select:none}
+.ci-cb:hover{border-color:rgba(56,189,248,0.35);background:rgba(14,116,144,0.12)}
+.ci-cb.checked{border-color:rgba(6,182,212,0.4);background:rgba(14,116,144,0.15)}
+.ci-cb input[type=checkbox]{appearance:none;-webkit-appearance:none;width:15px;height:15px;min-width:15px;border:1.5px solid rgba(56,189,248,0.35);border-radius:4px;background:transparent;cursor:pointer;position:relative;transition:background 0.15s,border-color 0.15s}
+.ci-cb input[type=checkbox]:checked{background:#06b6d4;border-color:#06b6d4}
+.ci-cb input[type=checkbox]:checked::after{content:'';position:absolute;left:4px;top:1px;width:4px;height:8px;border:2px solid #0a1628;border-top:none;border-left:none;transform:rotate(45deg)}
+.ci-cblabel{font-size:12px;color:#cbd5e1;line-height:1.3}
+.ci-span2{grid-column:span 2}
+
+.ci-radiogrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ci-radio{display:flex;align-items:center;gap:9px;background:rgba(10,22,40,0.6);border:1px solid rgba(56,189,248,0.12);border-radius:8px;padding:0.65rem 0.9rem;cursor:pointer;transition:border-color 0.15s,background 0.15s;user-select:none}
+.ci-radio:hover{border-color:rgba(56,189,248,0.35)}
+.ci-radio.checked{border-color:rgba(6,182,212,0.4);background:rgba(14,116,144,0.15)}
+.ci-radio input[type=radio]{appearance:none;-webkit-appearance:none;width:15px;height:15px;min-width:15px;border:1.5px solid rgba(56,189,248,0.35);border-radius:50%;background:transparent;cursor:pointer;position:relative;transition:border-color 0.15s}
+.ci-radio input[type=radio]:checked{border-color:#06b6d4}
+.ci-radio input[type=radio]:checked::after{content:'';position:absolute;inset:3px;background:#06b6d4;border-radius:50%}
+.ci-radiolabel{font-size:12px;color:#cbd5e1}
+
+.ci-err{font-size:11px;color:#f87171;margin-top:0.35rem;display:none}
+.ci-err.visible{display:block}
+
+.ci-btn{width:100%;background:#0e7490;border:1px solid #06b6d4;border-radius:8px;padding:0.85rem 2rem;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#fff;cursor:pointer;transition:background 0.2s,box-shadow 0.2s;margin-top:1.5rem}
+.ci-btn:hover{background:#06b6d4;box-shadow:0 0 20px rgba(6,182,212,0.25)}
+.ci-btn:disabled{opacity:0.5;cursor:not-allowed}
+.ci-note{font-size:11px;color:#94a3b8;margin-top:0.75rem;text-align:center;opacity:0.7}
+
+.ci-ty{display:none;text-align:center;padding:2.5rem 1rem}
+.ci-ty.visible{display:block}
+.ci-ty-icon{width:64px;height:64px;border-radius:50%;background:rgba(16,185,129,0.12);border:1.5px solid #10b981;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem}
+.ci-ty-icon svg{width:28px;height:28px;stroke:#10b981;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ci-ty h2{font-family:'Barlow Condensed',sans-serif;font-size:1.9rem;font-weight:700;color:#fff;margin-bottom:0.6rem}
+.ci-ty p{font-size:14px;font-weight:300;color:#94a3b8;max-width:380px;margin:0 auto 1.5rem;line-height:1.6}
+.ci-bar{width:260px;height:3px;background:rgba(56,189,248,0.15);border-radius:3px;overflow:hidden;margin:0 auto}
+.ci-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#0e7490,#38bdf8);border-radius:3px;transition:width 4s linear}
+.ci-bar-txt{font-size:11px;color:#94a3b8;margin-top:0.6rem;opacity:0.6}
+
+@keyframes cipulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.85)}}
+</style>
+
+<div id="cpas-wrap">
+  <div id="cpas-inner">
+
+    <div class="ci-brand">
+      <div class="ci-mark"></div>
+      <span class="ci-brand-name">VIDEAR — CPAS</span>
+    </div>
+    <h2 class="ci-h1">Making the Invisible, <span>Visible</span></h2>
+    <p class="ci-sub">Register your interest in the Coastal Position Awareness System. Your details help us shape the pilot programme and keep you informed as CPAS develops.</p>
+    <div class="ci-divider"></div>
+
+    <div class="ci-card">
+      <form id="ci-form" novalidate>
+
+        <div class="ci-field">
+          <label class="ci-label" for="ci-name">Full name <span style="color:#f87171">*</span></label>
+          <input class="ci-input" type="text" id="ci-name" placeholder="Your name" autocomplete="name" required>
+          <span class="ci-err" id="ci-name-err">Please enter your name</span>
+        </div>
+
+        <div class="ci-field">
+          <label class="ci-label" for="ci-email">Email address <span style="color:#f87171">*</span></label>
+          <input class="ci-input" type="email" id="ci-email" placeholder="you@example.com" autocomplete="email" required>
+          <span class="ci-err" id="ci-email-err">Please enter a valid email address</span>
+        </div>
+
+        <div class="ci-field">
+          <label class="ci-label" for="ci-location">Location <span style="color:#f87171">*</span></label>
+          <input class="ci-input" type="text" id="ci-location" placeholder="Town, county or region" required>
+          <span class="ci-err" id="ci-loc-err">Please enter your location</span>
+        </div>
+
+        <div class="ci-field">
+          <span class="ci-label">Your interest <span style="color:#f87171">*</span></span>
+          <div class="ci-cbgrid">
+            <label class="ci-cb"><input type="checkbox" value="Sailing Club"><span class="ci-cblabel">Sailing Club</span></label>
+            <label class="ci-cb"><input type="checkbox" value="Paramotor Pilot"><span class="ci-cblabel">Paramotor Pilot</span></label>
+            <label class="ci-cb"><input type="checkbox" value="Kayaker"><span class="ci-cblabel">Kayaker</span></label>
+            <label class="ci-cb"><input type="checkbox" value="SUP"><span class="ci-cblabel">SUP</span></label>
+            <label class="ci-cb"><input type="checkbox" value="Jet-Skiier"><span class="ci-cblabel">Jet-Skiier</span></label>
+            <label class="ci-cb"><input type="checkbox" value="Fisherman"><span class="ci-cblabel">Fisherman</span></label>
+            <label class="ci-cb"><input type="checkbox" value="Leisure"><span class="ci-cblabel">Leisure</span></label>
+            <label class="ci-cb"><input type="checkbox" value="Commercial Fisherman"><span class="ci-cblabel">Commercial Fisherman</span></label>
+            <label class="ci-cb"><input type="checkbox" value="Port/Marina"><span class="ci-cblabel">Port / Marina</span></label>
+            <label class="ci-cb"><input type="checkbox" value="RNLI/Coastguard"><span class="ci-cblabel">RNLI / Coastguard</span></label>
+            <label class="ci-cb ci-span2"><input type="checkbox" value="Hill / Fell / Mountain Activities"><span class="ci-cblabel">Hill / Fell / Mountain Activities</span></label>
+          </div>
+          <span class="ci-err" id="ci-int-err">Please select at least one interest</span>
+        </div>
+
+        <div class="ci-field">
+          <span class="ci-label">Letter of support</span>
+          <div class="ci-radiogrid">
+            <label class="ci-radio"><input type="radio" name="ci-letter" value="Yes, we can write and submit our own letter of support."><span class="ci-radiolabel">Yes — we can write one</span></label>
+            <label class="ci-radio"><input type="radio" name="ci-letter" value="No"><span class="ci-radiolabel">Not at this time</span></label>
+          </div>
+        </div>
+
+        <button type="submit" class="ci-btn" id="ci-btn">Register Interest</button>
+        <p class="ci-note">Your data is used solely to manage the CPAS pilot programme and will not be shared with third parties.</p>
+
+      </form>
+
+      <div class="ci-ty" id="ci-ty">
+        <div class="ci-ty-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2>Thank you for registering</h2>
+        <p>We've received your details and will be in touch as the CPAS pilot programme develops along the Newhaven–Shoreham corridor.</p>
+        <div class="ci-bar"><div class="ci-bar-fill" id="ci-bar-fill"></div></div>
+        <p class="ci-bar-txt">Returning to VIDEAR shortly…</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var ACTION='https://docs.google.com/forms/d/e/1FAIpQLSd0HpkujCgnJKjISlABpokRbOeGKoEUbrbEMxdpl_Mm3ADU8w/formResponse';
+  var REDIRECT='https://www.videar.tech';
+
+  document.querySelectorAll('.ci-cb input[type=checkbox]').forEach(function(cb){
+    cb.addEventListener('change',function(){
+      cb.closest('.ci-cb').classList.toggle('checked',cb.checked);
+    });
+  });
+
+  document.querySelectorAll('.ci-radio input[type=radio]').forEach(function(rb){
+    rb.addEventListener('change',function(){
+      document.querySelectorAll('.ci-radio').forEach(function(el){el.classList.remove('checked')});
+      rb.closest('.ci-radio').classList.add('checked');
+    });
+  });
+
+  document.getElementById('ci-form').addEventListener('submit',async function(e){
+    e.preventDefault();
+    var ok=true;
+    document.querySelectorAll('.ci-err').forEach(function(el){el.classList.remove('visible')});
+    document.querySelectorAll('.ci-input.error').forEach(function(el){el.classList.remove('error')});
+
+    var name=document.getElementById('ci-name');
+    if(!name.value.trim()){document.getElementById('ci-name-err').classList.add('visible');name.classList.add('error');ok=false;}
+
+    var email=document.getElementById('ci-email');
+    if(!email.value.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)){document.getElementById('ci-email-err').classList.add('visible');email.classList.add('error');ok=false;}
+
+    var loc=document.getElementById('ci-location');
+    if(!loc.value.trim()){document.getElementById('ci-loc-err').classList.add('visible');loc.classList.add('error');ok=false;}
+
+    var interests=document.querySelectorAll('.ci-cb input[type=checkbox]:checked');
+    if(!interests.length){document.getElementById('ci-int-err').classList.add('visible');ok=false;}
+
+    if(!ok)return;
+
+    var btn=document.getElementById('ci-btn');
+    btn.disabled=true;btn.textContent='Sending…';
+
+    var fd=new FormData();
+    fd.append('entry.1798665011',name.value.trim());
+    fd.append('entry.1393138436',email.value.trim());
+    fd.append('entry.645068376',loc.value.trim());
+    interests.forEach(function(cb){fd.append('entry.1097738620',cb.value);});
+    var letter=document.querySelector('input[name="ci-letter"]:checked');
+    if(letter)fd.append('entry.401268693',letter.value);
+
+    try{await fetch(ACTION,{method:'POST',mode:'no-cors',body:fd});}catch(err){}
+
+    document.getElementById('ci-form').style.display='none';
+    var ty=document.getElementById('ci-ty');
+    ty.classList.add('visible');
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      document.getElementById('ci-bar-fill').style.width='100%';
+    });});
+    setTimeout(function(){window.top.location.href=REDIRECT;},4000);
+  });
+})();
+</script>
