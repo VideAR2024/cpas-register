@@ -12,110 +12,84 @@
       --white: #ffffff; --offwhite: #e8eef4; --muted: #7a9ab5; --border: rgba(0,180,200,0.2);
     }
     html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Barlow', sans-serif;
-      background: var(--navy);
-      color: var(--offwhite);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+    body { font-family: 'Barlow', sans-serif; background: var(--navy); color: var(--offwhite); min-height: 100vh; display: flex; flex-direction: column; }
 
-    /* ── HEADER — hidden when inside iframe ── */
-    header {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2.5rem; height: 60px;
-      background: rgba(10,22,40,0.95); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.3rem; letter-spacing: 0.12em; color: var(--white); text-decoration: none; }
-    nav { display: flex; gap: 0.25rem; }
-    nav a { font-size: 0.82rem; font-weight: 500; letter-spacing: 0.06em; color: var(--muted); text-decoration: none; padding: 0.4rem 0.8rem; border-radius: 3px; transition: color 0.2s; text-transform: lowercase; }
-    nav a:hover { color: var(--white); background: rgba(255,255,255,0.05); }
-    nav a.active { color: var(--teal); }
+    /* HEADER */
+    header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; height: 60px; background: rgba(10,22,40,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.3rem; letter-spacing: 0.12em; color: var(--white); text-decoration: none; transition: color 0.2s; }
+    .logo:hover { color: var(--teal); }
+    .back-link { font-size: 0.82rem; font-weight: 500; letter-spacing: 0.06em; color: var(--muted); text-decoration: none; padding: 0.4rem 0.8rem; border-radius: 3px; transition: color 0.2s; display: flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--white); }
+    .back-link::before { content: '←'; }
 
-    /* ── HERO — hidden when inside iframe ── */
-    .hero {
-      position: relative; height: 260px;
-      display: flex; align-items: flex-end; padding-bottom: 2.5rem;
-      overflow: hidden; margin-top: 60px;
-    }
-    .hero-bg {
-      position: absolute; inset: 0;
-      background: linear-gradient(to bottom, rgba(10,22,40,0.25) 0%, rgba(10,22,40,0.78) 100%),
-        url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1400&q=80') center/cover no-repeat;
-      filter: saturate(1.2) brightness(0.85);
-    }
+    /* HERO */
+    .hero { position: relative; height: 320px; display: flex; align-items: flex-end; padding-bottom: 2.8rem; overflow: hidden; margin-top: 60px; }
+    .hero-bg { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10,22,40,0.25) 0%, rgba(10,22,40,0.78) 100%), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1400&q=80') center/cover no-repeat; filter: saturate(1.2) brightness(0.85); }
     .hero-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 55% 60%, rgba(0,180,200,0.18) 0%, transparent 70%); }
     .hero-content { position: relative; z-index: 2; width: 100%; max-width: 900px; margin: 0 auto; padding: 0 2.5rem; }
-    .hero-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.2em; color: var(--teal); text-transform: uppercase; margin-bottom: 0.5rem; }
-    .hero h1 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: 0.04em; color: var(--white); text-transform: uppercase; }
+    .hero-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.2em; color: var(--teal); text-transform: uppercase; margin-bottom: 0.6rem; }
+    .hero h1 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; letter-spacing: 0.04em; color: var(--white); text-transform: uppercase; }
     .hero h1 span { color: var(--teal); }
 
-    /* ── MAIN ── */
-    main { flex: 1; max-width: 860px; width: 100%; margin: 0 auto; padding: 2.5rem 2.5rem 3rem; }
-    .intro { border-left: 3px solid var(--teal); padding-left: 1.4rem; margin-bottom: 2.5rem; }
-    .intro p { font-size: 0.97rem; font-weight: 300; line-height: 1.75; color: var(--offwhite); }
+    /* MAIN */
+    main { flex: 1; max-width: 860px; width: 100%; margin: 0 auto; padding: 3rem 2.5rem 4rem; }
+    .intro { border-left: 3px solid var(--teal); padding-left: 1.4rem; margin-bottom: 2.8rem; }
+    .intro p { font-size: 1rem; font-weight: 300; line-height: 1.75; color: var(--offwhite); }
     .intro p + p { margin-top: 0.7rem; }
     .intro strong { font-weight: 600; color: var(--white); }
 
-    /* ── FORM ── */
-    .form-card { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 6px; padding: 2.2rem; }
-    .form-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.3rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--white); margin-bottom: 0.3rem; }
-    .form-subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.8rem; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+    /* FORM */
+    .form-card { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 6px; padding: 2.5rem; }
+    .form-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.35rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--white); margin-bottom: 0.3rem; }
+    .form-subtitle { font-size: 0.87rem; color: var(--muted); margin-bottom: 2rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
     .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
     .form-group.full { grid-column: 1 / -1; }
     label { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); }
-    input[type="text"], input[type="email"], input[type="tel"], textarea { background: var(--navy-light); border: 1px solid rgba(0,180,200,0.25); border-radius: 4px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 0.93rem; padding: 0.65rem 1rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; }
+    input[type="text"], input[type="email"], input[type="tel"], textarea { background: var(--navy-light); border: 1px solid rgba(0,180,200,0.25); border-radius: 4px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 0.93rem; padding: 0.7rem 1rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; }
     input::placeholder, textarea::placeholder { color: rgba(120,154,181,0.5); }
     input:focus, textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,180,200,0.12); }
     textarea { resize: vertical; min-height: 85px; }
-    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; margin-top: 0.3rem; }
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.3rem; }
     .check-label, .radio-label { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.87rem; color: var(--offwhite); cursor: pointer; text-transform: none; letter-spacing: 0; font-weight: 400; line-height: 1.4; }
     .check-label input, .radio-label input { width: 15px; height: 15px; min-width: 15px; margin-top: 2px; accent-color: var(--teal); cursor: pointer; }
     .radio-group { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.3rem; }
-    .divider { border: none; border-top: 1px solid var(--border); margin: 1.6rem 0; }
-    .submit-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.6rem; flex-wrap: wrap; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.8rem 0; }
+    .submit-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.8rem; flex-wrap: wrap; }
     .privacy-note { font-size: 0.78rem; color: var(--muted); line-height: 1.5; max-width: 380px; }
     .btn-submit { background: var(--teal); color: var(--navy); font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; border: none; border-radius: 4px; padding: 0.85rem 2.2rem; cursor: pointer; transition: background 0.2s, transform 0.1s, box-shadow 0.2s; white-space: nowrap; }
     .btn-submit:hover { background: #00cce0; box-shadow: 0 4px 20px rgba(0,180,200,0.35); transform: translateY(-1px); }
     .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .error-banner { display: none; background: rgba(200,60,60,0.15); border: 1px solid rgba(200,60,60,0.4); border-radius: 4px; padding: 0.75rem 1rem; font-size: 0.85rem; color: #ff9999; margin-bottom: 1.2rem; }
-    .success-msg { display: none; text-align: center; padding: 2.5rem 2rem; }
-    .success-msg .tick { font-size: 3rem; color: var(--teal); margin-bottom: 1rem; }
-    .success-msg h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--teal); text-transform: uppercase; margin-bottom: 0.6rem; }
-    .success-msg p { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
-    .success-msg a { color: var(--teal); }
 
-    /* ── FOOTER ── */
-    footer { background: var(--navy-mid); border-top: 1px solid var(--border); padding: 1.2rem 2.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+    /* SUCCESS PAGE */
+    .success-page { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4rem 2rem; min-height: 60vh; }
+    .success-page .tick { font-size: 4rem; color: var(--teal); margin-bottom: 1.5rem; }
+    .success-page h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--teal); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
+    .success-page p { color: var(--offwhite); font-size: 1rem; line-height: 1.7; max-width: 500px; }
+    .success-page .redirect-note { margin-top: 2rem; font-size: 0.85rem; color: var(--muted); }
+    .success-page .redirect-note a { color: var(--teal); text-decoration: none; }
+    .success-page .redirect-note a:hover { text-decoration: underline; }
+    .countdown { font-weight: 700; color: var(--teal); }
+    .progress-bar { width: 200px; height: 3px; background: rgba(0,180,200,0.2); border-radius: 2px; margin: 1rem auto 0; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--teal); width: 100%; transform-origin: left; animation: drain 8s linear forwards; }
+    @keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+    /* FOOTER */
+    footer { background: var(--navy-mid); border-top: 1px solid var(--border); padding: 1.4rem 2.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
     footer span { font-size: 0.8rem; color: var(--muted); }
     footer a { font-size: 0.8rem; color: var(--teal); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
     .footer-sep { color: rgba(120,154,181,0.4); }
 
-    /* ── IFRAME MODE — hide header/hero, remove top margin ── */
-    body.in-iframe header,
-    body.in-iframe .hero { display: none; }
-    body.in-iframe main { padding-top: 2rem; }
-
-    @media (max-width: 620px) { .form-grid { grid-template-columns: 1fr; } .check-grid { grid-template-columns: 1fr; } nav { display: none; } .submit-row { flex-direction: column; align-items: stretch; } .btn-submit { text-align: center; } }
+    @media (max-width: 620px) { .form-grid { grid-template-columns: 1fr; } .check-grid { grid-template-columns: 1fr; } .submit-row { flex-direction: column; align-items: stretch; } .btn-submit { text-align: center; } }
   </style>
 </head>
 <body>
 
   <header>
-    <a class="logo" href="https://www.videar.tech/home" target="_top">VIDEAR</a>
-    <nav>
-      <a href="https://www.videar.tech/home" target="_top">Home</a>
-      <a href="https://www.videar.tech/home/platform" target="_top">Platform</a>
-      <a href="https://www.videar.tech/home/solutions" target="_top">Solutions</a>
-      <a href="https://www.videar.tech/home/team" target="_top">Team</a>
-      <a href="https://www.videar.tech/home/video-deck" target="_top">Video &amp; Deck</a>
-      <a href="#" class="active">CPAS Register</a>
-    </nav>
+    <a class="logo" href="https://www.videar.tech/home">VIDEAR</a>
+    <a class="back-link" href="https://www.videar.tech/home">Back to site</a>
   </header>
 
   <div class="hero">
@@ -127,88 +101,97 @@
   </div>
 
   <main>
-    <div class="intro">
-      <p>VIDEAR's <strong>Common Position Awareness System (CPAS)</strong> turns the smartphone already in your pocket into a real-time safety beacon — no hardware, no infrastructure cost.</p>
-      <p>We're building our pilot across the <strong>Newhaven–Worthing corridor</strong>. Register below to join — <strong>6 months free access</strong>. Your response also helps demonstrate community need for our <strong>STA funding application</strong>.</p>
-    </div>
 
-    <div class="form-card" id="formCard">
-      <p class="form-title">Register Your Interest</p>
-      <p class="form-subtitle">Takes 60 seconds. We'll be in touch when the pilot opens in your area.</p>
+    <!-- FORM SECTION -->
+    <div id="formSection">
+      <div class="intro">
+        <p>VIDEAR's <strong>Common Position Awareness System (CPAS)</strong> turns the smartphone already in your pocket into a real-time safety beacon — no hardware, no infrastructure cost.</p>
+        <p>We're building our pilot across the <strong>Newhaven–Worthing corridor</strong>. Register below to join — <strong>6 months free access</strong>. Your response also helps demonstrate community need for our <strong>STA funding application</strong>.</p>
+      </div>
 
-      <div class="error-banner" id="errorBanner">Please fill in all required fields before submitting.</div>
+      <div class="form-card">
+        <p class="form-title">Register Your Interest</p>
+        <p class="form-subtitle">Takes 60 seconds. We'll be in touch when the pilot opens in your area.</p>
 
-      <form id="cpasForm" novalidate>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="fullName">Full Name *</label>
-            <input type="text" id="fullName" placeholder="Your full name" required />
+        <div class="error-banner" id="errorBanner">Please fill in all required fields before submitting.</div>
+
+        <form id="cpasForm" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="fullName">Full Name *</label>
+              <input type="text" id="fullName" placeholder="Your full name" required />
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address *</label>
+              <input type="email" id="email" placeholder="you@example.com" required />
+            </div>
+            <div class="form-group">
+              <label for="location">Location (Town/City) *</label>
+              <input type="text" id="location" placeholder="e.g. Newhaven, Brighton, Shoreham…" required />
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone (optional)</label>
+              <input type="tel" id="phone" placeholder="+44 7xxx xxxxxx" />
+            </div>
           </div>
-          <div class="form-group">
-            <label for="email">Email Address *</label>
-            <input type="email" id="email" placeholder="you@example.com" required />
+
+          <hr class="divider" />
+
+          <div class="form-group full">
+            <label>Your Interest — select all that apply *</label>
+            <div class="check-grid">
+              <label class="check-label"><input type="checkbox" class="interest" value="Sailing Club" /> Sailing Club</label>
+              <label class="check-label"><input type="checkbox" class="interest" value="Paramotor Pilot" /> Paramotor Pilot</label>
+              <label class="check-label"><input type="checkbox" class="interest" value="Kayaker" /> Kayaker</label>
+              <label class="check-label"><input type="checkbox" class="interest" value="SUP" /> SUP / Paddleboarder</label>
+              <label class="check-label"><input type="checkbox" class="interest" value="Fisherman" /> Fisherman (Leisure)</label>
+              <label class="check-label"><input type="checkbox" class="interest" value="Commercial Fisherman" /> Commercial Fisherman</label>
+              <label class="check-label"><input type="checkbox" class="interest" value="RNLI/Coastguard" /> RNLI / Coastguard</label>
+              <label class="check-label"><input type="checkbox" class="interest" value="Port/Marina" /> Port / Marina</label>
+              <label class="check-label"><input type="checkbox" class="interest" value="Jet-Skiier" /> Jet-Skier</label>
+              <label class="check-label"><input type="checkbox" class="interest" value="Leisure" /> Leisure / Other coastal</label>
+              <label class="check-label"><input type="checkbox" class="interest" value="Coastal Walking" /> Coastal Walking</label>
+              <label class="check-label"><input type="checkbox" class="interest" value="Hill / Fell / Mountain Activities" /> Hill / Fell / Mountain</label>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="location">Location (Town/City) *</label>
-            <input type="text" id="location" placeholder="e.g. Newhaven, Brighton, Shoreham…" required />
+
+          <hr class="divider" />
+
+          <div class="form-group full">
+            <label>Letter of Support for STA Application *</label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="letter" value="Yes, please send us a draft letter for review and sign-off." required /> Yes — please send us a draft letter for review and sign-off</label>
+              <label class="radio-label"><input type="radio" name="letter" value="Yes, we can write and submit our own letter of support." /> Yes — we can write and submit our own letter of support</label>
+              <label class="radio-label"><input type="radio" name="letter" value="Not at this time, but we are happy to remain informed." /> Not at this time, but happy to remain informed</label>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="phone">Phone (optional)</label>
-            <input type="tel" id="phone" placeholder="+44 7xxx xxxxxx" />
+
+          <hr class="divider" />
+
+          <div class="form-group full">
+            <label for="comments">Challenges or ways CPAS could help (optional)</label>
+            <textarea id="comments" placeholder="Tell us about challenges you face, or specific ways CPAS could help…"></textarea>
           </div>
-        </div>
 
-        <hr class="divider" />
-
-        <div class="form-group full">
-          <label>Your Interest — select all that apply *</label>
-          <div class="check-grid">
-            <label class="check-label"><input type="checkbox" class="interest" value="Sailing Club" /> Sailing Club</label>
-            <label class="check-label"><input type="checkbox" class="interest" value="Paramotor Pilot" /> Paramotor Pilot</label>
-            <label class="check-label"><input type="checkbox" class="interest" value="Kayaker" /> Kayaker</label>
-            <label class="check-label"><input type="checkbox" class="interest" value="SUP" /> SUP / Paddleboarder</label>
-            <label class="check-label"><input type="checkbox" class="interest" value="Fisherman" /> Fisherman (Leisure)</label>
-            <label class="check-label"><input type="checkbox" class="interest" value="Commercial Fisherman" /> Commercial Fisherman</label>
-            <label class="check-label"><input type="checkbox" class="interest" value="RNLI/Coastguard" /> RNLI / Coastguard</label>
-            <label class="check-label"><input type="checkbox" class="interest" value="Port/Marina" /> Port / Marina</label>
-            <label class="check-label"><input type="checkbox" class="interest" value="Jet-Skiier" /> Jet-Skier</label>
-            <label class="check-label"><input type="checkbox" class="interest" value="Leisure" /> Leisure / Other coastal</label>
-            <label class="check-label"><input type="checkbox" class="interest" value="Coastal Walking" /> Coastal Walking</label>
-            <label class="check-label"><input type="checkbox" class="interest" value="Hill / Fell / Mountain Activities" /> Hill / Fell / Mountain</label>
+          <div class="submit-row">
+            <p class="privacy-note">Your details are used only for CPAS pilot communications and to support our STA application. We do not sell or share personal data.</p>
+            <button type="submit" class="btn-submit" id="submitBtn">Register Interest →</button>
           </div>
-        </div>
-
-        <hr class="divider" />
-
-        <div class="form-group full">
-          <label>Letter of Support for STA Application *</label>
-          <div class="radio-group">
-            <label class="radio-label"><input type="radio" name="letter" value="Yes, please send us a draft letter for review and sign-off." required /> Yes — please send us a draft letter for review and sign-off</label>
-            <label class="radio-label"><input type="radio" name="letter" value="Yes, we can write and submit our own letter of support." /> Yes — we can write and submit our own letter of support</label>
-            <label class="radio-label"><input type="radio" name="letter" value="Not at this time, but we are happy to remain informed." /> Not at this time, but happy to remain informed</label>
-          </div>
-        </div>
-
-        <hr class="divider" />
-
-        <div class="form-group full">
-          <label for="comments">Challenges or ways CPAS could help (optional)</label>
-          <textarea id="comments" placeholder="Tell us about challenges you face, or specific ways CPAS could help…"></textarea>
-        </div>
-
-        <div class="submit-row">
-          <p class="privacy-note">Your details are used only for CPAS pilot communications and to support our STA application. We do not sell or share personal data.</p>
-          <button type="submit" class="btn-submit" id="submitBtn">Register Interest →</button>
-        </div>
-      </form>
-
-      <div class="success-msg" id="successMsg">
-        <div class="tick">✓</div>
-        <h2>You're registered</h2>
-        <p>Thank you for your interest in CPAS — we have received your response and will be in touch.<br/><br/>
-        Keep an eye on <a href="https://www.videar.tech" target="_top">videar.tech</a> for updates on the pilot launch.</p>
+        </form>
       </div>
     </div>
+
+    <!-- SUCCESS SECTION -->
+    <div class="success-page" id="successSection">
+      <div class="tick">✓</div>
+      <h2>You're Registered</h2>
+      <p>Thank you for your interest in CPAS. We've received your response and will be in touch when the <strong>Newhaven–Worthing pilot</strong> opens.</p>
+      <div class="redirect-note">
+        Returning to <a href="https://www.videar.tech/home" id="homeLink">videar.tech</a> in <span class="countdown" id="countdown">8</span> seconds…
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </div>
+
   </main>
 
   <footer>
@@ -216,18 +199,14 @@
     <span class="footer-sep">|</span>
     <span>UK Patent GB2629638B</span>
     <span class="footer-sep">|</span>
-    <a href="https://www.videar.tech/home/team" target="_top">Contact Us</a>
+    <a href="https://www.videar.tech/home/team">Contact Us</a>
     <span class="footer-sep">|</span>
-    <a href="https://www.videar.tech/home" target="_top">videar.tech</a>
+    <a href="https://www.videar.tech/home">videar.tech</a>
   </footer>
 
   <script>
-    // Detect if inside iframe — if so, hide header/hero (Google Sites already provides those)
-    if (window.self !== window.top) {
-      document.body.classList.add('in-iframe');
-    }
-
     const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSd0HpkujCgnJKjISlABpokRbOeGKoEUbrbEMxdpl_Mm3ADU8w/formResponse';
+    const HOME = 'https://www.videar.tech/home';
 
     document.getElementById('cpasForm').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -264,8 +243,26 @@
         await fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: fd });
       } catch(err) { /* no-cors expected */ }
 
-      document.getElementById('cpasForm').style.display = 'none';
-      document.getElementById('successMsg').style.display = 'block';
+      // Show success, hide form
+      document.getElementById('formSection').style.display = 'none';
+      const successSection = document.getElementById('successSection');
+      successSection.style.display = 'flex';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Countdown + auto redirect after 8 seconds
+      let seconds = 8;
+      const countdownEl = document.getElementById('countdown');
+      const timer = setInterval(() => {
+        seconds--;
+        countdownEl.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(timer);
+          window.location.href = HOME;
+        }
+      }, 1000);
+
+      // If user clicks the link manually, cancel timer
+      document.getElementById('homeLink').addEventListener('click', () => clearInterval(timer));
     });
   </script>
 
