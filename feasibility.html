@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coastal Safety Feasibility Input — VIDEAR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #00b4c8; --navy: #0a1628; --navy-mid: #0d1f38; --navy-light: #132840;
+      --white: #ffffff; --offwhite: #e8eef4; --muted: #7a9ab5; --border: rgba(0,180,200,0.2);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Barlow', sans-serif; background: var(--navy); color: var(--offwhite); min-height: 100vh; display: flex; flex-direction: column; }
+
+    header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; height: 60px; background: rgba(10,22,40,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.3rem; letter-spacing: 0.12em; color: var(--white); text-decoration: none; transition: color 0.2s; }
+    .logo:hover { color: var(--teal); }
+    .back-link { font-size: 0.82rem; font-weight: 500; color: var(--muted); text-decoration: none; padding: 0.4rem 0.8rem; transition: color 0.2s; }
+    .back-link::before { content: '← '; }
+    .back-link:hover { color: var(--white); }
+
+    .hero { position: relative; height: 300px; display: flex; align-items: flex-end; padding-bottom: 2.5rem; overflow: hidden; margin-top: 60px; }
+    .hero-bg { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10,22,40,0.3) 0%, rgba(10,22,40,0.82) 100%), url('https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1400&q=80') center/cover no-repeat; filter: saturate(1.1) brightness(0.8); }
+    .hero-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 40% 60%, rgba(0,180,200,0.15) 0%, transparent 70%); }
+    .hero-content { position: relative; z-index: 2; width: 100%; max-width: 900px; margin: 0 auto; padding: 0 2.5rem; }
+    .hero-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.2em; color: var(--teal); text-transform: uppercase; margin-bottom: 0.6rem; }
+    .hero h1 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: 0.04em; color: var(--white); text-transform: uppercase; line-height: 1.1; }
+    .hero h1 span { color: var(--teal); }
+
+    main { flex: 1; max-width: 860px; width: 100%; margin: 0 auto; padding: 3rem 2.5rem 4rem; }
+
+    .intro-card { border-left: 3px solid var(--teal); padding: 1.4rem 1.6rem; margin-bottom: 2.5rem; background: rgba(0,180,200,0.04); border-radius: 0 4px 4px 0; }
+    .intro-card p { font-size: 0.95rem; font-weight: 300; line-height: 1.8; color: var(--offwhite); }
+    .intro-card p + p { margin-top: 0.7rem; }
+
+    .section-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--teal); margin-bottom: 1.2rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+
+    .form-card { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 6px; padding: 2.2rem; margin-bottom: 1.5rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group.full { grid-column: 1 / -1; }
+    label.field-label { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); }
+    input[type="text"], textarea, select { background: var(--navy-light); border: 1px solid rgba(0,180,200,0.25); border-radius: 4px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 0.93rem; padding: 0.7rem 1rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; }
+    input::placeholder, textarea::placeholder { color: rgba(120,154,181,0.5); }
+    input:focus, textarea:focus, select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,180,200,0.12); }
+    textarea { resize: vertical; min-height: 90px; }
+    select { appearance: none; cursor: pointer; }
+    select option { background: var(--navy-mid); }
+
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; margin-top: 0.3rem; }
+    .check-label, .radio-label { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.87rem; color: var(--offwhite); cursor: pointer; line-height: 1.4; font-weight: 400; }
+    .check-label input, .radio-label input { width: 15px; height: 15px; min-width: 15px; margin-top: 2px; accent-color: var(--teal); cursor: pointer; }
+    .radio-group { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.3rem; }
+
+    .rating-group { display: flex; align-items: center; gap: 0; margin-top: 0.5rem; }
+    .rating-label-text { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+    .rating-options { display: flex; gap: 0.5rem; margin: 0 1rem; }
+    .rating-option { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; cursor: pointer; }
+    .rating-option input { display: none; }
+    .rating-btn { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--border); background: var(--navy-light); color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
+    .rating-option input:checked + .rating-btn { background: var(--teal); border-color: var(--teal); color: var(--navy); }
+    .rating-option:hover .rating-btn { border-color: var(--teal); color: var(--teal); }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.6rem 0; }
+    .error-banner { display: none; background: rgba(200,60,60,0.15); border: 1px solid rgba(200,60,60,0.4); border-radius: 4px; padding: 0.75rem 1rem; font-size: 0.85rem; color: #ff9999; margin-bottom: 1.2rem; }
+    .submit-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+    .privacy-note { font-size: 0.78rem; color: var(--muted); line-height: 1.5; max-width: 420px; }
+    .btn-submit { background: var(--teal); color: var(--navy); font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; border: none; border-radius: 4px; padding: 0.85rem 2.2rem; cursor: pointer; transition: background 0.2s, transform 0.1s, box-shadow 0.2s; white-space: nowrap; }
+    .btn-submit:hover { background: #00cce0; box-shadow: 0 4px 20px rgba(0,180,200,0.35); transform: translateY(-1px); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .success-page { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4rem 2rem; min-height: 60vh; }
+    .success-page .tick { font-size: 4rem; color: var(--teal); margin-bottom: 1.5rem; }
+    .success-page h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--teal); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
+    .success-page p { color: var(--offwhite); font-size: 1rem; line-height: 1.7; max-width: 500px; }
+    .redirect-note { margin-top: 2rem; font-size: 0.85rem; color: var(--muted); }
+    .redirect-note a { color: var(--teal); text-decoration: none; }
+    .countdown { font-weight: 700; color: var(--teal); }
+    .progress-bar { width: 200px; height: 3px; background: rgba(0,180,200,0.2); border-radius: 2px; margin: 1rem auto 0; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--teal); transform-origin: left; animation: drain 8s linear forwards; }
+    @keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+    footer { background: var(--navy-mid); border-top: 1px solid var(--border); padding: 1.4rem 2.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+    footer span { font-size: 0.8rem; color: var(--muted); }
+    footer a { font-size: 0.8rem; color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .footer-sep { color: rgba(120,154,181,0.4); }
+
+    .hint { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; font-style: italic; }
+
+    @media (max-width: 620px) { .form-grid { grid-column: 1fr; } .check-grid { grid-template-columns: 1fr; } .submit-row { flex-direction: column; align-items: stretch; } .btn-submit { text-align: center; } .rating-group { flex-direction: column; align-items: flex-start; } .rating-options { margin: 0.5rem 0; } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="https://www.videar.tech/home">VIDEAR</a>
+    <a class="back-link" href="https://www.videar.tech/home">Back to site</a>
+  </header>
+
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Newhaven – Brighton – Shoreham Corridor</p>
+      <h1>Coastal Safety <span>Feasibility</span> Input</h1>
+    </div>
+  </div>
+
+  <main>
+
+    <div id="formSection">
+      <div class="intro-card">
+        <p>Thank you for taking a few minutes to share your perspective. We're exploring a local coastal safety initiative focused on improving visibility of coastal users — including sailing, paddle, swimming, wind and aerial activity — in a live rescue context using just a phone.</p>
+        <p>This is being shaped with input from RNLI stakeholders and local communities. Your input will help sense check the concept and understand how people are currently operating along the coast, particularly following the closure of SafeTrx. There is no commitment at this stage.</p>
+        <p>The questions should take around <strong>5 minutes</strong> to complete.</p>
+      </div>
+
+      <div class="error-banner" id="errorBanner">Please complete all required fields before submitting.</div>
+
+      <form id="feasibilityForm" novalidate>
+
+        <!-- SECTION 1: About You -->
+        <div class="form-card">
+          <p class="section-label">About You</p>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="field-label" for="orgName">Organisation / Club Name *</label>
+              <input type="text" id="orgName" placeholder="e.g. Newhaven Sailing Club, Brighton SUP Club…" required />
+            </div>
+            <div class="form-group full">
+              <label class="field-label">Type of activity your members engage in — select all that apply *</label>
+              <div class="check-grid">
+                <label class="check-label"><input type="checkbox" class="activity" value="Sailing" /> Sailing</label>
+                <label class="check-label"><input type="checkbox" class="activity" value="SUP / Paddle" /> SUP / Paddle</label>
+                <label class="check-label"><input type="checkbox" class="activity" value="Kayak / Canoe" /> Kayak / Canoe</label>
+                <label class="check-label"><input type="checkbox" class="activity" value="Rowing" /> Rowing</label>
+                <label class="check-label"><input type="checkbox" class="activity" value="Swimming / Open water" /> Swimming / Open water</label>
+                <label class="check-label"><input type="checkbox" class="activity" value="Kitesurfing / Windsurfing" /> Kitesurfing / Windsurfing</label>
+                <label class="check-label"><input type="checkbox" class="activity" value="Paragliding / Paramotor / Gliding" /> Paragliding / Paramotor / Gliding</label>
+                <label class="check-label"><input type="checkbox" class="activity" value="Angling" /> Angling</label>
+                <label class="check-label"><input type="checkbox" class="activity" value="Other" /> Other</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: How You Operate -->
+        <div class="form-card">
+          <p class="section-label">How You Operate</p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="field-label">How often are your members active? *</label>
+              <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="frequency" value="Daily" required /> Daily</label>
+                <label class="radio-label"><input type="radio" name="frequency" value="Weekly" /> Weekly</label>
+                <label class="radio-label"><input type="radio" name="frequency" value="Occasional" /> Occasional</label>
+                <label class="radio-label"><input type="radio" name="frequency" value="Seasonal" /> Seasonal</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="field-label">Main environments — select all that apply *</label>
+              <div style="display:flex;flex-direction:column;gap:0.45rem;margin-top:0.3rem;">
+                <label class="check-label"><input type="checkbox" class="environment" value="Open sea" /> Open sea</label>
+                <label class="check-label"><input type="checkbox" class="environment" value="Harbour / marina" /> Harbour / marina</label>
+                <label class="check-label"><input type="checkbox" class="environment" value="Coastal (near shore)" /> Coastal (near shore)</label>
+                <label class="check-label"><input type="checkbox" class="environment" value="Rivers / estuary" /> Rivers / estuary</label>
+                <label class="check-label"><input type="checkbox" class="environment" value="Cliffs / aerial launch areas" /> Cliffs / aerial launch areas</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: Safety & Visibility -->
+        <div class="form-card">
+          <p class="section-label">Safety &amp; Visibility</p>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="field-label">Do your members currently use any tracking or safety tools? *</label>
+              <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="tracking" value="Yes (please specify below)" required /> Yes (please specify below)</label>
+                <label class="radio-label"><input type="radio" name="tracking" value="No" /> No</label>
+                <label class="radio-label"><input type="radio" name="tracking" value="Not sure" /> Not sure</label>
+              </div>
+            </div>
+            <div class="form-group full" id="toolsRow" style="display:none;">
+              <label class="field-label" for="toolsUsed">If Yes — please specify the tools used</label>
+              <input type="text" id="toolsUsed" placeholder="e.g. VHF radio, PLB, Garmin inReach…" />
+            </div>
+            <div class="form-group full">
+              <label class="field-label">Since SafeTrx closed, have your members replaced it with an alternative? *</label>
+              <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="safetrx" value="Yes" required /> Yes</label>
+                <label class="radio-label"><input type="radio" name="safetrx" value="No" /> No</label>
+                <label class="radio-label"><input type="radio" name="safetrx" value="Partially" /> Partially</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="field-label">How easy is it currently to locate a member in difficulty? *</label>
+              <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="locateEase" value="Very easy" required /> Very easy</label>
+                <label class="radio-label"><input type="radio" name="locateEase" value="Manageable" /> Manageable</label>
+                <label class="radio-label"><input type="radio" name="locateEase" value="Difficult" /> Difficult</label>
+                <label class="radio-label"><input type="radio" name="locateEase" value="Very difficult" /> Very difficult</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="field-label">How significant is the current gap in visibility / tracking? *</label>
+              <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="gap" value="Significant gap" required /> Significant gap</label>
+                <label class="radio-label"><input type="radio" name="gap" value="Some gap" /> Some gap</label>
+                <label class="radio-label"><input type="radio" name="gap" value="Minimal gap" /> Minimal gap</label>
+                <label class="radio-label"><input type="radio" name="gap" value="Not sure" /> Not sure</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 4: Your View -->
+        <div class="form-card">
+          <p class="section-label">Your View</p>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="field-label">If a simple phone-based system could improve rescue visibility, how useful would that be? *</label>
+              <p class="hint">Rate from 1 (not useful) to 5 (very useful)</p>
+              <div class="rating-group" style="margin-top:0.8rem;">
+                <span class="rating-label-text">Not useful</span>
+                <div class="rating-options">
+                  <label class="rating-option"><input type="radio" name="useful" value="1" required /><div class="rating-btn">1</div></label>
+                  <label class="rating-option"><input type="radio" name="useful" value="2" /><div class="rating-btn">2</div></label>
+                  <label class="rating-option"><input type="radio" name="useful" value="3" /><div class="rating-btn">3</div></label>
+                  <label class="rating-option"><input type="radio" name="useful" value="4" /><div class="rating-btn">4</div></label>
+                  <label class="rating-option"><input type="radio" name="useful" value="5" /><div class="rating-btn">5</div></label>
+                </div>
+                <span class="rating-label-text">Very useful</span>
+              </div>
+            </div>
+            <div class="form-group full">
+              <label class="field-label">Would you / your organisation be open to being involved in an early pilot or feasibility study? *</label>
+              <div class="radio-group" style="flex-direction:row;flex-wrap:wrap;gap:1rem;margin-top:0.5rem;">
+                <label class="radio-label"><input type="radio" name="pilot" value="Yes" required /> Yes</label>
+                <label class="radio-label"><input type="radio" name="pilot" value="Maybe" /> Maybe</label>
+                <label class="radio-label"><input type="radio" name="pilot" value="No" /> No</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 5: Optional -->
+        <div class="form-card">
+          <p class="section-label">Optional</p>
+          <div class="form-group">
+            <label class="field-label" for="thoughts">Any thoughts, concerns, or specific needs we should be aware of?</label>
+            <textarea id="thoughts" placeholder="Tell us about challenges you face, concerns about the concept, or ways CPAS could help your members…"></textarea>
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <p class="privacy-note">Your response is used solely to shape the CPAS feasibility study and inform our STA grant application. We do not sell or share your data. If helpful, SR may follow up for a short conversation.</p>
+          <button type="submit" class="btn-submit" id="submitBtn">Submit Input →</button>
+        </div>
+
+      </form>
+
+      <!-- SUCCESS PAGE -->
+      <div class="success-page" id="successSection">
+        <div class="tick">✓</div>
+        <h2>Thank You</h2>
+        <p>Your input has been received and will directly help shape the CPAS coastal safety feasibility study across the <strong>Newhaven–Worthing corridor</strong>.</p>
+        <p style="margin-top:0.8rem;">If you're open to a follow-up conversation, we'll be in touch shortly.</p>
+        <div class="redirect-note">
+          Returning to <a href="https://www.videar.tech/home" id="homeLink">videar.tech</a> in <span class="countdown" id="countdown">8</span> seconds…
+          <div class="progress-bar"><div class="progress-fill"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <span>© VIDEAR 2026</span>
+    <span class="footer-sep">|</span>
+    <span>UK Patent GB2629638B</span>
+    <span class="footer-sep">|</span>
+    <a href="https://www.videar.tech/home/team">Contact Us</a>
+    <span class="footer-sep">|</span>
+    <a href="https://www.videar.tech/home">videar.tech</a>
+  </footer>
+
+  <script>
+    const FORM_URL = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSc94fYl7ZLqjX5O2nVL18_nYAuxzOhHBXWpmt4zYz7yqHnb0A/formResponse';
+    const HOME = 'https://www.videar.tech/home';
+
+    // Show/hide tools field based on tracking answer
+    document.querySelectorAll('input[name="tracking"]').forEach(r => {
+      r.addEventListener('change', () => {
+        document.getElementById('toolsRow').style.display =
+          r.value === 'Yes (please specify below)' && r.checked ? 'block' : 'none';
+        if (r.value !== 'Yes (please specify below)') document.getElementById('toolsUsed').value = '';
+      });
+    });
+
+    document.getElementById('feasibilityForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const errorBanner = document.getElementById('errorBanner');
+      errorBanner.style.display = 'none';
+
+      const orgName     = document.getElementById('orgName').value.trim();
+      const activities  = Array.from(document.querySelectorAll('.activity:checked'));
+      const frequency   = document.querySelector('input[name="frequency"]:checked');
+      const environments = Array.from(document.querySelectorAll('.environment:checked'));
+      const tracking    = document.querySelector('input[name="tracking"]:checked');
+      const safetrx     = document.querySelector('input[name="safetrx"]:checked');
+      const locateEase  = document.querySelector('input[name="locateEase"]:checked');
+      const gap         = document.querySelector('input[name="gap"]:checked');
+      const useful      = document.querySelector('input[name="useful"]:checked');
+      const pilot       = document.querySelector('input[name="pilot"]:checked');
+
+      if (!orgName || activities.length === 0 || !frequency || environments.length === 0 ||
+          !tracking || !safetrx || !locateEase || !gap || !useful || !pilot) {
+        errorBanner.style.display = 'block';
+        errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+
+      const fd = new FormData();
+      fd.append('entry.22462805', orgName);
+      activities.forEach(cb => fd.append('entry.1166740878', cb.value));
+      fd.append('entry.543328366', frequency.value);
+      environments.forEach(cb => fd.append('entry.778555005', cb.value));
+      fd.append('entry.281020643', tracking.value);
+      const tools = document.getElementById('toolsUsed').value.trim();
+      if (tools) fd.append('entry.916717192', tools);
+      fd.append('entry.1730096947', safetrx.value);
+      fd.append('entry.1876920299', locateEase.value);
+      fd.append('entry.1897410863', gap.value);
+      fd.append('entry.949416111', useful.value);
+      fd.append('entry.1094416762', pilot.value);
+      const thoughts = document.getElementById('thoughts').value.trim();
+      if (thoughts) fd.append('entry.1172022680', thoughts);
+
+      try {
+        await fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: fd });
+      } catch(err) { /* no-cors expected */ }
+
+      document.getElementById('feasibilityForm').style.display = 'none';
+      const success = document.getElementById('successSection');
+      success.style.display = 'flex';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      let seconds = 8;
+      const countdownEl = document.getElementById('countdown');
+      const timer = setInterval(() => {
+        seconds--;
+        countdownEl.textContent = seconds;
+        if (seconds <= 0) { clearInterval(timer); window.location.href = HOME; }
+      }, 1000);
+      document.getElementById('homeLink').addEventListener('click', () => clearInterval(timer));
+    });
+  </script>
+
+</body>
+</html>
