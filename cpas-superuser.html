@@ -90,17 +90,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 /* MAP */
 #map-wrap{grid-column:2;grid-row:2;position:relative;}
 #lmap{width:100%;height:100%;}
-.leaflet-container{background:#080c10!important;}
-.leaflet-control-zoom{border:1px solid var(--border)!important;border-radius:0!important;}
-.leaflet-control-zoom a{background:var(--panel)!important;color:var(--text)!important;border-color:var(--border)!important;font-family:'Share Tech Mono',monospace!important;}
-.leaflet-control-zoom a:hover{background:var(--border)!important;color:#fff!important;}
-.leaflet-control-attribution{background:rgba(8,12,16,.7)!important;color:var(--dim)!important;font-size:8px!important;}
-.leaflet-control-attribution a{color:var(--dim)!important;}
+.mapboxgl-canvas{outline:none;}
+.mapboxgl-ctrl-group{background:var(--panel)!important;border:1px solid var(--border)!important;border-radius:0!important;}
+.mapboxgl-ctrl-group button{background:var(--panel)!important;border-color:var(--border)!important;}
+.mapboxgl-ctrl-group button:hover{background:var(--border)!important;}
+.mapboxgl-ctrl-group button span{filter:invert(1) brightness(.6);}
+.mapboxgl-ctrl-attrib{background:rgba(8,12,16,.7)!important;color:var(--dim)!important;font-size:8px!important;}
+.mapboxgl-ctrl-attrib a{color:var(--dim)!important;}
+.mapboxgl-ctrl-attrib-button{display:none!important;}
 #oc{position:absolute;top:0;left:0;pointer-events:none;z-index:500;}
 
 #compass{position:absolute;top:14px;right:14px;z-index:600;width:76px;height:76px;background:rgba(8,12,16,.9);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;}
-#vmode{position:absolute;top:14px;left:14px;z-index:600;display:flex;gap:4px;}
-.vmb{padding:5px 10px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;font-weight:600;text-transform:uppercase;border:1px solid var(--border);background:rgba(8,12,16,.88);color:var(--dim);cursor:pointer;transition:all .15s;}
+#vmode{position:absolute;top:14px;left:14px;z-index:600;display:flex;gap:3px;flex-wrap:nowrap;}
+.vmb{padding:5px 8px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;font-weight:600;text-transform:uppercase;border:1px solid var(--border);background:rgba(8,12,16,.88);color:var(--dim);cursor:pointer;transition:all .15s;}
 .vmb.active{color:var(--accent);border-color:var(--accent);background:rgba(0,212,255,.1);}
 .vmb:hover{color:var(--text);}
 #coords{position:absolute;bottom:10px;left:10px;z-index:600;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);background:rgba(8,12,16,.8);border:1px solid var(--border);padding:3px 8px;}
@@ -111,7 +113,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
 #sct{position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:601;width:18px;height:60px;background:rgba(0,212,255,.12);border:1px solid var(--border);border-right:none;cursor:pointer;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;font-family:'Barlow Condensed',sans-serif;font-size:8px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;transition:background .15s;}
 #sct:hover{background:rgba(0,212,255,.25);color:var(--accent);}
-#scp{position:absolute;right:0;top:0;bottom:0;width:180px;background:rgba(8,12,16,.97);border-left:1px solid var(--border);transform:translateX(100%);transition:transform .3s;padding:14px;z-index:600;display:flex;flex-direction:column;}
+#scp{position:absolute;right:0;top:0;bottom:0;width:180px;background:rgba(8,12,16,.97);border-left:1px solid var(--border);transform:translateX(100%);transition:transform .3s;padding:14px;z-index:600;display:flex;flex-direction:column;} #scp.open{transform:translateX(0);}
 #scp.open{transform:translateX(0);}
 .sct2{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
 .scb{width:100%;padding:8px 10px;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;margin-bottom:5px;transition:all .15s;}
@@ -153,7 +155,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .sk{color:var(--dim);letter-spacing:1px;}.sv{color:var(--text);letter-spacing:1px;}.slv{color:var(--green);}
 .sr{margin-left:auto;padding:0 14px;}
 
-#pitch-control{position:absolute;top:52px;left:14px;z-index:600;background:rgba(8,12,16,.88);border:1px solid var(--border);padding:8px 10px;display:flex;flex-direction:column;align-items:center;}
+#pitch-control{position:absolute;top:52px;left:14px;z-index:600;background:rgba(8,12,16,.88);border:1px solid var(--border);padding:6px 10px;display:flex;flex-direction:row;align-items:center;gap:8px;}
 #toast{position:fixed;bottom:44px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);color:var(--text);padding:7px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
@@ -194,6 +196,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     <div class="sp ai"><div class="sd"></div>AIS</div>
     <div id="utc">00:00:00 UTC</div>
     <div id="pat">Patent GB2629638B</div>
+  <button id="daynight-btn" onclick="toggleDayNight()" style="margin-left:8px;padding:4px 12px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:pointer;transition:all .2s;" title="Toggle Day/Night">🌙 NIGHT</button>
   </div>
 </div>
 
@@ -350,48 +353,8 @@ map.addControl(new mapboxgl.NavigationControl({showCompass:false}), 'top-right')
 
 // Terrain + 3D buildings added once style loads
 map.on('load', () => {
-  // Add terrain source for real elevation
-  map.addSource('mapbox-dem', {
-    type: 'raster-dem',
-    url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-    tileSize: 512,
-    maxzoom: 14,
-  });
-  map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
-
-  // 3D buildings layer
-  map.addLayer({
-    id: 'cpas-3d-buildings',
-    source: 'composite',
-    'source-layer': 'building',
-    filter: ['==', 'extrude', 'true'],
-    type: 'fill-extrusion',
-    minzoom: 13,
-    paint: {
-      'fill-extrusion-color': '#0d1f2d',
-      'fill-extrusion-height': ['get', 'height'],
-      'fill-extrusion-base': ['get', 'min_height'],
-      'fill-extrusion-opacity': 0.8,
-    },
-  });
-
-  // Corridor boundary lines
-  map.addSource('corridor', {
-    type: 'geojson',
-    data: {
-      type: 'FeatureCollection',
-      features: [
-        { type:'Feature', geometry:{ type:'LineString', coordinates:[[-0.056,50.750],[-0.056,50.830]] }, properties:{} },
-        { type:'Feature', geometry:{ type:'LineString', coordinates:[[ 0.005,50.750],[ 0.005,50.830]] }, properties:{} },
-      ]
-    }
-  });
-  map.addLayer({
-    id: 'corridor-lines',
-    type: 'line',
-    source: 'corridor',
-    paint: { 'line-color':'#00d4ff', 'line-opacity':0.15, 'line-width':1, 'line-dasharray':[4,4] }
-  });
+  // Add terrain, buildings, corridor
+  addTerrainAndBuildings();
 
   // Initialise target markers once map is ready
   createMkrs();
@@ -469,6 +432,7 @@ const TDEFS=[
 
 let targets=TDEFS.map(t=>({...t,trail:[],vlon:t.id==='KAYAK-01'?0:(Math.random()-.5)*0.00003,vlat:t.id==='KAYAK-01'?0:(Math.random()-.5)*0.00002,mobileLive:false}));
 let mkrs={},selId=null,simT=0,lastT=null,totalP=326;
+let isDayMode=false;
 let pulseCircles=[];
 let nameplates={};
 let nameplateLayers={};
@@ -795,7 +759,12 @@ function setView(mode){
     document.getElementById('pitch-val').textContent='55°';
   } else if(mode==='sat'){
     map.setStyle('mapbox://styles/mapbox/satellite-streets-v12');
-    map.once('styledata',()=>{ map.easeTo({center:[-0.032,50.808],zoom:13,pitch:45,bearing:0,duration:1000}); });
+    map.once('styledata',()=>{
+      map.easeTo({center:[-0.032,50.808],zoom:13,pitch:45,bearing:0,duration:1000});
+      addTerrainAndBuildings();
+      Object.values(mkrs).forEach(entry=>entry.marker.addTo(map));
+      updNameplates();
+    });
     document.getElementById('pitch-slider').value=45;
     document.getElementById('pitch-val').textContent='45°';
   } else if(mode==='chase'){
@@ -916,6 +885,88 @@ function busHighlight(id){
   locatePulse(t);
   drawOC();
   if(selId===id) updPanel();
+}
+
+
+// ── DAY / NIGHT TOGGLE ──
+function toggleDayNight(){
+  isDayMode = !isDayMode;
+  const btn = document.getElementById('daynight-btn');
+
+  if(isDayMode){
+    // Switch to Mapbox Light / Outdoors style — coastal detail, daylight look
+    map.setStyle('mapbox://styles/mapbox/outdoors-v12');
+    btn.textContent = '☀ DAY';
+    btn.style.color = '#ffcc44';
+    btn.style.borderColor = '#ffcc4440';
+    // Re-add terrain and buildings after style swap
+    map.once('styledata', () => {
+      addTerrainAndBuildings();
+      // Redraw markers since style wipe removes them
+      Object.values(mkrs).forEach(entry => {
+        entry.marker.addTo(map);
+      });
+      updNameplates();
+    });
+  } else {
+    // Back to dark ops
+    map.setStyle('mapbox://styles/mapbox/dark-v11');
+    btn.textContent = '🌙 NIGHT';
+    btn.style.color = '';
+    btn.style.borderColor = '';
+    map.once('styledata', () => {
+      addTerrainAndBuildings();
+      Object.values(mkrs).forEach(entry => {
+        entry.marker.addTo(map);
+      });
+      updNameplates();
+    });
+  }
+}
+
+// Extract terrain+buildings setup so it can be re-called after style swap
+function addTerrainAndBuildings(){
+  if(map.getSource('mapbox-dem')) return; // already added
+  map.addSource('mapbox-dem', {
+    type: 'raster-dem',
+    url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+    tileSize: 512, maxzoom: 14,
+  });
+  map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+
+  if(!map.getLayer('cpas-3d-buildings')){
+    map.addLayer({
+      id: 'cpas-3d-buildings',
+      source: 'composite',
+      'source-layer': 'building',
+      filter: ['==', 'extrude', 'true'],
+      type: 'fill-extrusion',
+      minzoom: 13,
+      paint: {
+        'fill-extrusion-color': isDayMode ? '#c8b89a' : '#0d1f2d',
+        'fill-extrusion-height': ['get', 'height'],
+        'fill-extrusion-base': ['get', 'min_height'],
+        'fill-extrusion-opacity': isDayMode ? 0.7 : 0.8,
+      },
+    });
+  }
+
+  if(!map.getSource('corridor')){
+    map.addSource('corridor', {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [
+          { type:'Feature', geometry:{ type:'LineString', coordinates:[[-0.056,50.750],[-0.056,50.830]] }, properties:{} },
+          { type:'Feature', geometry:{ type:'LineString', coordinates:[[ 0.005,50.750],[ 0.005,50.830]] }, properties:{} },
+        ]
+      }
+    });
+    map.addLayer({
+      id: 'corridor-lines', type: 'line', source: 'corridor',
+      paint: { 'line-color':'#00d4ff', 'line-opacity':isDayMode?0.4:0.15, 'line-width':1, 'line-dasharray':[4,4] }
+    });
+  }
 }
 
 // Loop
