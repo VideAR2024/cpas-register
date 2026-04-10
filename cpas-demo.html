@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIDEAR CPAS — Live Corridor Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700;900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #050a0f;
+    --surface:   #0a1520;
+    --panel:     #0d1e2e;
+    --border:    #1a3a52;
+    --accent:    #00d4ff;
+    --accent2:   #ff6b35;
+    --green:     #00ff88;
+    --red:       #ff2244;
+    --amber:     #ffaa00;
+    --text:      #c8dde8;
+    --muted:     #4a7a96;
+    --white:     #ffffff;
+    --ferry:     #ffaa00;
+    --paramotor: #00d4ff;
+    --dark:      #ff2244;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── SCANLINE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,212,255,0.015) 2px,
+      rgba(0,212,255,0.015) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .logo-block { display: flex; align-items: center; gap: 16px; }
+
+  .logo-mark {
+    width: 42px; height: 42px;
+    border: 2px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    clip-path: polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%);
+    background: rgba(0,212,255,0.08);
+  }
+
+  .logo-mark span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 15px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  .logo-text h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: 4px;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .logo-text p {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,255,136,0.08);
+    border: 1px solid rgba(0,255,136,0.3);
+    padding: 6px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--green);
+  }
+
+  .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse-green 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-green {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.6); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+  }
+
+  .patent-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* ── CORRIDOR BANNER ── */
+  .corridor-banner {
+    background: linear-gradient(135deg, rgba(0,212,255,0.06), rgba(0,10,20,0));
+    border-bottom: 1px solid var(--border);
+    padding: 10px 28px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .corridor-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .corridor-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+
+  .corridor-stats {
+    display: flex;
+    gap: 24px;
+    margin-left: auto;
+  }
+
+  .cstat {
+    text-align: right;
+  }
+
+  .cstat-val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--white);
+  }
+
+  .cstat-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .main {
+    display: grid;
+    grid-template-columns: 320px 1fr 280px;
+    grid-template-rows: 1fr auto;
+    height: calc(100vh - 120px);
+    gap: 0;
+  }
+
+  /* ── LEFT PANEL ── */
+  .left-panel {
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .panel-section {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 20px;
+  }
+
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Target Cards */
+  .target-card {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    padding: 14px;
+    margin-bottom: 10px;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+
+  .target-card:last-child { margin-bottom: 0; }
+
+  .target-card.cpas { border-left: 3px solid var(--paramotor); }
+  .target-card.ais  { border-left: 3px solid var(--ferry); }
+  .target-card.dark { border-left: 3px solid var(--dark); opacity: 0.6; }
+
+  .target-card.active { border-color: rgba(0,212,255,0.4); }
+
+  .target-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .target-type {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 2px 7px;
+    text-transform: uppercase;
+  }
+
+  .type-cpas  { background: rgba(0,212,255,0.15); color: var(--paramotor); border: 1px solid rgba(0,212,255,0.3); }
+  .type-ais   { background: rgba(255,170,0,0.12); color: var(--ferry);     border: 1px solid rgba(255,170,0,0.3); }
+  .type-dark  { background: rgba(255,34,68,0.12);  color: var(--dark);      border: 1px solid rgba(255,34,68,0.3); }
+
+  .target-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--white);
+    letter-spacing: 1px;
+  }
+
+  .target-data {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .tdata {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tdata-val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    color: var(--white);
+  }
+
+  .tdata-label {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .dark-notice {
+    font-size: 10px;
+    color: var(--dark);
+    letter-spacing: 1px;
+    margin-top: 6px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* Alert */
+  .alert-box {
+    background: rgba(255,34,68,0.08);
+    border: 1px solid rgba(255,34,68,0.3);
+    padding: 10px 12px;
+    margin-top: 10px;
+    animation: alert-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes alert-pulse {
+    0%, 100% { border-color: rgba(255,34,68,0.3); }
+    50% { border-color: rgba(255,34,68,0.8); background: rgba(255,34,68,0.15); }
+  }
+
+  .alert-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--red);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  .alert-body {
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* Ping feed */
+  .ping-feed {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 2;
+    max-height: 140px;
+    overflow: hidden;
+  }
+
+  .ping-line { 
+    display: flex; 
+    gap: 8px; 
+    animation: fade-in 0.3s ease;
+  }
+  
+  @keyframes fade-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; } }
+
+  .ping-line .ts { color: var(--accent); }
+  .ping-line .msg { color: var(--text); }
+  .ping-line.sos { color: var(--red); }
+
+  /* ── MAP AREA ── */
+  .map-area {
+    position: relative;
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  canvas#map {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Map overlays */
+  .map-overlay-tl {
+    position: absolute;
+    top: 16px; left: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .map-label {
+    background: rgba(5,10,15,0.85);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    backdrop-filter: blur(4px);
+  }
+
+  .map-overlay-br {
+    position: absolute;
+    bottom: 16px; right: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .scale-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+  }
+
+  .scale-line {
+    width: 60px;
+    height: 2px;
+    background: var(--muted);
+    position: relative;
+  }
+
+  .scale-line::before, .scale-line::after {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 6px;
+    background: var(--muted);
+    top: -2px;
+  }
+
+  .scale-line::before { left: 0; }
+  .scale-line::after  { right: 0; }
+
+  /* CPA Warning overlay */
+  .cpa-warning {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255,34,68,0.12);
+    border: 2px solid var(--red);
+    padding: 20px 32px;
+    text-align: center;
+    display: none;
+    backdrop-filter: blur(8px);
+  }
+
+  .cpa-warning.visible { display: block; animation: warning-in 0.3s ease; }
+
+  @keyframes warning-in {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+
+  .cpa-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--red);
+    letter-spacing: 4px;
+    animation: flicker 0.8s ease-in-out infinite;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .cpa-body {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+
+  /* Legend */
+  .map-legend {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(5,10,15,0.85);
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    backdrop-filter: blur(4px);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 11px;
+    color: var(--text);
+  }
+
+  .legend-item:last-child { margin-bottom: 0; }
+
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .legend-line {
+    width: 20px; height: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  /* Mission timer */
+  .mission-timer {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    background: rgba(0,0,0,0.2);
+  }
+
+  .timer-label {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .timer-display {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 38px;
+    color: var(--green);
+    letter-spacing: 4px;
+    line-height: 1;
+    text-shadow: 0 0 20px rgba(0,255,136,0.4);
+  }
+
+  .timer-sub {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* Stats grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-cell {
+    background: var(--panel);
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 22px;
+    color: var(--white);
+    display: block;
+    line-height: 1;
+  }
+
+  .stat-val.accent { color: var(--accent); }
+  .stat-val.amber  { color: var(--amber); }
+  .stat-val.green  { color: var(--green); }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* Altitude graph */
+  .alt-graph-wrap {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  canvas#altGraph {
+    width: 100%;
+    height: 80px;
+    display: block;
+  }
+
+  /* Soft ADS-B panel */
+  .soft-adsb {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .adsb-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(26,58,82,0.5);
+    font-size: 12px;
+  }
+
+  .adsb-row:last-child { border-bottom: none; }
+
+  .adsb-key { color: var(--muted); letter-spacing: 1px; }
+  .adsb-val { font-family: 'Share Tech Mono', monospace; color: var(--white); }
+  .adsb-val.ok  { color: var(--green); }
+  .adsb-val.warn { color: var(--amber); }
+  .adsb-val.bad  { color: var(--red); }
+
+  /* Network status */
+  .net-status {
+    padding: 16px 20px;
+  }
+
+  .net-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .net-icon {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .net-info { flex: 1; }
+  .net-name { font-size: 12px; color: var(--white); font-weight: 600; }
+  .net-detail { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+
+  .net-status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  .dot-ok  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .dot-off { background: var(--muted); }
+
+  /* ── BOTTOM BAR ── */
+  .bottom-bar {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 10px 28px;
+    gap: 32px;
+  }
+
+  .bottom-bar::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .bb-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bb-val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 16px;
+    color: var(--white);
+  }
+
+  .bb-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .bb-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--border);
+  }
+
+  .bb-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .patent-notice {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  /* ── DEMO CONTROLS ── */
+  .demo-controls {
+    position: fixed;
+    top: 80px;
+    right: 0;
+    background: rgba(10,21,32,0.95);
+    border: 1px solid var(--border);
+    border-right: none;
+    padding: 14px;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    width: 180px;
+    transform: translateX(140px);
+    transition: transform 0.3s ease;
+  }
+
+  .demo-controls:hover { transform: translateX(0); }
+
+  .demo-controls-tab {
+    position: absolute;
+    left: -36px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    white-space: nowrap;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+
+  .ctrl-title {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .ctrl-btn {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.25);
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover {
+    background: rgba(0,212,255,0.18);
+    border-color: var(--accent);
+  }
+
+  .ctrl-btn.red {
+    background: rgba(255,34,68,0.08);
+    border-color: rgba(255,34,68,0.25);
+    color: var(--red);
+  }
+
+  .ctrl-btn.red:hover {
+    background: rgba(255,34,68,0.18);
+    border-color: var(--red);
+  }
+
+  .ctrl-btn.amber {
+    background: rgba(255,170,0,0.08);
+    border-color: rgba(255,170,0,0.25);
+    color: var(--amber);
+  }
+
+  /* ── TOOLTIP ── */
+  .tooltip {
+    position: absolute;
+    background: rgba(5,10,15,0.95);
+    border: 1px solid var(--accent);
+    padding: 10px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text);
+    pointer-events: none;
+    z-index: 200;
+    display: none;
+    min-width: 160px;
+    line-height: 1.8;
+    letter-spacing: 1px;
+  }
+
+  .tooltip-title {
+    color: var(--accent);
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .main {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 400px auto auto auto;
+      height: auto;
+    }
+    .left-panel, .right-panel { border: none; border-bottom: 1px solid var(--border); }
+    .corridor-stats { display: none; }
+    .demo-controls { display: none; }
+    .bottom-bar { flex-wrap: wrap; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-block">
+    <div class="logo-mark"><span>VDR</span></div>
+    <div class="logo-text">
+      <h1>VIDEAR</h1>
+      <p>Common Position Awareness System</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      LIVE DEMO
+    </div>
+    <div class="patent-tag">Patent GB2629638B</div>
+  </div>
+</header>
+
+<!-- CORRIDOR BANNER -->
+<div class="corridor-banner">
+  <div>
+    <div class="corridor-label">Active Corridor</div>
+    <div class="corridor-name">NEWHAVEN → SHOREHAM · EAST SUSSEX</div>
+  </div>
+  <div class="corridor-stats">
+    <div class="cstat">
+      <div class="cstat-val" id="activeCount">3</div>
+      <div class="cstat-label">Active Targets</div>
+    </div>
+    <div class="cstat">
+      <div class="cstat-val">14km</div>
+      <div class="cstat-label">Corridor Length</div>
+    </div>
+    <div class="cstat">
+      <div class="cstat-val" id="totalPings">0</div>
+      <div class="cstat-label">Total Pings</div>
+    </div>
+    <div class="cstat">
+      <div class="cstat-val" id="lastPing">—</div>
+      <div class="cstat-label">Last Ping</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <div class="panel-section">
+      <div class="section-title">CPAS Targets</div>
+
+      <!-- Paramotor -->
+      <div class="target-card cpas active">
+        <div class="target-header">
+          <span class="target-type type-cpas">CPAS · PARAMOTOR</span>
+          <div class="live-dot"></div>
+        </div>
+        <div class="target-name">PILOT ALPHA-1</div>
+        <div style="height:8px"></div>
+        <div class="target-data">
+          <div class="tdata">
+            <span class="tdata-val" id="pm-alt">—</span>
+            <span class="tdata-label">ALT (GNSS)</span>
+          </div>
+          <div class="tdata">
+            <span class="tdata-val" id="pm-spd">—</span>
+            <span class="tdata-label">SPEED</span>
+          </div>
+          <div class="tdata">
+            <span class="tdata-val" id="pm-hdg">—</span>
+            <span class="tdata-label">HEADING</span>
+          </div>
+          <div class="tdata">
+            <span class="tdata-val" id="pm-acc">—</span>
+            <span class="tdata-label">GPS ACC</span>
+          </div>
+        </div>
+        <div id="cpa-alert-box" class="alert-box" style="display:none">
+          <div class="alert-title">⚠ CPA ALERT — SOFT ADS-B IN</div>
+          <div class="alert-body" id="cpa-alert-text">Proximity threshold exceeded</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-title">AIS Targets</div>
+
+      <!-- Ferry -->
+      <div class="target-card ais">
+        <div class="target-header">
+          <span class="target-type type-ais">AIS · VESSEL</span>
+        </div>
+        <div class="target-name">MV NEWHAVEN</div>
+        <div style="height:8px"></div>
+        <div class="target-data">
+          <div class="tdata">
+            <span class="tdata-val" id="fv-spd">—</span>
+            <span class="tdata-label">SPEED</span>
+          </div>
+          <div class="tdata">
+            <span class="tdata-val" id="fv-hdg">—</span>
+            <span class="tdata-label">HEADING</span>
+          </div>
+          <div class="tdata">
+            <span class="tdata-val" id="fv-type">FERRY</span>
+            <span class="tdata-label">VESSEL TYPE</span>
+          </div>
+          <div class="tdata">
+            <span class="tdata-val" id="fv-cpa">—</span>
+            <span class="tdata-label">CPA DIST</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-title">Dark Targets</div>
+
+      <!-- Dark kayaker -->
+      <div class="target-card dark">
+        <div class="target-header">
+          <span class="target-type type-dark">DARK · UNKNOWN</span>
+        </div>
+        <div class="target-name">UNIDENTIFIED</div>
+        <div class="dark-notice">⬛ NO POSITION DATA</div>
+        <div class="dark-notice">⬛ NO MQTT SIGNAL</div>
+        <div class="dark-notice">⬛ INVISIBLE TO SAR</div>
+        <div style="margin-top:8px; font-size:10px; color: var(--muted); line-height:1.6;">
+          Kayaker operating in corridor without CPAS. Radar blind. This is the Dark Target problem CPAS solves.
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-title">MQTT Ping Feed</div>
+      <div class="ping-feed" id="pingFeed"></div>
+    </div>
+
+  </div>
+
+  <!-- MAP -->
+  <div class="map-area">
+    <canvas id="map"></canvas>
+
+    <div class="map-overlay-tl">
+      <div class="map-label">CESIUM TERRAIN · EA LIDAR 2M RES</div>
+      <div class="map-label">AIS FEED · ACTIVE</div>
+      <div class="map-label" id="zAxisLabel">Z-AXIS · TERRAIN CLAMPED</div>
+    </div>
+
+    <div class="map-legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--paramotor)"></div>
+        CPAS Target (visible)
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--ferry)"></div>
+        AIS Vessel
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--dark); opacity:0.6"></div>
+        Dark Target (invisible)
+      </div>
+      <div class="legend-item">
+        <div class="legend-line" style="background:rgba(0,212,255,0.5)"></div>
+        MQTT Trail
+      </div>
+    </div>
+
+    <div class="map-overlay-br">
+      <div class="scale-bar">
+        <span>0</span>
+        <div class="scale-line"></div>
+        <span>5km</span>
+      </div>
+      <div class="map-label">50.7°N  0.1°W</div>
+    </div>
+
+    <!-- CPA Warning -->
+    <div class="cpa-warning" id="cpaWarning">
+      <div class="cpa-title">⚠ CPA WARNING</div>
+      <div class="cpa-body" id="cpaWarningText">COLLISION COURSE DETECTED</div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip">
+      <div class="tooltip-title" id="tt-title">TARGET</div>
+      <div id="tt-body"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <div class="mission-timer">
+      <div class="timer-label">Mission Elapsed Time</div>
+      <div class="timer-display" id="missionTimer">00:00:00</div>
+      <div class="timer-sub">AUTO SOS ESCALATION · T+04:00:00</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-cell">
+        <span class="stat-val accent" id="stat-pings">0</span>
+        <span class="stat-label">Pings Sent</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-val green" id="stat-alt">—</span>
+        <span class="stat-label">Altitude (m)</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-val" id="stat-spd">—</span>
+        <span class="stat-label">Speed km/h</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-val amber" id="stat-cpa">—</span>
+        <span class="stat-label">CPA (m)</span>
+      </div>
+    </div>
+
+    <div class="alt-graph-wrap">
+      <div class="section-title">Altitude Profile</div>
+      <canvas id="altGraph"></canvas>
+    </div>
+
+    <div class="soft-adsb panel-section">
+      <div class="section-title">Soft ADS-B Status</div>
+      <div class="adsb-row">
+        <span class="adsb-key">OUT (Broadcasting)</span>
+        <span class="adsb-val ok" id="sb-out">ACTIVE</span>
+      </div>
+      <div class="adsb-row">
+        <span class="adsb-key">IN (Receiving)</span>
+        <span class="adsb-val ok" id="sb-in">ACTIVE</span>
+      </div>
+      <div class="adsb-row">
+        <span class="adsb-key">MQTT Broker</span>
+        <span class="adsb-val ok">AWS · CONNECTED</span>
+      </div>
+      <div class="adsb-row">
+        <span class="adsb-key">Terrain Clamp</span>
+        <span class="adsb-val ok">LOCKED · 2M RES</span>
+      </div>
+      <div class="adsb-row">
+        <span class="adsb-key">Session ID</span>
+        <span class="adsb-val" style="font-size:9px">A1-2026-04</span>
+      </div>
+    </div>
+
+    <div class="net-status panel-section">
+      <div class="section-title">Network</div>
+      <div class="net-row">
+        <div class="net-icon">📡</div>
+        <div class="net-info">
+          <div class="net-name">4G LTE</div>
+          <div class="net-detail" id="net-4g-detail">PRIMARY · ACTIVE</div>
+        </div>
+        <div class="net-status-dot dot-ok" id="net-4g-dot"></div>
+      </div>
+      <div class="net-row">
+        <div class="net-icon">🛰</div>
+        <div class="net-info">
+          <div class="net-name">VMO2 Direct-to-Cell</div>
+          <div class="net-detail">STANDBY · READY</div>
+        </div>
+        <div class="net-status-dot dot-off" id="net-sat-dot"></div>
+      </div>
+      <div class="net-row">
+        <div class="net-icon">💾</div>
+        <div class="net-info">
+          <div class="net-name">Local Cache</div>
+          <div class="net-detail" id="net-cache-detail">0 PINGS QUEUED</div>
+        </div>
+        <div class="net-status-dot dot-ok"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="bottom-bar" style="position:relative">
+    <div class="bb-item">
+      <span class="bb-val">NEWHAVEN → SHOREHAM</span>
+      <span class="bb-label">Pilot Corridor</span>
+    </div>
+    <div class="bb-divider"></div>
+    <div class="bb-item">
+      <span class="bb-val" id="bb-session">A1-2026-04-09</span>
+      <span class="bb-label">Session ID</span>
+    </div>
+    <div class="bb-divider"></div>
+    <div class="bb-item">
+      <span class="bb-val" id="bb-seq">—</span>
+      <span class="bb-label">Ping Sequence</span>
+    </div>
+    <div class="bb-divider"></div>
+    <div class="bb-item">
+      <span class="bb-val" id="bb-net">4G</span>
+      <span class="bb-label">Network Mode</span>
+    </div>
+    <div class="bb-divider"></div>
+    <div class="bb-item">
+      <span class="bb-val" id="bb-batt">94%</span>
+      <span class="bb-label">Battery</span>
+    </div>
+    <div class="bb-right">
+      <div class="patent-notice">
+        Patent GB2629638B · VIDEAR Ltd<br>
+        Making the Invisible, Visible
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DEMO CONTROLS -->
+<div class="demo-controls">
+  <div class="demo-controls-tab">DEMO CONTROLS</div>
+  <div class="ctrl-title">Scenario Controls</div>
+  <button class="ctrl-btn" onclick="resetDemo()">↺ RESET FLIGHT</button>
+  <button class="ctrl-btn amber" onclick="triggerCPA()">⚠ TRIGGER CPA</button>
+  <button class="ctrl-btn" onclick="toggleSatellite()">🛰 SATELLITE MODE</button>
+  <button class="ctrl-btn red" onclick="triggerSOS()">🆘 TRIGGER SOS</button>
+  <button class="ctrl-btn" onclick="toggleDarkTarget()">⬛ TOGGLE DARK</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  CPAS DEMO ENGINE
+// ══════════════════════════════════════════════════════
+
+const canvas  = document.getElementById('map');
+const ctx     = canvas.getContext('2d');
+const agCtx   = document.getElementById('altGraph').getContext('2d');
+
+// Corridor geography (normalised 0-1 coordinates)
+// Newhaven (left) → Shoreham (right)
+const CORRIDOR = {
+  newhavenX: 0.05,
+  shorehameX: 0.92,
+  seaY: 0.55,
+  cliffY: 0.42,
+  landY: 0.75,
+};
+
+// ── STATE ──
+let state = {
+  time: 0,
+  pingCount: 0,
+  pingSeq: 0,
+  missionSeconds: 0,
+  altHistory: [],
+  cpaActive: false,
+  sosActive: false,
+  satelliteMode: false,
+  showDark: true,
+  
+  // Paramotor pilot
+  pm: {
+    x: CORRIDOR.newhavenX,
+    y: CORRIDOR.cliffY,
+    alt: 55,
+    speed: 44,
+    heading: 98,
+    progress: 0,  // 0→1 along corridor
+    trail: [],
+    pingTimer: 0,
+  },
+
+  // Ferry vessel
+  ferry: {
+    x: 0.15,
+    y: CORRIDOR.seaY + 0.05,
+    speed: 18,
+    heading: 247,
+    progress: 0,
+    trail: [],
+  },
+
+  // Dark kayaker (static, invisible)
+  dark: {
+    x: 0.55,
+    y: CORRIDOR.seaY + 0.02,
+  },
+};
+
+// Port / landmark positions (normalised)
+const LANDMARKS = [
+  { x: 0.05,  label: 'NEWHAVEN\nPORT',    side: 'top' },
+  { x: 0.40,  label: 'PEACEHAVEN\nCLIFFS', side: 'top' },
+  { x: 0.62,  label: 'BRIGHTON',           side: 'top' },
+  { x: 0.92,  label: 'SHOREHAM\nPORT',     side: 'top' },
+];
+
+// ── RESIZE ──
+function resize() {
+  const mapArea = canvas.parentElement;
+  canvas.width  = mapArea.clientWidth;
+  canvas.height = mapArea.clientHeight;
+  
+  const ag = document.getElementById('altGraph');
+  ag.width  = ag.parentElement.clientWidth - 40;
+  ag.height = 80;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ── COORDINATE HELPERS ──
+function mapX(nx) { return nx * canvas.width; }
+function mapY(ny) { return ny * canvas.height; }
+
+// ── DRAW MAP ──
+function drawMap() {
+  const W = canvas.width;
+  const H = canvas.height;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Sky / atmosphere
+  const sky = ctx.createLinearGradient(0, 0, 0, H * 0.45);
+  sky.addColorStop(0, '#050d1a');
+  sky.addColorStop(1, '#071525');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H * 0.45);
+
+  // Cliff face
+  const cliffTop = H * CORRIDOR.cliffY;
+  const seaStart = H * CORRIDOR.seaY;
+  
+  ctx.fillStyle = '#0c1f14';
+  ctx.beginPath();
+  ctx.moveTo(0, cliffTop);
+  // Undulating cliff line
+  for (let x = 0; x <= W; x += 20) {
+    const t = x / W;
+    const dy = Math.sin(t * Math.PI * 6) * 8 + Math.cos(t * Math.PI * 3) * 5;
+    ctx.lineTo(x, cliffTop + dy);
+  }
+  ctx.lineTo(W, H);
+  ctx.lineTo(0, H);
+  ctx.closePath();
+  ctx.fill();
+
+  // Land stripe
+  const land = ctx.createLinearGradient(0, cliffTop, 0, seaStart);
+  land.addColorStop(0, '#112210');
+  land.addColorStop(1, '#0a1a10');
+  ctx.fillStyle = land;
+  ctx.fillRect(0, cliffTop, W, seaStart - cliffTop);
+
+  // Sea
+  const sea = ctx.createLinearGradient(0, seaStart, 0, H * 0.8);
+  sea.addColorStop(0, '#071a2e');
+  sea.addColorStop(1, '#040f1c');
+  ctx.fillStyle = sea;
+  ctx.fillRect(0, seaStart, W, H - seaStart);
+
+  // Sea shimmer lines
+  ctx.strokeStyle = 'rgba(0,212,255,0.04)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 8; i++) {
+    const sy = seaStart + (i / 8) * (H - seaStart) * 0.6;
+    ctx.beginPath();
+    ctx.moveTo(0, sy + Math.sin(state.time * 0.3 + i) * 3);
+    ctx.lineTo(W, sy + Math.cos(state.time * 0.2 + i) * 3);
+    ctx.stroke();
+  }
+
+  // Cliff edge glow
+  ctx.strokeStyle = 'rgba(0,255,136,0.12)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let x = 0; x <= W; x += 20) {
+    const t = x / W;
+    const dy = Math.sin(t * Math.PI * 6) * 8 + Math.cos(t * Math.PI * 3) * 5;
+    if (x === 0) ctx.moveTo(x, cliffTop + dy);
+    else ctx.lineTo(x, cliffTop + dy);
+  }
+  ctx.stroke();
+
+  // Grid overlay
+  ctx.strokeStyle = 'rgba(0,212,255,0.04)';
+  ctx.lineWidth = 1;
+  const gridSize = 60;
+  for (let x = 0; x < W; x += gridSize) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += gridSize) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Landmarks
+  LANDMARKS.forEach(lm => {
+    const lx = mapX(lm.x);
+    ctx.strokeStyle = 'rgba(74,122,150,0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(lx, 0);
+    ctx.lineTo(lx, H * 0.8);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = 'rgba(74,122,150,0.7)';
+    ctx.font = '9px "Share Tech Mono"';
+    ctx.textAlign = 'center';
+    const lines = lm.label.split('\n');
+    lines.forEach((line, i) => {
+      ctx.fillText(line, lx, 16 + i * 13);
+    });
+  });
+
+  // Rampion wind farm (dots)
+  ctx.fillStyle = 'rgba(255,170,0,0.2)';
+  for (let i = 0; i < 6; i++) {
+    for (let j = 0; j < 3; j++) {
+      ctx.beginPath();
+      ctx.arc(mapX(0.72 + i*0.025), mapY(0.68 + j*0.04), 3, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+  ctx.fillStyle = 'rgba(255,170,0,0.4)';
+  ctx.font = '8px "Share Tech Mono"';
+  ctx.textAlign = 'center';
+  ctx.fillText('RAMPION OWF', mapX(0.82), mapY(0.77));
+
+  // ── FERRY TRAIL ──
+  if (state.ferry.trail.length > 1) {
+    ctx.strokeStyle = 'rgba(255,170,0,0.25)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 5]);
+    ctx.beginPath();
+    state.ferry.trail.forEach((p, i) => {
+      if (i === 0) ctx.moveTo(mapX(p.x), mapY(p.y));
+      else ctx.lineTo(mapX(p.x), mapY(p.y));
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // ── PARAMOTOR TRAIL ──
+  if (state.pm.trail.length > 1) {
+    // Gradient trail
+    for (let i = 1; i < state.pm.trail.length; i++) {
+      const alpha = (i / state.pm.trail.length) * 0.6;
+      ctx.strokeStyle = `rgba(0,212,255,${alpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(mapX(state.pm.trail[i-1].x), mapY(state.pm.trail[i-1].y));
+      ctx.lineTo(mapX(state.pm.trail[i].x), mapY(state.pm.trail[i].y));
+      ctx.stroke();
+    }
+
+    // Ping dots on trail
+    state.pm.trail.forEach((p, i) => {
+      if (i % 8 === 0) {
+        ctx.fillStyle = 'rgba(0,212,255,0.4)';
+        ctx.beginPath();
+        ctx.arc(mapX(p.x), mapY(p.y), 2, 0, Math.PI*2);
+        ctx.fill();
+      }
+    });
+  }
+
+  // ── CPA THREAT ARC ──
+  if (state.cpaActive) {
+    const px = mapX(state.pm.x);
+    const py = mapY(state.pm.y);
+    const radius = 60 + Math.sin(state.time * 3) * 10;
+    const grad = ctx.createRadialGradient(px, py, 0, px, py, radius);
+    grad.addColorStop(0, 'rgba(255,34,68,0)');
+    grad.addColorStop(0.7, 'rgba(255,34,68,0)');
+    grad.addColorStop(1, 'rgba(255,34,68,0.25)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(px, py, radius, 0, Math.PI*2);
+    ctx.fill();
+
+    // CPA line to ferry
+    ctx.strokeStyle = 'rgba(255,34,68,0.5)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(mapX(state.ferry.x), mapY(state.ferry.y));
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // ── FERRY ──
+  drawVessel(mapX(state.ferry.x), mapY(state.ferry.y), state.ferry.heading);
+
+  // ── DARK TARGET ──
+  if (state.showDark) {
+    drawDarkTarget(mapX(state.dark.x), mapY(state.dark.y));
+  }
+
+  // ── PARAMOTOR ──
+  drawParamotor(mapX(state.pm.x), mapY(state.pm.y), state.pm.heading, state.pm.alt);
+
+  // Altitude shadow on ground
+  const shadowX = mapX(state.pm.x);
+  const shadowY = mapY(CORRIDOR.cliffY + 0.02);
+  const shadowR = 8 + state.pm.alt / 40;
+  ctx.fillStyle = 'rgba(0,212,255,0.08)';
+  ctx.beginPath();
+  ctx.ellipse(shadowX, shadowY, shadowR, shadowR * 0.3, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Altitude line
+  ctx.strokeStyle = 'rgba(0,212,255,0.2)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([2, 4]);
+  ctx.beginPath();
+  ctx.moveTo(mapX(state.pm.x), mapY(state.pm.y));
+  ctx.lineTo(shadowX, shadowY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawParamotor(x, y, heading, alt) {
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Glow
+  const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 22);
+  glow.addColorStop(0, 'rgba(0,212,255,0.4)');
+  glow.addColorStop(1, 'rgba(0,212,255,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(0, 0, 22, 0, Math.PI*2);
+  ctx.fill();
+
+  // Icon ring
+  ctx.strokeStyle = 'rgba(0,212,255,0.8)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(0, 0, 10, 0, Math.PI*2);
+  ctx.stroke();
+
+  // Direction tick
+  const rad = (heading - 90) * Math.PI / 180;
+  ctx.strokeStyle = '#00d4ff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(Math.cos(rad) * 14, Math.sin(rad) * 14);
+  ctx.stroke();
+
+  // Centre dot
+  ctx.fillStyle = '#00d4ff';
+  ctx.beginPath();
+  ctx.arc(0, 0, 4, 0, Math.PI*2);
+  ctx.fill();
+
+  // SOS pulse
+  if (state.sosActive) {
+    ctx.strokeStyle = `rgba(255,34,68,${0.5 + Math.sin(state.time * 8) * 0.5})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, 18 + Math.sin(state.time * 4) * 4, 0, Math.PI*2);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+
+  // Label
+  ctx.fillStyle = 'rgba(0,212,255,0.9)';
+  ctx.font = 'bold 10px "Barlow Condensed"';
+  ctx.textAlign = 'left';
+  ctx.fillText(`ALPHA-1  ${alt.toFixed(0)}m`, x + 14, y - 8);
+  ctx.fillStyle = 'rgba(0,212,255,0.5)';
+  ctx.font = '9px "Share Tech Mono"';
+  ctx.fillText(`${(state.pm.speed).toFixed(0)}km/h`, x + 14, y + 4);
+}
+
+function drawVessel(x, y, heading) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate((heading - 90) * Math.PI / 180);
+
+  ctx.fillStyle = 'rgba(255,170,0,0.15)';
+  ctx.strokeStyle = 'rgba(255,170,0,0.8)';
+  ctx.lineWidth = 1.5;
+
+  // Hull shape
+  ctx.beginPath();
+  ctx.moveTo(0, -14);
+  ctx.lineTo(6, -6);
+  ctx.lineTo(6, 8);
+  ctx.lineTo(-6, 8);
+  ctx.lineTo(-6, -6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.restore();
+
+  ctx.fillStyle = 'rgba(255,170,0,0.8)';
+  ctx.font = 'bold 10px "Barlow Condensed"';
+  ctx.textAlign = 'left';
+  ctx.fillText('MV NEWHAVEN', x + 12, y - 4);
+  ctx.fillStyle = 'rgba(255,170,0,0.5)';
+  ctx.font = '9px "Share Tech Mono"';
+  ctx.fillText(`AIS · ${state.ferry.speed}kts`, x + 12, y + 8);
+}
+
+function drawDarkTarget(x, y) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.globalAlpha = 0.35 + Math.sin(state.time * 1.5) * 0.1;
+
+  ctx.strokeStyle = 'rgba(255,34,68,0.5)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([2, 3]);
+  ctx.beginPath();
+  ctx.arc(0, 0, 12, 0, Math.PI*2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = 'rgba(255,34,68,0.3)';
+  ctx.beginPath();
+  ctx.arc(0, 0, 5, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.globalAlpha = 0.5;
+  ctx.fillStyle = '#ff2244';
+  ctx.font = '9px "Share Tech Mono"';
+  ctx.textAlign = 'center';
+  ctx.fillText('DARK', 0, -16);
+  ctx.fillText('KAYAKER', 0, -5);
+
+  ctx.restore();
+}
+
+// ── ALTITUDE GRAPH ──
+function drawAltGraph() {
+  const W = agCtx.canvas.width;
+  const H = agCtx.canvas.height;
+
+  agCtx.clearRect(0, 0, W, H);
+
+  if (state.altHistory.length < 2) return;
+
+  const maxAlt = 180;
+  const minAlt = 0;
+
+  // Cliff reference line
+  agCtx.strokeStyle = 'rgba(0,255,136,0.2)';
+  agCtx.lineWidth = 1;
+  agCtx.setLineDash([3, 5]);
+  const cliffPx = H - (50 / maxAlt) * H;
+  agCtx.beginPath();
+  agCtx.moveTo(0, cliffPx);
+  agCtx.lineTo(W, cliffPx);
+  agCtx.stroke();
+  agCtx.setLineDash([]);
+  agCtx.fillStyle = 'rgba(0,255,136,0.3)';
+  agCtx.font = '8px "Share Tech Mono"';
+  agCtx.textAlign = 'right';
+  agCtx.fillText('CLIFF', W - 2, cliffPx - 2);
+
+  // Altitude fill
+  const maxPoints = 120;
+  const pts = state.altHistory.slice(-maxPoints);
+
+  agCtx.beginPath();
+  pts.forEach((a, i) => {
+    const px = (i / (maxPoints - 1)) * W;
+    const py = H - ((a - minAlt) / (maxAlt - minAlt)) * H;
+    if (i === 0) agCtx.moveTo(px, py);
+    else agCtx.lineTo(px, py);
+  });
+
+  // Fill under line
+  const lastPx = ((pts.length - 1) / (maxPoints - 1)) * W;
+  agCtx.lineTo(lastPx, H);
+  agCtx.lineTo(0, H);
+  agCtx.closePath();
+  agCtx.fillStyle = 'rgba(0,212,255,0.08)';
+  agCtx.fill();
+
+  // Line
+  agCtx.beginPath();
+  pts.forEach((a, i) => {
+    const px = (i / (maxPoints - 1)) * W;
+    const py = H - ((a - minAlt) / (maxAlt - minAlt)) * H;
+    if (i === 0) agCtx.moveTo(px, py);
+    else agCtx.lineTo(px, py);
+  });
+  agCtx.strokeStyle = 'rgba(0,212,255,0.8)';
+  agCtx.lineWidth = 1.5;
+  agCtx.stroke();
+}
+
+// ── SIMULATION ──
+let lastPingTime = 0;
+const PING_INTERVAL = 5000; // 5 seconds
+
+function updateSimulation(dt) {
+  state.time += dt;
+  state.missionSeconds += dt;
+
+  // Paramotor flight path — follows cliff line, gentle oscillation
+  state.pm.progress += dt * 0.012; // Speed of demo progression
+  if (state.pm.progress > 1) state.pm.progress = 0.01;
+
+  const t = state.pm.progress;
+  state.pm.x = CORRIDOR.newhavenX + t * (CORRIDOR.shorehameX - CORRIDOR.newhavenX);
+
+  // Oscillate between cliff and slightly out to sea
+  const yBase = CORRIDOR.cliffY - 0.04;
+  const yOsc  = Math.sin(t * Math.PI * 4) * 0.04;
+  state.pm.y  = yBase + yOsc;
+
+  // Altitude profile — rises over Peacehaven, descends toward Shoreham
+  const baseAlt = 55;
+  const peacehavenBump = Math.exp(-Math.pow((t - 0.38) / 0.12, 2)) * 80;
+  const windVariation  = Math.sin(t * Math.PI * 8) * 8 + Math.cos(t * Math.PI * 5) * 5;
+  state.pm.alt    = baseAlt + peacehavenBump + windVariation;
+  state.pm.speed  = 38 + Math.sin(t * Math.PI * 6) * 10;
+  state.pm.heading = 88 + Math.sin(t * Math.PI * 3) * 22;
+
+  // Ferry moves west to east slowly
+  state.ferry.progress += dt * 0.007;
+  if (state.ferry.progress > 1) state.ferry.progress = 0;
+  state.ferry.x = 0.85 - state.ferry.progress * 0.7;
+  state.ferry.y = CORRIDOR.seaY + 0.06 + Math.sin(state.ferry.progress * Math.PI) * 0.03;
+
+  // CPA calculation
+  const dx = state.pm.x - state.ferry.x;
+  const dy = state.pm.y - state.ferry.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  const cpaDist = Math.round(dist * 14000); // normalised → metres
+
+  document.getElementById('fv-cpa').textContent = cpaDist + 'm';
+  document.getElementById('stat-cpa').textContent = cpaDist + 'm';
+  document.getElementById('stat-cpa').className = 'stat-val ' + (cpaDist < 500 ? 'bad' : cpaDist < 1200 ? 'warn' : 'amber');
+
+  // Auto CPA trigger when ferry and paramotor are close
+  if (cpaDist < 900 && !state.cpaActive && !state.sosActive) {
+    state.cpaActive = true;
+    showCPAWarning(`PARAMOTOR ALPHA-1 ON COLLISION COURSE WITH MV NEWHAVEN\nCPA: ${cpaDist}m · ALERT ISSUED`);
+  } else if (cpaDist > 1500 && state.cpaActive && !state.sosActive) {
+    state.cpaActive = false;
+    hideCPAWarning();
+  }
+
+  // MQTT ping
+  state.pm.pingTimer += dt;
+  const pingRate = state.sosActive ? 1 : state.pm.speed > 15 ? 3 : 5;
+  if (state.pm.pingTimer >= pingRate) {
+    state.pm.pingTimer = 0;
+    firePing();
+  }
+
+  // Trail recording
+  state.pm.trail.push({ x: state.pm.x, y: state.pm.y });
+  if (state.pm.trail.length > 200) state.pm.trail.shift();
+
+  state.ferry.trail.push({ x: state.ferry.x, y: state.ferry.y });
+  if (state.ferry.trail.length > 80) state.ferry.trail.shift();
+
+  // Altitude history
+  state.altHistory.push(state.pm.alt);
+  if (state.altHistory.length > 300) state.altHistory.shift();
+
+  // Battery drain
+  const batt = Math.max(60, 94 - Math.floor(state.missionSeconds / 60));
+  document.getElementById('bb-batt').textContent = batt + '%';
+
+  updateUI();
+}
+
+function firePing() {
+  state.pingCount++;
+  state.pingSeq++;
+
+  const now = new Date();
+  const ts  = now.toISOString().substr(11, 8);
+
+  const ping = {
+    session_id: 'A1-2026-04-09',
+    user_id: 'ALPHA-1',
+    timestamp_utc: now.toISOString(),
+    lat: (50.78 + state.pm.progress * 0.08).toFixed(5),
+    lon: (-0.057 + state.pm.progress * 0.12).toFixed(5),
+    alt_gnss: state.pm.alt.toFixed(1),
+    alt_baro: (state.pm.alt - 1.8).toFixed(1),
+    speed_ms: (state.pm.speed / 3.6).toFixed(2),
+    heading: state.pm.heading.toFixed(0),
+    accuracy_m: (3.2 + Math.random()).toFixed(1),
+    network_mode: state.satelliteMode ? 'SATELLITE' : '4G',
+    battery_pct: document.getElementById('bb-batt').textContent.replace('%',''),
+    ping_seq: state.pingSeq,
+  };
+
+  addPingLine(ts, `SEQ:${state.pingSeq} ALT:${parseFloat(ping.alt_gnss).toFixed(0)}m SPD:${state.pm.speed.toFixed(0)}km/h`, state.sosActive ? 'sos' : '');
+
+  document.getElementById('totalPings').textContent = state.pingCount;
+  document.getElementById('lastPing').textContent = 'now';
+  setTimeout(() => {
+    const el = document.getElementById('lastPing');
+    if (el) el.textContent = '2s ago';
+  }, 2000);
+}
+
+function addPingLine(ts, msg, cls='') {
+  const feed = document.getElementById('pingFeed');
+  const line = document.createElement('div');
+  line.className = 'ping-line' + (cls ? ' ' + cls : '');
+  line.innerHTML = `<span class="ts">${ts}</span><span class="msg">${msg}</span>`;
+  feed.insertBefore(line, feed.firstChild);
+  // Keep max 8 lines
+  while (feed.children.length > 8) feed.removeChild(feed.lastChild);
+}
+
+function updateUI() {
+  // Paramotor data
+  document.getElementById('pm-alt').textContent = state.pm.alt.toFixed(0) + 'm';
+  document.getElementById('pm-spd').textContent = state.pm.speed.toFixed(0) + 'km/h';
+  document.getElementById('pm-hdg').textContent = state.pm.heading.toFixed(0) + '°';
+  document.getElementById('pm-acc').textContent = '±3.4m';
+
+  // Ferry data
+  document.getElementById('fv-spd').textContent = state.ferry.speed + 'kts';
+  document.getElementById('fv-hdg').textContent = state.ferry.heading + '°';
+
+  // Stats
+  document.getElementById('stat-pings').textContent = state.pingCount;
+  document.getElementById('stat-alt').textContent = state.pm.alt.toFixed(0);
+  document.getElementById('stat-spd').textContent = state.pm.speed.toFixed(0);
+
+  // Bottom bar
+  document.getElementById('bb-seq').textContent = '#' + state.pingSeq;
+  document.getElementById('bb-net').textContent = state.satelliteMode ? 'SATELLITE' : '4G';
+
+  // Mission timer
+  const h = Math.floor(state.missionSeconds / 3600);
+  const m = Math.floor((state.missionSeconds % 3600) / 60);
+  const s = Math.floor(state.missionSeconds % 60);
+  document.getElementById('missionTimer').textContent =
+    String(h).padStart(2,'0') + ':' +
+    String(m).padStart(2,'0') + ':' +
+    String(s).padStart(2,'0');
+
+  // CPA alert card
+  if (state.cpaActive) {
+    document.getElementById('cpa-alert-box').style.display = 'block';
+    document.getElementById('cpa-alert-text').textContent =
+      'MV NEWHAVEN closing. Soft ADS-B In alert issued to pilot.';
+  } else {
+    document.getElementById('cpa-alert-box').style.display = 'none';
+  }
+
+  // Active count
+  document.getElementById('activeCount').textContent = state.showDark ? '3' : '2';
+}
+
+function showCPAWarning(text) {
+  document.getElementById('cpaWarningText').textContent = text;
+  document.getElementById('cpaWarning').classList.add('visible');
+  setTimeout(hideCPAWarning, 6000);
+}
+
+function hideCPAWarning() {
+  document.getElementById('cpaWarning').classList.remove('visible');
+}
+
+// ── DEMO CONTROLS ──
+function resetDemo() {
+  state.pm.progress = 0;
+  state.pm.trail = [];
+  state.ferry.trail = [];
+  state.altHistory = [];
+  state.pingCount = 0;
+  state.pingSeq = 0;
+  state.missionSeconds = 0;
+  state.cpaActive = false;
+  state.sosActive = false;
+  hideCPAWarning();
+  document.getElementById('cpa-alert-box').style.display = 'none';
+  document.getElementById('pingFeed').innerHTML = '';
+  addPingLine(new Date().toISOString().substr(11,8), 'SESSION RESET · DEMO RESTARTED', '');
+}
+
+function triggerCPA() {
+  state.cpaActive = true;
+  showCPAWarning('MANUAL CPA TRIGGER · PARAMOTOR ALPHA-1 / MV NEWHAVEN\nSOFT ADS-B IN ALERT ISSUED');
+}
+
+function toggleSatellite() {
+  state.satelliteMode = !state.satelliteMode;
+  const dot4g  = document.getElementById('net-4g-dot');
+  const dotSat = document.getElementById('net-sat-dot');
+  const det4g  = document.getElementById('net-4g-detail');
+
+  if (state.satelliteMode) {
+    dot4g.className  = 'net-status-dot dot-off';
+    dotSat.className = 'net-status-dot dot-ok';
+    det4g.textContent = 'COVERAGE GAP · STANDBY';
+    addPingLine(new Date().toISOString().substr(11,8), 'HANDOFF → VMO2 DIRECT-TO-CELL · MQTT CONTINUES', '');
+  } else {
+    dot4g.className  = 'net-status-dot dot-ok';
+    dotSat.className = 'net-status-dot dot-off';
+    det4g.textContent = 'PRIMARY · ACTIVE';
+    addPingLine(new Date().toISOString().substr(11,8), 'HANDOFF → 4G LTE RESTORED · NOMINAL', '');
+  }
+}
+
+function triggerSOS() {
+  state.sosActive = !state.sosActive;
+  if (state.sosActive) {
+    addPingLine(new Date().toISOString().substr(11,8), '🆘 SOS ACTIVATED · SAR NOTIFIED · 1s PING RATE', 'sos');
+    showCPAWarning('🆘 SOS SIGNAL RECEIVED\nPILOT ALPHA-1 · ESCALATING TO SAR\nLAST POSITION TRANSMITTED');
+    document.getElementById('sb-out').textContent = 'SOS MODE';
+    document.getElementById('sb-out').className = 'adsb-val bad';
+  } else {
+    addPingLine(new Date().toISOString().substr(11,8), 'SOS CANCELLED · RETURNING TO NORMAL', '');
+    document.getElementById('sb-out').textContent = 'ACTIVE';
+    document.getElementById('sb-out').className = 'adsb-val ok';
+    hideCPAWarning();
+  }
+}
+
+function toggleDarkTarget() {
+  state.showDark = !state.showDark;
+  addPingLine(
+    new Date().toISOString().substr(11,8),
+    state.showDark ? 'DARK TARGET VISIBLE (demo only)' : 'DARK TARGET HIDDEN · INVISIBLE TO SAR',
+    ''
+  );
+}
+
+// ── MAIN LOOP ──
+let lastTime = null;
+
+function loop(timestamp) {
+  if (!lastTime) lastTime = timestamp;
+  const dt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+
+  updateSimulation(dt);
+  drawMap();
+  drawAltGraph();
+
+  requestAnimationFrame(loop);
+}
+
+// ── BOOT ──
+addPingLine(new Date().toISOString().substr(11,8), 'CPAS BEACON INITIALISED · SESSION A1-2026-04-09', '');
+addPingLine(new Date().toISOString().substr(11,8), 'MQTT CONNECTED · AWS BROKER READY', '');
+addPingLine(new Date().toISOString().substr(11,8), 'GPS LOCK ACQUIRED · ACCURACY ±3.4m', '');
+addPingLine(new Date().toISOString().substr(11,8), 'TERRAIN CLAMP ACTIVE · EA LIDAR 2M', '');
+addPingLine(new Date().toISOString().substr(11,8), 'PILOT ALPHA-1 MISSION STARTED', '');
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

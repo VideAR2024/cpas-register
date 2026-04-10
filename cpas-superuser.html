@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIDEAR CPAS — SuperUser Ops Centre</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700;900&family=Barlow+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #030810;
+  --surface:  #070f1a;
+  --panel:    #090e1a;
+  --panel2:   #0b1522;
+  --border:   #152436;
+  --border2:  #1e3550;
+  --accent:   #00d4ff;
+  --accent2:  #0088bb;
+  --green:    #00ff88;
+  --red:      #ff2244;
+  --amber:    #ffaa00;
+  --purple:   #aa66ff;
+  --text:     #b8cedd;
+  --muted:    #3d6880;
+  --white:    #ffffff;
+
+  /* Target type colours */
+  --cpas-pm:    #00d4ff;
+  --cpas-kayak: #00ffaa;
+  --cpas-sup:   #44ffdd;
+  --cpas-sail:  #66aaff;
+  --cpas-drone: #aa88ff;
+  --ais-ferry:  #ffaa00;
+  --ais-cargo:  #ff8800;
+  --dark:       #ff3355;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  width:100%; height:100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+}
+
+/* Scanlines */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,212,255,0.012) 3px, rgba(0,212,255,0.012) 4px
+  );
+  pointer-events:none; z-index:9999;
+}
+
+/* ══ HEADER ══ */
+header {
+  height: 52px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 0;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+}
+
+header::after {
+  content:'';
+  position:absolute;
+  bottom:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent) 30%, var(--accent) 70%, transparent 100%);
+  opacity: 0.4;
+}
+
+.logo {
+  display:flex; align-items:center; gap:12px;
+  margin-right: 32px;
+}
+
+.logo-hex {
+  width:34px; height:34px;
+  background: rgba(0,212,255,0.08);
+  border: 1.5px solid var(--accent);
+  clip-path: polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);
+  display:flex; align-items:center; justify-content:center;
+}
+
+.logo-hex span {
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:900; font-size:11px;
+  color:var(--accent); letter-spacing:1px;
+}
+
+.logo h1 {
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:900; font-size:18px;
+  letter-spacing:4px; color:var(--white);
+  line-height:1;
+}
+
+.logo p {
+  font-size:8px; letter-spacing:3px;
+  color:var(--muted); margin-top:1px;
+}
+
+/* Nav tabs */
+.nav-tabs {
+  display:flex; align-items:stretch;
+  height:100%; gap:2px;
+}
+
+.nav-tab {
+  display:flex; align-items:center;
+  padding: 0 20px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px; letter-spacing:2px;
+  color: var(--muted);
+  text-decoration:none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  cursor:pointer;
+}
+
+.nav-tab:hover { color:var(--text); border-bottom-color: var(--border2); }
+.nav-tab.active { color:var(--accent); border-bottom-color:var(--accent); background: rgba(0,212,255,0.04); }
+
+/* Header right */
+.header-right {
+  margin-left:auto;
+  display:flex; align-items:center; gap:20px;
+}
+
+.sys-status {
+  display:flex; align-items:center; gap:6px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px; letter-spacing:2px;
+}
+
+.status-dot {
+  width:7px; height:7px; border-radius:50%;
+}
+
+.dot-live { background:var(--green); box-shadow:0 0 8px var(--green); animation:pulse-g 1.4s infinite; }
+.dot-warn { background:var(--amber); box-shadow:0 0 8px var(--amber); }
+.dot-off  { background:var(--muted); }
+
+@keyframes pulse-g {
+  0%,100%{ opacity:1; box-shadow:0 0 0 0 rgba(0,255,136,.6); }
+  50%{ opacity:.7; box-shadow:0 0 0 5px rgba(0,255,136,0); }
+}
+
+.utc-clock {
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px; color:var(--accent);
+  letter-spacing:2px;
+}
+
+/* ══ LAYOUT ══ */
+.app {
+  display:grid;
+  grid-template-columns: 260px 1fr 320px;
+  height: calc(100vh - 52px);
+  overflow: hidden;
+}
+
+/* ══ LEFT SIDEBAR — TARGET LIST ══ */
+.sidebar {
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+
+.sidebar-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink:0;
+}
+
+.sidebar-title {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:10px; letter-spacing:4px;
+  color:var(--muted); text-transform:uppercase;
+  margin-bottom:10px;
+}
+
+.sidebar-counts {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  gap:4px;
+}
+
+.sc-cell {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  padding:6px 8px; text-align:center;
+}
+
+.sc-val {
+  font-family:'Share Tech Mono',monospace;
+  font-size:18px; display:block; line-height:1;
+}
+
+.sc-label {
+  font-size:8px; letter-spacing:1px;
+  color:var(--muted); text-transform:uppercase;
+  margin-top:2px; display:block;
+}
+
+/* Filter bar */
+.filter-bar {
+  padding:8px 12px;
+  border-bottom: 1px solid var(--border);
+  display:flex; gap:4px; flex-wrap:wrap;
+  flex-shrink:0;
+}
+
+.filter-btn {
+  padding:3px 8px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:8px; letter-spacing:1px;
+  border:1px solid var(--border);
+  background:transparent; color:var(--muted);
+  cursor:pointer; transition:all 0.2s;
+}
+
+.filter-btn:hover { color:var(--text); border-color:var(--border2); }
+.filter-btn.active { background:rgba(0,212,255,0.1); border-color:var(--accent); color:var(--accent); }
+
+/* Target list */
+.target-list {
+  flex:1; overflow-y:auto;
+  padding:6px;
+}
+
+.target-list::-webkit-scrollbar { width:4px; }
+.target-list::-webkit-scrollbar-track { background:transparent; }
+.target-list::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+/* Club group */
+.club-group { margin-bottom:8px; }
+
+.club-header {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 8px;
+  background: rgba(0,0,0,0.3);
+  border:1px solid var(--border);
+  cursor:pointer; user-select:none;
+  transition:background 0.2s;
+}
+
+.club-header:hover { background:rgba(0,212,255,0.04); }
+
+.club-color {
+  width:3px; height:20px; flex-shrink:0;
+  border-radius:2px;
+}
+
+.club-name {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11px; font-weight:700;
+  letter-spacing:1px; color:var(--text);
+  flex:1;
+}
+
+.club-count {
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px; color:var(--muted);
+  background: rgba(0,0,0,0.4);
+  padding:1px 5px; border-radius:2px;
+}
+
+.club-chevron {
+  font-size:8px; color:var(--muted);
+  transition:transform 0.2s;
+}
+
+.club-group.collapsed .club-chevron { transform:rotate(-90deg); }
+.club-group.collapsed .club-members { display:none; }
+
+.club-members { padding:2px 0 2px 4px; }
+
+/* Individual target row */
+.target-row {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 8px;
+  margin-bottom:2px;
+  cursor:pointer;
+  border:1px solid transparent;
+  border-left:2px solid transparent;
+  transition:all 0.15s;
+  position:relative;
+}
+
+.target-row:hover { background:rgba(255,255,255,0.03); border-color:var(--border); }
+
+.target-row.selected {
+  background:rgba(0,212,255,0.07);
+  border-color:rgba(0,212,255,0.3);
+  border-left-color:var(--accent);
+}
+
+.target-row.selected-ais {
+  background:rgba(255,170,0,0.07);
+  border-color:rgba(255,170,0,0.3);
+  border-left-color:var(--amber);
+}
+
+.target-row.selected-dark {
+  background:rgba(255,34,68,0.07);
+  border-color:rgba(255,34,68,0.3);
+  border-left-color:var(--red);
+}
+
+.target-icon {
+  font-size:13px; flex-shrink:0; width:18px; text-align:center;
+}
+
+.target-info { flex:1; min-width:0; }
+
+.target-callsign {
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:700; font-size:12px;
+  color:var(--white); letter-spacing:1px;
+  white-space:nowrap; overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.target-meta {
+  font-size:9px; color:var(--muted);
+  letter-spacing:1px; margin-top:1px;
+}
+
+.target-ping {
+  width:6px; height:6px; border-radius:50%;
+  flex-shrink:0;
+  animation:ping-anim 2s ease-in-out infinite;
+}
+
+@keyframes ping-anim {
+  0%,100%{ opacity:1; }
+  50%{ opacity:0.2; }
+}
+
+.target-alt {
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px; color:var(--muted);
+  text-align:right; flex-shrink:0;
+  min-width:36px;
+}
+
+/* AIS group */
+.ais-group { margin-bottom:8px; }
+.dark-group { margin-bottom:8px; }
+
+/* ══ MAP ══ */
+.map-wrap {
+  position:relative; overflow:hidden;
+  background: var(--bg);
+}
+
+#map { width:100%; height:100%; display:block; }
+
+/* Map overlays */
+.map-corner {
+  position:absolute;
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px; letter-spacing:2px;
+  color:var(--muted);
+  background: rgba(3,8,16,0.8);
+  border:1px solid var(--border);
+  padding:4px 8px;
+  backdrop-filter:blur(4px);
+}
+
+.map-corner.tl { top:12px; left:12px; }
+.map-corner.tr { top:12px; right:12px; }
+.map-corner.bl { bottom:12px; left:12px; }
+
+.map-legend-wrap {
+  position:absolute; bottom:12px; left:12px;
+  background:rgba(3,8,16,0.88);
+  border:1px solid var(--border);
+  padding:10px 12px;
+  backdrop-filter:blur(4px);
+}
+
+.leg-item {
+  display:flex; align-items:center; gap:8px;
+  margin-bottom:5px; font-size:10px; color:var(--text);
+}
+.leg-item:last-child { margin-bottom:0; }
+.leg-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.leg-line { width:18px; height:2px; flex-shrink:0; }
+
+/* Alert overlay */
+.alert-overlay {
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(3,8,16,0.92);
+  border:2px solid var(--red);
+  padding:18px 28px; text-align:center;
+  display:none; backdrop-filter:blur(10px);
+  min-width:320px;
+}
+
+.alert-overlay.show { display:block; animation:ao-in 0.3s ease; }
+@keyframes ao-in {
+  from{ opacity:0; transform:translate(-50%,-50%) scale(0.92); }
+  to  { opacity:1; transform:translate(-50%,-50%) scale(1); }
+}
+
+.ao-title {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:26px; font-weight:900;
+  color:var(--red); letter-spacing:4px;
+  animation:flk 0.9s infinite;
+}
+@keyframes flk { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+
+.ao-body {
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px; color:var(--text);
+  margin-top:8px; line-height:2; letter-spacing:1px;
+}
+
+.ao-close {
+  margin-top:12px;
+  padding:6px 20px;
+  background:rgba(255,34,68,0.15);
+  border:1px solid var(--red);
+  color:var(--red);
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px; letter-spacing:2px;
+  cursor:pointer; transition:all 0.2s;
+}
+.ao-close:hover { background:rgba(255,34,68,0.3); }
+
+/* ══ RIGHT PANEL ══ */
+.right-panel {
+  background: var(--panel);
+  border-left:1px solid var(--border);
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+
+/* Target detail header */
+.detail-header {
+  padding:14px 18px;
+  border-bottom:1px solid var(--border);
+  background: var(--panel2);
+  flex-shrink:0;
+}
+
+.detail-none {
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px; color:var(--muted);
+  letter-spacing:2px; text-align:center;
+  padding:20px 0;
+}
+
+.detail-type-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px; letter-spacing:2px;
+  padding:3px 8px; margin-bottom:8px;
+  border:1px solid;
+}
+
+.detail-callsign {
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:900; font-size:28px;
+  color:var(--white); letter-spacing:2px;
+  line-height:1;
+}
+
+.detail-org {
+  font-size:11px; color:var(--muted);
+  letter-spacing:2px; margin-top:4px;
+}
+
+/* Data grid */
+.data-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:1px; background:var(--border);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+
+.dg-cell {
+  background:var(--panel);
+  padding:12px 14px; text-align:center;
+}
+
+.dg-val {
+  font-family:'Share Tech Mono',monospace;
+  font-size:20px; color:var(--white);
+  display:block; line-height:1;
+}
+
+.dg-label {
+  font-size:8px; letter-spacing:2px;
+  color:var(--muted); text-transform:uppercase;
+  margin-top:3px; display:block;
+}
+
+/* Heartbeat */
+.heartbeat-wrap {
+  padding:14px 18px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+
+.hb-title {
+  font-size:9px; letter-spacing:3px;
+  color:var(--muted); text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+#hbCanvas {
+  width:100%; height:50px; display:block;
+}
+
+.hb-stats {
+  display:flex; gap:16px; margin-top:6px;
+}
+
+.hb-stat {
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;
+}
+
+.hb-stat span { color:var(--muted); }
+
+/* Trail toggle */
+.trail-section {
+  padding:12px 18px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+
+.section-label {
+  font-size:9px; letter-spacing:3px;
+  color:var(--muted); text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.action-btns {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+
+.act-btn {
+  padding:8px 12px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px; letter-spacing:1px;
+  border:1px solid var(--border2);
+  background:rgba(0,0,0,0.3);
+  color:var(--text); cursor:pointer;
+  transition:all 0.2s; text-align:center;
+}
+
+.act-btn:hover { background:rgba(0,212,255,0.08); border-color:var(--accent); color:var(--accent); }
+.act-btn.active { background:rgba(0,212,255,0.15); border-color:var(--accent); color:var(--accent); }
+.act-btn.warn { border-color:rgba(255,170,0,0.4); color:var(--amber); }
+.act-btn.warn:hover { background:rgba(255,170,0,0.1); }
+.act-btn.danger { border-color:rgba(255,34,68,0.4); color:var(--red); }
+.act-btn.danger:hover { background:rgba(255,34,68,0.1); }
+
+/* Ping log */
+.ping-log {
+  flex:1; overflow-y:auto;
+  padding:10px 18px;
+}
+
+.ping-log::-webkit-scrollbar { width:3px; }
+.ping-log::-webkit-scrollbar-thumb { background:var(--border2); }
+
+.pl-title {
+  font-size:9px; letter-spacing:3px;
+  color:var(--muted); text-transform:uppercase;
+  margin-bottom:8px; position:sticky; top:0;
+  background:var(--panel); padding:4px 0;
+}
+
+.pl-entry {
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px; line-height:2;
+  border-bottom:1px solid rgba(21,36,54,0.5);
+  padding:2px 0;
+  display:flex; gap:8px; align-items:baseline;
+  animation:fade-in 0.3s ease;
+}
+
+@keyframes fade-in { from{opacity:0;transform:translateY(-3px);} to{opacity:1;} }
+
+.pl-ts { color:var(--accent); flex-shrink:0; }
+.pl-seq { color:var(--purple); flex-shrink:0; }
+.pl-data { color:var(--text); flex:1; }
+.pl-entry.sos { color:var(--red); }
+
+/* Global log */
+.global-log {
+  padding:10px 18px;
+  border-top:1px solid var(--border);
+  flex-shrink:0; max-height:100px; overflow-y:auto;
+}
+
+.global-log::-webkit-scrollbar { width:3px; }
+.global-log::-webkit-scrollbar-thumb { background:var(--border2); }
+
+/* ══ BOTTOM STATUS BAR ══ */
+.status-bar {
+  position:fixed; bottom:0; left:0; right:0;
+  height:32px;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  display:flex; align-items:center;
+  padding:0 20px; gap:24px;
+  z-index:100;
+}
+
+.sb-item {
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px; letter-spacing:2px;
+  color:var(--muted);
+}
+
+.sb-item span { color:var(--text); }
+.sb-divider { width:1px; height:16px; background:var(--border); }
+.sb-right { margin-left:auto; color:var(--muted); font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:1px; }
+
+/* ══ SCENARIO PANEL ══ */
+.scenario-panel {
+  position:fixed;
+  bottom:32px; right:0;
+  background:rgba(7,15,26,0.96);
+  border:1px solid var(--border);
+  border-right:none;
+  width:200px;
+  transform:translateX(160px);
+  transition:transform 0.3s ease;
+  backdrop-filter:blur(8px);
+  z-index:200;
+}
+
+.scenario-panel:hover { transform:translateX(0); }
+
+.sp-tab {
+  position:absolute; left:-42px; top:50%;
+  transform:translateY(-50%) rotate(-90deg);
+  font-family:'Share Tech Mono',monospace;
+  font-size:8px; letter-spacing:2px;
+  color:var(--muted); white-space:nowrap;
+  background:var(--panel);
+  border:1px solid var(--border);
+  padding:4px 10px;
+}
+
+.sp-title {
+  padding:10px 14px 6px;
+  font-size:8px; letter-spacing:3px;
+  color:var(--muted); text-transform:uppercase;
+  border-bottom:1px solid var(--border);
+}
+
+.sp-btn {
+  width:100%; padding:8px 14px;
+  background:transparent;
+  border:none; border-bottom:1px solid var(--border);
+  color:var(--muted);
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px; letter-spacing:1px;
+  cursor:pointer; text-align:left;
+  transition:all 0.2s;
+}
+
+.sp-btn:hover { background:rgba(0,212,255,0.06); color:var(--accent); }
+.sp-btn:last-child { border-bottom:none; }
+.sp-btn.red:hover { background:rgba(255,34,68,0.06); color:var(--red); }
+.sp-btn.amber:hover { background:rgba(255,170,0,0.06); color:var(--amber); }
+
+/* Responsive */
+@media(max-width:900px){
+  .app{ grid-template-columns:1fr; grid-template-rows:auto 50vh auto; height:auto; overflow:auto; }
+  .sidebar{ max-height:280px; }
+  .right-panel{ max-height:400px; }
+  .scenario-panel{ display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-hex"><span>VDR</span></div>
+    <div>
+      <h1>VIDEAR CPAS</h1>
+      <p>Common Position Awareness System</p>
+    </div>
+  </div>
+
+  <nav class="nav-tabs">
+    <a class="nav-tab" href="cpas-demo.html">PILOT VIEW</a>
+    <div class="nav-tab active">SUPERUSER OPS</div>
+  </nav>
+
+  <div class="header-right">
+    <div class="sys-status">
+      <div class="status-dot dot-live"></div>
+      <span style="color:var(--green)">LIVE</span>
+    </div>
+    <div class="sys-status">
+      <div class="status-dot dot-live"></div>
+      <span>MQTT</span>
+    </div>
+    <div class="sys-status">
+      <div class="status-dot dot-live"></div>
+      <span>AIS</span>
+    </div>
+    <div class="utc-clock" id="utcClock">00:00:00 UTC</div>
+    <div style="font-size:9px;letter-spacing:2px;color:var(--muted)">Patent GB2629638B</div>
+  </div>
+</header>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Active Targets — Newhaven · Shoreham Corridor</div>
+      <div class="sidebar-counts">
+        <div class="sc-cell">
+          <span class="sc-val" id="countCpas" style="color:var(--cpas-pm)">0</span>
+          <span class="sc-label">CPAS</span>
+        </div>
+        <div class="sc-cell">
+          <span class="sc-val" id="countAis" style="color:var(--ais-ferry)">0</span>
+          <span class="sc-label">AIS</span>
+        </div>
+        <div class="sc-cell">
+          <span class="sc-val" id="countDark" style="color:var(--dark)">0</span>
+          <span class="sc-label">DARK</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setFilter('all',this)">ALL</button>
+      <button class="filter-btn" onclick="setFilter('cpas',this)">CPAS</button>
+      <button class="filter-btn" onclick="setFilter('ais',this)">AIS</button>
+      <button class="filter-btn" onclick="setFilter('dark',this)">DARK</button>
+      <button class="filter-btn" onclick="setFilter('alert',this)">ALERTS</button>
+    </div>
+
+    <div class="target-list" id="targetList">
+      <!-- Dynamically populated -->
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="map-wrap">
+    <canvas id="map"></canvas>
+
+    <div class="map-corner tl" id="mapCornerTL">
+      CESIUM · EA LiDAR 2M · AIS LIVE
+    </div>
+    <div class="map-corner tr" id="coordDisplay">50.7821°N  0.0234°W</div>
+
+    <div class="map-legend-wrap">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--cpas-pm)"></div>Paramotor (CPAS)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--cpas-kayak)"></div>Kayak / SUP (CPAS)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--cpas-sail)"></div>Sailing (CPAS)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--ais-ferry)"></div>Vessel (AIS)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--dark);opacity:.6"></div>Dark Target</div>
+      <div class="leg-item"><div class="leg-line" style="background:rgba(0,212,255,0.5)"></div>MQTT Trail</div>
+    </div>
+
+    <!-- Alert overlay -->
+    <div class="alert-overlay" id="alertOverlay">
+      <div class="ao-title" id="aoTitle">CPA WARNING</div>
+      <div class="ao-body" id="aoBody">—</div>
+      <button class="ao-close" onclick="closeAlert()">ACKNOWLEDGE</button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- Detail header -->
+    <div class="detail-header" id="detailHeader">
+      <div class="detail-none" id="detailNone">SELECT A TARGET</div>
+      <div id="detailContent" style="display:none">
+        <div class="detail-type-badge" id="detailBadge">CPAS · PARAMOTOR</div>
+        <div class="detail-callsign" id="detailCallsign">—</div>
+        <div class="detail-org" id="detailOrg">—</div>
+      </div>
+    </div>
+
+    <!-- Data grid -->
+    <div class="data-grid" id="dataGrid" style="display:none">
+      <div class="dg-cell">
+        <span class="dg-val" id="dg-alt">—</span>
+        <span class="dg-label">ALT (m)</span>
+      </div>
+      <div class="dg-cell">
+        <span class="dg-val" id="dg-spd">—</span>
+        <span class="dg-label">SPEED</span>
+      </div>
+      <div class="dg-cell">
+        <span class="dg-val" id="dg-hdg">—</span>
+        <span class="dg-label">HDG °</span>
+      </div>
+      <div class="dg-cell">
+        <span class="dg-val" id="dg-pings">—</span>
+        <span class="dg-label">PINGS</span>
+      </div>
+      <div class="dg-cell">
+        <span class="dg-val" id="dg-batt">—</span>
+        <span class="dg-label">BATT %</span>
+      </div>
+      <div class="dg-cell">
+        <span class="dg-val" id="dg-acc">—</span>
+        <span class="dg-label">GPS ±m</span>
+      </div>
+    </div>
+
+    <!-- Heartbeat -->
+    <div class="heartbeat-wrap" id="hbWrap" style="display:none">
+      <div class="hb-title">MQTT Heartbeat — Ping Rhythm</div>
+      <canvas id="hbCanvas"></canvas>
+      <div class="hb-stats">
+        <div class="hb-stat"><span>RATE: </span><span id="hb-rate" style="color:var(--green)">5s</span></div>
+        <div class="hb-stat"><span>LAST: </span><span id="hb-last" style="color:var(--accent)">—</span></div>
+        <div class="hb-stat"><span>NET: </span><span id="hb-net" style="color:var(--white)">4G</span></div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="trail-section" id="actionSection" style="display:none">
+      <div class="section-label">Target Actions</div>
+      <div class="action-btns">
+        <button class="act-btn" id="btnTrail" onclick="toggleTrail()">📍 SHOW TRAIL</button>
+        <button class="act-btn" id="btnHb" onclick="toggleHB()">💓 HEARTBEAT</button>
+        <button class="act-btn warn" onclick="sendAlert()">⚠ SEND ALERT</button>
+        <button class="act-btn" onclick="exportSession()">📤 EXPORT</button>
+        <button class="act-btn danger" onclick="flagTarget()">🚩 FLAG</button>
+        <button class="act-btn" onclick="zoomTarget()">🎯 CENTRE MAP</button>
+      </div>
+    </div>
+
+    <!-- Ping log -->
+    <div class="ping-log" id="pingLog" style="display:none">
+      <div class="pl-title">MQTT Ping Log — Selected Target</div>
+      <div id="pingLogEntries"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="sb-item">CORRIDOR: <span>NEWHAVEN → SHOREHAM · 14km</span></div>
+  <div class="sb-divider"></div>
+  <div class="sb-item">MQTT BROKER: <span style="color:var(--green)">AWS · CONNECTED</span></div>
+  <div class="sb-divider"></div>
+  <div class="sb-item">AIS FEED: <span style="color:var(--green)">LIVE</span></div>
+  <div class="sb-divider"></div>
+  <div class="sb-item">TOTAL PINGS TODAY: <span id="totalPingsToday">0</span></div>
+  <div class="sb-divider"></div>
+  <div class="sb-item">SESSION: <span>OPS-2026-04-09</span></div>
+  <div class="sb-right">VIDEAR Ltd · Patent GB2629638B · CONFIDENTIAL</div>
+</div>
+
+<!-- SCENARIO PANEL -->
+<div class="scenario-panel">
+  <div class="sp-tab">SCENARIOS</div>
+  <div class="sp-title">Demo Scenarios</div>
+  <button class="sp-btn" onclick="scenarioCPA()">⚠ Trigger CPA Event</button>
+  <button class="sp-btn amber" onclick="scenarioSOS()">🆘 Trigger SOS — Alpha-1</button>
+  <button class="sp-btn" onclick="scenarioSatellite()">🛰 VMO2 Satellite Handoff</button>
+  <button class="sp-btn" onclick="scenarioCluster()">⛵ Brighton SC Launch</button>
+  <button class="sp-btn" onclick="scenarioReset()">↺ Reset All</button>
+  <button class="sp-btn red" onclick="scenarioDarkReveal()">⬛ Reveal Dark Targets</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  CPAS SUPERUSER ENGINE
+// ══════════════════════════════════════════════════════════════
+
+const canvas = document.getElementById('map');
+const ctx    = canvas.getContext('2d');
+const hbCvs  = document.getElementById('hbCanvas');
+const hbCtx  = hbCvs.getContext('2d');
+
+// ── TARGET DATABASE ──
+// All positions normalised 0-1 within corridor
+const CLUBS = {
+  'Brighton Sailing Club': { color: '#66aaff', icon:'⛵' },
+  'Adur Canoe Club':       { color: '#00ffaa', icon:'🚣' },
+  'Shoreham Outrigger':    { color: '#44ffdd', icon:'🚣' },
+  'Airworks Paragliding':  { color: '#00d4ff', icon:'🪂' },
+  'Flight Culture':        { color: '#88ccff', icon:'🪂' },
+  'AIS Vessel':            { color: '#ffaa00', icon:'🚢' },
+  'DARK':                  { color: '#ff3355', icon:'⬛' },
+};
+
+// Build target roster
+function buildTargets() {
+  return [
+    // ── CPAS PARAMOTORS ──
+    { id:'PM-001', callsign:'ALPHA-1',    org:'Airworks Paragliding',  type:'cpas', subtype:'paramotor',
+      x:0.12, y:0.34, alt:87, speed:44, heading:98,  batt:87, acc:3.4,
+      pings:342, trail:[], pingTimer:0, pingSeq:342, active:true, hasCpa:false,
+      color:'#00d4ff', icon:'🪂', missionSec:3720 },
+    { id:'PM-002', callsign:'BRAVO-1',    org:'Flight Culture',        type:'cpas', subtype:'paramotor',
+      x:0.28, y:0.30, alt:112, speed:51, heading:112, batt:72, acc:3.8,
+      pings:218, trail:[], pingTimer:0, pingSeq:218, active:true, hasCpa:false,
+      color:'#88ccff', icon:'🪂', missionSec:2100 },
+
+    // ── CPAS KAYAKS / SUP ──
+    { id:'KY-001', callsign:'KAYAK-01',   org:'Adur Canoe Club',       type:'cpas', subtype:'kayak',
+      x:0.55, y:0.58, alt:1,  speed:6,  heading:270, batt:94, acc:4.1,
+      pings:156, trail:[], pingTimer:0, pingSeq:156, active:true, hasCpa:false,
+      color:'#00ffaa', icon:'🚣', missionSec:1560 },
+    { id:'KY-002', callsign:'KAYAK-02',   org:'Adur Canoe Club',       type:'cpas', subtype:'kayak',
+      x:0.57, y:0.61, alt:1,  speed:5,  heading:265, batt:89, acc:4.3,
+      pings:142, trail:[], pingTimer:0, pingSeq:142, active:true, hasCpa:false,
+      color:'#00ffaa', icon:'🚣', missionSec:1440 },
+    { id:'KY-003', callsign:'KAYAK-03',   org:'Adur Canoe Club',       type:'cpas', subtype:'kayak',
+      x:0.59, y:0.56, alt:1,  speed:7,  heading:280, batt:91, acc:3.9,
+      pings:168, trail:[], pingTimer:0, pingSeq:168, active:true, hasCpa:false,
+      color:'#00ffaa', icon:'🚣', missionSec:1680 },
+    { id:'SUP-001', callsign:'SUP-01',    org:'Adur Canoe Club',       type:'cpas', subtype:'sup',
+      x:0.62, y:0.60, alt:1,  speed:4,  heading:255, batt:78, acc:4.5,
+      pings:98,  trail:[], pingTimer:0, pingSeq:98,  active:true, hasCpa:false,
+      color:'#44ffdd', icon:'🏄', missionSec:980 },
+
+    // ── CPAS SAILING ──
+    { id:'SL-001', callsign:'DELTA-1',    org:'Brighton Sailing Club',  type:'cpas', subtype:'sail',
+      x:0.68, y:0.63, alt:2,  speed:9,  heading:220, batt:85, acc:3.2,
+      pings:204, trail:[], pingTimer:0, pingSeq:204, active:true, hasCpa:false,
+      color:'#66aaff', icon:'⛵', missionSec:2040 },
+    { id:'SL-002', callsign:'DELTA-2',    org:'Brighton Sailing Club',  type:'cpas', subtype:'sail',
+      x:0.71, y:0.66, alt:2,  speed:10, heading:215, batt:82, acc:3.5,
+      pings:188, trail:[], pingTimer:0, pingSeq:188, active:true, hasCpa:false,
+      color:'#66aaff', icon:'⛵', missionSec:1880 },
+    { id:'SL-003', callsign:'DELTA-3',    org:'Brighton Sailing Club',  type:'cpas', subtype:'sail',
+      x:0.67, y:0.68, alt:2,  speed:8,  heading:230, batt:90, acc:3.1,
+      pings:176, trail:[], pingTimer:0, pingSeq:176, active:true, hasCpa:false,
+      color:'#66aaff', icon:'⛵', missionSec:1760 },
+    { id:'SL-004', callsign:'DELTA-4',    org:'Brighton Sailing Club',  type:'cpas', subtype:'sail',
+      x:0.73, y:0.64, alt:2,  speed:11, heading:225, batt:77, acc:3.7,
+      pings:162, trail:[], pingTimer:0, pingSeq:162, active:true, hasCpa:false,
+      color:'#66aaff', icon:'⛵', missionSec:1620 },
+    { id:'SL-005', callsign:'DELTA-5',    org:'Brighton Sailing Club',  type:'cpas', subtype:'sail',
+      x:0.69, y:0.70, alt:2,  speed:9,  heading:210, batt:88, acc:3.3,
+      pings:194, trail:[], pingTimer:0, pingSeq:194, active:true, hasCpa:false,
+      color:'#66aaff', icon:'⛵', missionSec:1940 },
+    { id:'SL-006', callsign:'DELTA-6',    org:'Brighton Sailing Club',  type:'cpas', subtype:'sail',
+      x:0.74, y:0.67, alt:2,  speed:10, heading:218, batt:83, acc:3.6,
+      pings:178, trail:[], pingTimer:0, pingSeq:178, active:true, hasCpa:false,
+      color:'#66aaff', icon:'⛵', missionSec:1780 },
+
+    // ── AIS VESSELS ──
+    { id:'AIS-001', callsign:'MV NEWHAVEN',  org:'AIS Vessel',  type:'ais', subtype:'ferry',
+      x:0.15, y:0.72, alt:0, speed:18, heading:247, batt:100, acc:10,
+      pings:0, trail:[], pingTimer:0, pingSeq:0, active:true, hasCpa:false,
+      color:'#ffaa00', icon:'🚢', missionSec:0 },
+    { id:'AIS-002', callsign:'SHOREHAM DREDGER', org:'AIS Vessel', type:'ais', subtype:'cargo',
+      x:0.82, y:0.69, alt:0, speed:4,  heading:180, batt:100, acc:15,
+      pings:0, trail:[], pingTimer:0, pingSeq:0, active:true, hasCpa:false,
+      color:'#ff8800', icon:'🚢', missionSec:0 },
+
+    // ── DARK TARGETS ──
+    { id:'DK-001', callsign:'UNKNOWN-1', org:'DARK',  type:'dark', subtype:'unknown',
+      x:0.42, y:0.62, alt:null, speed:null, heading:null, batt:null, acc:null,
+      pings:0, trail:[], pingTimer:0, pingSeq:0, active:true, hasCpa:false,
+      color:'#ff3355', icon:'⬛', missionSec:0 },
+    { id:'DK-002', callsign:'UNKNOWN-2', org:'DARK',  type:'dark', subtype:'unknown',
+      x:0.50, y:0.65, alt:null, speed:null, heading:null, batt:null, acc:null,
+      pings:0, trail:[], pingTimer:0, pingSeq:0, active:true, hasCpa:false,
+      color:'#ff3355', icon:'⬛', missionSec:0 },
+    { id:'DK-003', callsign:'UNKNOWN-3', org:'DARK',  type:'dark', subtype:'unknown',
+      x:0.46, y:0.60, alt:null, speed:null, heading:null, batt:null, acc:null,
+      pings:0, trail:[], pingTimer:0, pingSeq:0, active:true, hasCpa:false,
+      color:'#ff3355', icon:'⬛', missionSec:0 },
+  ];
+}
+
+// ── STATE ──
+let targets = buildTargets();
+let selectedId = null;
+let showTrail  = false;
+let showHB     = false;
+let activeFilter = 'all';
+let totalPings = 0;
+let simTime    = 0;
+let hbHistory  = [];
+let sosActive  = false;
+let satelliteMode = false;
+let darkRevealed = false;
+let globalLogEntries = [];
+
+// Corridor layout constants
+const CL = {
+  skyH:  0.38,
+  cliffY:0.42,
+  seaY:  0.56,
+};
+
+// ── RESIZE ──
+function resize() {
+  const wrap = canvas.parentElement;
+  canvas.width  = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  hbCvs.width  = hbCvs.parentElement.clientWidth - 36;
+  hbCvs.height = 50;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function mapX(nx) { return nx * canvas.width; }
+function mapY(ny) { return ny * canvas.height; }
+
+// ── SIMULATION ──
+let lastT = null;
+
+function simulate(dt) {
+  simTime += dt;
+
+  targets.forEach(t => {
+    if (!t.active) return;
+
+    // Movement
+    if (t.type === 'cpas' && t.subtype === 'paramotor') {
+      // Oscillate along corridor
+      t._phase = (t._phase || Math.random() * Math.PI * 2);
+      t._phase += dt * 0.008;
+      if (t._phase > 1) t._phase = 0.02;
+
+      const base = t.id === 'PM-001' ? 0.12 : 0.28;
+      t.x = Math.min(0.92, Math.max(0.05, base + t._phase * 0.7));
+      t.y = CL.cliffY - 0.06 + Math.sin(t._phase * Math.PI * 4) * 0.04;
+
+      const bump = Math.exp(-Math.pow((t.x - 0.40) / 0.1, 2)) * 70;
+      t.alt = (t.id === 'PM-001' ? 60 : 80) + bump + Math.sin(simTime * 2 + (t.id==='PM-001'?0:1)) * 8;
+      t.speed = (t.id==='PM-001'?44:51) + Math.sin(simTime * 3) * 6;
+      t.heading = (t.id==='PM-001'?98:112) + Math.sin(simTime * 1.5) * 18;
+
+    } else if (t.type === 'cpas' && (t.subtype==='kayak'||t.subtype==='sup')) {
+      // Drift gently at sea
+      t._drift = t._drift || 0;
+      t._drift += dt * 0.0015;
+      t.x += Math.sin(simTime * 0.4 + parseFloat(t.id.replace(/\D/g,''))) * dt * 0.003;
+      t.y  = CL.seaY + 0.04 + Math.sin(simTime * 0.3 + parseFloat(t.id.replace(/\D/g,''))) * 0.02;
+      t.x  = Math.max(0.4, Math.min(0.75, t.x));
+      t.heading = (t.heading + Math.sin(simTime) * 0.5 + 360) % 360;
+
+    } else if (t.type === 'cpas' && t.subtype === 'sail') {
+      // Tacking pattern
+      const idx = parseInt(t.id.replace('SL-','')) - 1;
+      t.x += Math.cos(simTime * 0.2 + idx * 0.8) * dt * 0.008;
+      t.y  = CL.seaY + 0.07 + Math.sin(simTime * 0.15 + idx) * 0.04;
+      t.x  = Math.max(0.55, Math.min(0.88, t.x));
+      t.heading = (200 + Math.sin(simTime * 0.3 + idx) * 35 + 360) % 360;
+
+    } else if (t.type === 'ais') {
+      if (t.id === 'AIS-001') {
+        // Ferry west to east
+        t._fp = (t._fp || 0) + dt * 0.006;
+        if (t._fp > 1) t._fp = 0;
+        t.x = 0.85 - t._fp * 0.75;
+        t.y = CL.seaY + 0.14 + Math.sin(t._fp * Math.PI) * 0.03;
+      } else {
+        // Dredger slow circle
+        t._dp = (t._dp || 0) + dt * 0.003;
+        t.x = 0.82 + Math.cos(t._dp) * 0.04;
+        t.y = CL.seaY + 0.12 + Math.sin(t._dp) * 0.03;
+      }
+    }
+
+    // Ping timer — CPAS only
+    if (t.type === 'cpas') {
+      t.pingTimer += dt;
+      const rate = sosActive && t.id === 'PM-001' ? 1 : 5;
+      if (t.pingTimer >= rate) {
+        t.pingTimer = 0;
+        t.pings++;
+        t.pingSeq++;
+        totalPings++;
+        t.trail.push({ x:t.x, y:t.y, t:simTime });
+        if (t.trail.length > 150) t.trail.shift();
+        if (t.id === selectedId) addPingLogEntry(t);
+        hbHistory.push(simTime);
+        if (hbHistory.length > 60) hbHistory.shift();
+      }
+    } else if (t.type === 'ais') {
+      // AIS trail
+      t.pingTimer += dt;
+      if (t.pingTimer >= 30) {
+        t.pingTimer = 0;
+        t.trail.push({ x:t.x, y:t.y, t:simTime });
+        if (t.trail.length > 40) t.trail.shift();
+      }
+    }
+
+    // Battery drain
+    if (t.batt && t.batt > 5 && t.type === 'cpas') {
+      t.batt = Math.max(5, t.batt - dt * 0.004);
+    }
+  });
+
+  document.getElementById('totalPingsToday').textContent = totalPings;
+  updateCounts();
+  updateDetailPanel();
+  updateUTCClock();
+  updateSBItem();
+}
+
+function updateCounts() {
+  const cpas = targets.filter(t=>t.type==='cpas'&&t.active).length;
+  const ais  = targets.filter(t=>t.type==='ais'&&t.active).length;
+  const dark = targets.filter(t=>t.type==='dark'&&t.active).length;
+  document.getElementById('countCpas').textContent = cpas;
+  document.getElementById('countAis').textContent  = ais;
+  document.getElementById('countDark').textContent = dark;
+}
+
+function updateUTCClock() {
+  const n = new Date();
+  document.getElementById('utcClock').textContent =
+    n.toISOString().substr(11,8) + ' UTC';
+}
+
+function updateSBItem() {}
+
+// ── TARGET LIST ──
+function buildTargetList() {
+  const list = document.getElementById('targetList');
+  list.innerHTML = '';
+
+  const groups = {};
+  targets.forEach(t => {
+    if (!t.active) return;
+    if (activeFilter !== 'all' && t.type !== activeFilter) return;
+    if (activeFilter === 'alert' && !t.hasCpa && !sosActive) return;
+    const g = t.org;
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(t);
+  });
+
+  Object.entries(groups).forEach(([org, members]) => {
+    const club = CLUBS[org] || { color:'#aaaaaa', icon:'●' };
+    const group = document.createElement('div');
+    group.className = 'club-group';
+    group.id = 'group-' + org.replace(/\s/g,'_');
+
+    const header = document.createElement('div');
+    header.className = 'club-header';
+    header.innerHTML = `
+      <div class="club-color" style="background:${club.color}"></div>
+      <span class="club-name">${org}</span>
+      <span class="club-count">${members.length}</span>
+      <span class="club-chevron">▾</span>
+    `;
+    header.onclick = () => {
+      group.classList.toggle('collapsed');
+    };
+
+    const membersDiv = document.createElement('div');
+    membersDiv.className = 'club-members';
+
+    members.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'target-row' + (t.id===selectedId ? ' selected' : '');
+      row.id = 'row-' + t.id;
+
+      const pingColor = t.type==='dark' ? '#ff3355' : (sosActive && t.id==='PM-001' ? '#ff2244' : t.color);
+      const altText = t.alt !== null ? Math.round(t.alt)+'m' : '—';
+      const metaText = t.type==='dark' ? 'NO SIGNAL · INVISIBLE' :
+                       t.type==='ais'  ? `AIS · ${t.speed}kts` :
+                       `${t.subtype.toUpperCase()} · ${Math.round(t.speed)}km/h`;
+
+      row.innerHTML = `
+        <div class="target-icon">${t.icon}</div>
+        <div class="target-info">
+          <div class="target-callsign">${t.callsign}</div>
+          <div class="target-meta">${metaText}</div>
+        </div>
+        <div class="target-ping" style="background:${pingColor}"></div>
+        <div class="target-alt">${altText}</div>
+      `;
+
+      row.onclick = () => selectTarget(t.id);
+      membersDiv.appendChild(row);
+    });
+
+    group.appendChild(header);
+    group.appendChild(membersDiv);
+    list.appendChild(group);
+  });
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── SELECT TARGET ──
+function selectTarget(id) {
+  selectedId = id;
+  showTrail  = false;
+  showHB     = false;
+  hbHistory  = [];
+  document.getElementById('pingLogEntries').innerHTML = '';
+
+  const t = targets.find(x=>x.id===id);
+  if (!t) return;
+
+  // Show panels
+  document.getElementById('detailNone').style.display    = 'none';
+  document.getElementById('detailContent').style.display = 'block';
+  document.getElementById('dataGrid').style.display      = 'grid';
+  document.getElementById('hbWrap').style.display        = t.type==='dark' ? 'none' : 'block';
+  document.getElementById('actionSection').style.display = 'block';
+  document.getElementById('pingLog').style.display       = 'block';
+
+  // Badge
+  const badge = document.getElementById('detailBadge');
+  const badgeText = t.type==='cpas' ? `CPAS · ${t.subtype.toUpperCase()}` :
+                    t.type==='ais'  ? `AIS · ${t.subtype.toUpperCase()}` :
+                    'DARK TARGET · NO DATA';
+  const badgeColor = t.type==='dark' ? 'var(--red)' : t.type==='ais' ? 'var(--amber)' : 'var(--accent)';
+  badge.textContent = badgeText;
+  badge.style.color       = badgeColor;
+  badge.style.borderColor = badgeColor;
+
+  document.getElementById('detailCallsign').textContent = t.callsign;
+  document.getElementById('detailOrg').textContent      = t.org + ' · ' + t.id;
+
+  // Reset trail btn
+  document.getElementById('btnTrail').textContent = '📍 SHOW TRAIL';
+  document.getElementById('btnTrail').classList.remove('active');
+  document.getElementById('btnHb').textContent = '💓 HEARTBEAT';
+  document.getElementById('btnHb').classList.remove('active');
+
+  // Dark target special
+  if (t.type === 'dark') {
+    document.getElementById('dg-alt').textContent = '—';
+    document.getElementById('dg-spd').textContent = '—';
+    document.getElementById('dg-hdg').textContent = '—';
+    document.getElementById('dg-pings').textContent = '0';
+    document.getElementById('dg-batt').textContent = '—';
+    document.getElementById('dg-acc').textContent = '—';
+    addPingLogEntry({ type:'dark', callsign:t.callsign });
+  }
+
+  zoomTarget();
+}
+
+function updateDetailPanel() {
+  if (!selectedId) return;
+  const t = targets.find(x=>x.id===selectedId);
+  if (!t) return;
+
+  if (t.type !== 'dark') {
+    document.getElementById('dg-alt').textContent   = t.alt !== null ? Math.round(t.alt) : '—';
+    document.getElementById('dg-spd').textContent   = t.speed !== null ? Math.round(t.speed) : '—';
+    document.getElementById('dg-hdg').textContent   = t.heading !== null ? Math.round(t.heading)+'°' : '—';
+    document.getElementById('dg-pings').textContent = t.pings;
+    document.getElementById('dg-batt').textContent  = t.batt !== null ? Math.round(t.batt)+'%' : '—';
+    document.getElementById('dg-acc').textContent   = t.acc !== null ? '±'+t.acc : '—';
+    document.getElementById('hb-rate').textContent  = (sosActive && t.id==='PM-001') ? '1s' : '5s';
+    document.getElementById('hb-last').textContent  = 'now';
+    document.getElementById('hb-net').textContent   = satelliteMode ? 'SATELLITE' : '4G';
+  }
+
+  // Update selected row
+  document.querySelectorAll('.target-row').forEach(r=>r.classList.remove('selected'));
+  const row = document.getElementById('row-'+selectedId);
+  if (row) row.classList.add('selected');
+}
+
+function addPingLogEntry(t) {
+  const log = document.getElementById('pingLogEntries');
+  const now = new Date();
+  const ts  = now.toISOString().substr(11,8);
+
+  const entry = document.createElement('div');
+
+  if (t.type === 'dark') {
+    entry.className = 'pl-entry';
+    entry.innerHTML = `<span class="pl-ts">${ts}</span><span class="pl-data" style="color:var(--red)">NO SIGNAL · TARGET INVISIBLE TO SAR</span>`;
+  } else {
+    entry.className = 'pl-entry' + (sosActive && t.id==='PM-001' ? ' sos' : '');
+    entry.innerHTML = `
+      <span class="pl-ts">${ts}</span>
+      <span class="pl-seq">#${t.pingSeq}</span>
+      <span class="pl-data">ALT:${Math.round(t.alt||0)}m SPD:${Math.round(t.speed||0)} HDG:${Math.round(t.heading||0)}° BAT:${Math.round(t.batt||0)}%</span>
+    `;
+  }
+
+  log.insertBefore(entry, log.firstChild);
+  while (log.children.length > 20) log.removeChild(log.lastChild);
+}
+
+// ── ACTION BUTTONS ──
+function toggleTrail() {
+  showTrail = !showTrail;
+  const btn = document.getElementById('btnTrail');
+  btn.textContent = showTrail ? '📍 HIDE TRAIL' : '📍 SHOW TRAIL';
+  btn.classList.toggle('active', showTrail);
+}
+
+function toggleHB() {
+  showHB = !showHB;
+  const btn = document.getElementById('btnHb');
+  btn.textContent = showHB ? '💓 STOP HB' : '💓 HEARTBEAT';
+  btn.classList.toggle('active', showHB);
+}
+
+function sendAlert() {
+  if (!selectedId) return;
+  const t = targets.find(x=>x.id===selectedId);
+  if (!t) return;
+  showAlertOverlay('ALERT ISSUED',
+    `TARGET: ${t.callsign}\nTYPE: ${t.subtype?.toUpperCase()}\nSOFT ADS-B IN ALERT TRANSMITTED\nPILOT NOTIFIED VIA CPAS APP`);
+}
+
+function exportSession() {
+  if (!selectedId) return;
+  const t = targets.find(x=>x.id===selectedId);
+  if (!t) return;
+  alert(`Session Export — ${t.callsign}\n\nIn production this would download:\n• Full MQTT ping log (JSON)\n• GPS trail (GPX)\n• Altitude profile (CSV)\n• Session audit report (PDF)\n\nSession ID: OPS-2026-04-09-${t.id}`);
+}
+
+function flagTarget() {
+  if (!selectedId) return;
+  const t = targets.find(x=>x.id===selectedId);
+  showAlertOverlay('TARGET FLAGGED', `${t.callsign} has been flagged for monitoring.\nAll subsequent pings logged to audit trail.\nSAR team notified.`);
+}
+
+function zoomTarget() {
+  if (!selectedId) return;
+  // In production: pan map to target. In demo: update coord display
+  const t = targets.find(x=>x.id===selectedId);
+  if (!t) return;
+  const lat = (50.78 + t.x * 0.08).toFixed(4);
+  const lon = (-0.057 + t.x * 0.12).toFixed(4);
+  document.getElementById('coordDisplay').textContent = `${lat}°N  ${Math.abs(lon)}°W`;
+}
+
+// ── SCENARIOS ──
+function scenarioCPA() {
+  targets.find(t=>t.id==='PM-001').hasCpa = true;
+  showAlertOverlay('⚠ CPA ALERT',
+    'ALPHA-1 (PARAMOTOR) / MV NEWHAVEN\nCLOSEST POINT OF APPROACH: 420m\nSOFT ADS-B IN ALERT: ISSUED TO PILOT\nSOFT ADS-B IN ALERT: ISSUED TO VESSEL');
+}
+
+function scenarioSOS() {
+  sosActive = !sosActive;
+  if (sosActive) {
+    showAlertOverlay('🆘 SOS ACTIVATED',
+      'PILOT: ALPHA-1 · AIRWORKS PARAGLIDING\nPOSITION: 50.7821°N 0.0234°W\nALTITUDE: 87m · HEADING: 098°\nPING RATE: 1s · SAR NOTIFIED\nAUTO ESCALATION: ACTIVE');
+  } else {
+    closeAlert();
+  }
+}
+
+function scenarioSatellite() {
+  satelliteMode = !satelliteMode;
+  showAlertOverlay(satelliteMode ? '🛰 VMO2 HANDOFF ACTIVE' : '📡 4G RESTORED',
+    satelliteMode
+    ? 'COVERAGE GAP DETECTED AT 8nm OFFSHORE\nHANDOFF → VMO2 DIRECT-TO-CELL SATELLITE\nMQTT HEARTBEAT CONTINUES UNINTERRUPTED\nZERO PING LOSS · SEAMLESS TRANSITION'
+    : '4G LTE SIGNAL RESTORED\nHANDOFF → TERRESTRIAL NETWORK\nMQTT BROKER: RE-CONFIRMED\nSATELLITE STANDBY: READY');
+}
+
+function scenarioCluster() {
+  showAlertOverlay('⛵ BRIGHTON SC LAUNCH',
+    'BRIGHTON SAILING CLUB — FLEET LAUNCH\n6 VESSELS NOW ACTIVE IN CORRIDOR\nALL TRANSMITTING VIA CPAS\nCLUSTER VISIBLE TO RNLI NEWHAVEN\nCPA MONITORING: ENGAGED');
+}
+
+function scenarioReset() {
+  targets = buildTargets();
+  selectedId = null;
+  sosActive  = false;
+  satelliteMode = false;
+  darkRevealed = false;
+  showTrail  = false;
+  showHB     = false;
+  totalPings = 0;
+  hbHistory  = [];
+  closeAlert();
+  document.getElementById('detailNone').style.display    = 'block';
+  document.getElementById('detailContent').style.display = 'none';
+  document.getElementById('dataGrid').style.display      = 'none';
+  document.getElementById('hbWrap').style.display        = 'none';
+  document.getElementById('actionSection').style.display = 'none';
+  document.getElementById('pingLog').style.display       = 'none';
+}
+
+function scenarioDarkReveal() {
+  darkRevealed = !darkRevealed;
+  showAlertOverlay(
+    darkRevealed ? '⬛ DARK TARGETS REVEALED' : '⬛ DARK TARGETS HIDDEN',
+    darkRevealed
+    ? '3 UNIDENTIFIED TARGETS IN CORRIDOR\nNO CPAS SIGNAL · NO AIS DATA\nRADAR BLIND · INVISIBLE TO SAR\nTHIS IS THE DARK TARGET PROBLEM\nCPAS SOLVES THIS WITH ZERO HARDWARE'
+    : 'DARK TARGETS RETURNED TO INVISIBLE STATE\nTHIS IS OPERATIONAL REALITY\nSAR HAS NO KNOWLEDGE OF THESE USERS'
+  );
+}
+
+// ── ALERT OVERLAY ──
+function showAlertOverlay(title, body) {
+  document.getElementById('aoTitle').textContent = title;
+  document.getElementById('aoBody').textContent  = body;
+  document.getElementById('alertOverlay').classList.add('show');
+  setTimeout(closeAlert, 7000);
+}
+
+function closeAlert() {
+  document.getElementById('alertOverlay').classList.remove('show');
+}
+
+// ── DRAW ──
+function draw() {
+  const W = canvas.width;
+  const H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  drawTerrain(W, H);
+  drawGrid(W, H);
+  drawLandmarks(W, H);
+
+  // Trails
+  targets.forEach(t => {
+    if (t.type === 'ais' && t.trail.length > 1) drawTrail(t, 0.3, 2, true);
+    if (t.type === 'cpas' && showTrail && t.id === selectedId && t.trail.length > 1) drawTrail(t, 0.7, 2, false);
+    if (t.type === 'cpas' && t.trail.length > 1) drawTrail(t, 0.15, 1, false);
+  });
+
+  // CPA arcs
+  targets.forEach(t => {
+    if (t.hasCpa || (sosActive && t.id==='PM-001')) drawThreatArc(t);
+  });
+
+  // Targets (draw dark first, then AIS, then CPAS on top)
+  targets.filter(t=>t.type==='dark').forEach(t=>drawTarget(t));
+  targets.filter(t=>t.type==='ais').forEach(t=>drawTarget(t));
+  targets.filter(t=>t.type==='cpas').forEach(t=>drawTarget(t));
+
+  // Selection ring
+  if (selectedId) {
+    const t = targets.find(x=>x.id===selectedId);
+    if (t) drawSelectionRing(t);
+  }
+
+  drawHBCanvas();
+}
+
+function drawTerrain(W, H) {
+  // Sky
+  const sky = ctx.createLinearGradient(0,0,0,H*CL.skyH);
+  sky.addColorStop(0,'#020810');
+  sky.addColorStop(1,'#051420');
+  ctx.fillStyle = sky; ctx.fillRect(0,0,W,H*CL.skyH);
+
+  // Cliff top irregular line
+  ctx.fillStyle = '#0c2010';
+  ctx.beginPath(); ctx.moveTo(0, H*CL.cliffY);
+  for(let x=0;x<=W;x+=15){
+    const t=x/W;
+    const dy = Math.sin(t*Math.PI*7)*10+Math.cos(t*Math.PI*4)*6;
+    ctx.lineTo(x,H*CL.cliffY+dy);
+  }
+  ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+
+  // Cliff land between cliff top and sea
+  const land = ctx.createLinearGradient(0,H*CL.cliffY,0,H*CL.seaY);
+  land.addColorStop(0,'#101e0e'); land.addColorStop(1,'#0a150a');
+  ctx.fillStyle=land;
+  ctx.fillRect(0,H*CL.cliffY,W,H*(CL.seaY-CL.cliffY));
+
+  // Sea
+  const sea = ctx.createLinearGradient(0,H*CL.seaY,0,H*0.95);
+  sea.addColorStop(0,'#061828'); sea.addColorStop(1,'#030e1a');
+  ctx.fillStyle=sea; ctx.fillRect(0,H*CL.seaY,W,H);
+
+  // Sea shimmer
+  for(let i=0;i<6;i++){
+    ctx.strokeStyle=`rgba(0,212,255,0.03)`;
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    const sy=H*CL.seaY+(i/6)*(H-H*CL.seaY)*0.5;
+    ctx.moveTo(0, sy+Math.sin(simTime*0.4+i)*4);
+    ctx.lineTo(W, sy+Math.cos(simTime*0.3+i)*4);
+    ctx.stroke();
+  }
+
+  // Cliff glow
+  ctx.strokeStyle='rgba(0,255,100,0.1)'; ctx.lineWidth=2;
+  ctx.beginPath();
+  for(let x=0;x<=W;x+=15){
+    const t=x/W;
+    const dy=Math.sin(t*Math.PI*7)*10+Math.cos(t*Math.PI*4)*6;
+    if(x===0) ctx.moveTo(x,H*CL.cliffY+dy);
+    else ctx.lineTo(x,H*CL.cliffY+dy);
+  }
+  ctx.stroke();
+}
+
+function drawGrid(W,H){
+  ctx.strokeStyle='rgba(0,212,255,0.03)';
+  ctx.lineWidth=1;
+  for(let x=0;x<W;x+=55){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
+  for(let y=0;y<H;y+=55){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+}
+
+function drawLandmarks(W,H){
+  const lms = [
+    {x:0.05, label:'NEWHAVEN'},
+    {x:0.38, label:'PEACEHAVEN'},
+    {x:0.62, label:'BRIGHTON'},
+    {x:0.92, label:'SHOREHAM'},
+  ];
+  lms.forEach(lm=>{
+    const lx=mapX(lm.x);
+    ctx.strokeStyle='rgba(60,100,130,0.3)';
+    ctx.lineWidth=1; ctx.setLineDash([3,6]);
+    ctx.beginPath(); ctx.moveTo(lx,0); ctx.lineTo(lx,H*0.85); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(60,100,130,0.6)';
+    ctx.font='9px "Share Tech Mono"';
+    ctx.textAlign='center';
+    ctx.fillText(lm.label,lx,14);
+  });
+
+  // Rampion OWF
+  ctx.fillStyle='rgba(255,170,0,0.18)';
+  for(let i=0;i<5;i++) for(let j=0;j<3;j++){
+    ctx.beginPath();
+    ctx.arc(mapX(0.74+i*0.022),mapY(0.76+j*0.04),3,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.fillStyle='rgba(255,170,0,0.35)';
+  ctx.font='8px "Share Tech Mono"';
+  ctx.textAlign='center';
+  ctx.fillText('RAMPION OWF',mapX(0.82),mapY(0.84));
+}
+
+function drawTrail(t, alpha, lw, dashed){
+  if(t.trail.length<2) return;
+  ctx.strokeStyle=`rgba(${hexToRgb(t.color)},${alpha})`;
+  ctx.lineWidth=lw;
+  if(dashed) ctx.setLineDash([3,5]); else ctx.setLineDash([]);
+  ctx.beginPath();
+  t.trail.forEach((p,i)=>{
+    if(i===0) ctx.moveTo(mapX(p.x),mapY(p.y));
+    else ctx.lineTo(mapX(p.x),mapY(p.y));
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Ping dots on CPAS trails
+  if(t.type==='cpas' && showTrail && t.id===selectedId){
+    t.trail.forEach((p,i)=>{
+      if(i%10===0){
+        ctx.fillStyle=`rgba(${hexToRgb(t.color)},0.5)`;
+        ctx.beginPath();
+        ctx.arc(mapX(p.x),mapY(p.y),2.5,0,Math.PI*2);
+        ctx.fill();
+      }
+    });
+  }
+}
+
+function drawThreatArc(t){
+  const x=mapX(t.x), y=mapY(t.y);
+  const r = 50+Math.sin(simTime*3)*8;
+  const g=ctx.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0,'rgba(255,34,68,0)');
+  g.addColorStop(0.6,'rgba(255,34,68,0)');
+  g.addColorStop(1,'rgba(255,34,68,0.3)');
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+
+  ctx.strokeStyle=`rgba(255,34,68,${0.3+Math.sin(simTime*4)*0.3})`;
+  ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+}
+
+function drawSelectionRing(t){
+  const x=mapX(t.x), y=mapY(t.y);
+  const r=22+Math.sin(simTime*4)*3;
+  ctx.strokeStyle=`rgba(${hexToRgb(t.color)},${0.4+Math.sin(simTime*3)*0.3})`;
+  ctx.lineWidth=1.5;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawTarget(t){
+  const x=mapX(t.x), y=mapY(t.y);
+  const rgb=hexToRgb(t.color);
+  const isSel = t.id===selectedId;
+  const isSos = sosActive && t.id==='PM-001';
+
+  if(t.type==='dark'){
+    // Dark target — faint, pulsing
+    ctx.globalAlpha = darkRevealed ? 0.7 : (0.3+Math.sin(simTime*1.5+t.x)*0.1);
+    ctx.strokeStyle=`rgba(255,51,85,0.5)`;
+    ctx.lineWidth=1; ctx.setLineDash([2,4]);
+    ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=`rgba(255,51,85,0.35)`;
+    ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();
+    if(darkRevealed){
+      ctx.fillStyle='rgba(255,51,85,0.7)';
+      ctx.font='8px "Share Tech Mono"'; ctx.textAlign='center';
+      ctx.fillText('DARK',x,y-14);
+    }
+    ctx.globalAlpha=1;
+    return;
+  }
+
+  // Glow
+  const glowR = isSel ? 28 : 18;
+  const glowA = isSel ? 0.5 : 0.25;
+  const glow=ctx.createRadialGradient(x,y,0,x,y,glowR);
+  glow.addColorStop(0,`rgba(${rgb},${glowA})`);
+  glow.addColorStop(1,`rgba(${rgb},0)`);
+  ctx.fillStyle=glow;
+  ctx.beginPath(); ctx.arc(x,y,glowR,0,Math.PI*2); ctx.fill();
+
+  // Ring
+  ctx.strokeStyle = isSos ? 'rgba(255,34,68,0.9)' : `rgba(${rgb},0.85)`;
+  ctx.lineWidth = isSel ? 2 : 1.5;
+  ctx.beginPath(); ctx.arc(x,y,9,0,Math.PI*2); ctx.stroke();
+
+  // Heading tick
+  if(t.heading!==null){
+    const rad=(t.heading-90)*Math.PI/180;
+    ctx.strokeStyle=isSos ? '#ff2244' : t.color;
+    ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(x,y);
+    ctx.lineTo(x+Math.cos(rad)*13, y+Math.sin(rad)*13);
+    ctx.stroke();
+  }
+
+  // Centre dot
+  ctx.fillStyle = isSos ? '#ff2244' : t.color;
+  ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fill();
+
+  // SOS pulse
+  if(isSos){
+    const pulseR=16+Math.sin(simTime*8)*5;
+    ctx.strokeStyle=`rgba(255,34,68,${0.4+Math.sin(simTime*6)*0.4})`;
+    ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(x,y,pulseR,0,Math.PI*2); ctx.stroke();
+  }
+
+  // Label
+  ctx.font = isSel ? 'bold 11px "Barlow Condensed"' : '10px "Barlow Condensed"';
+  ctx.textAlign='left';
+  ctx.fillStyle = `rgba(${rgb},${isSel?1:0.8})`;
+  const label = t.type==='ais' ? t.callsign : t.callsign;
+  ctx.fillText(label, x+12, y-5);
+
+  if(t.type==='cpas' && t.alt!==null){
+    ctx.font='8px "Share Tech Mono"';
+    ctx.fillStyle=`rgba(${rgb},0.55)`;
+    ctx.fillText(`${Math.round(t.alt)}m`, x+12, y+6);
+  } else if(t.type==='ais'){
+    ctx.font='8px "Share Tech Mono"';
+    ctx.fillStyle=`rgba(${rgb},0.55)`;
+    ctx.fillText(`${t.speed}${t.subtype==='ferry'?'kts':'kts'}`, x+12, y+6);
+  }
+}
+
+// ── HEARTBEAT CANVAS ──
+function drawHBCanvas(){
+  if(!showHB || !selectedId) return;
+  const W=hbCvs.width, H=hbCvs.height;
+  hbCtx.clearRect(0,0,W,H);
+
+  // Background
+  hbCtx.fillStyle='rgba(0,0,0,0.4)';
+  hbCtx.fillRect(0,0,W,H);
+
+  // Baseline
+  hbCtx.strokeStyle='rgba(0,212,255,0.15)';
+  hbCtx.lineWidth=1;
+  hbCtx.beginPath();
+  hbCtx.moveTo(0,H*0.7); hbCtx.lineTo(W,H*0.7); hbCtx.stroke();
+
+  // Draw heartbeat waveform
+  const now=simTime;
+  const window=30; // seconds visible
+
+  hbCtx.strokeStyle='rgba(0,212,255,0.85)';
+  hbCtx.lineWidth=1.5;
+  hbCtx.beginPath();
+
+  let started=false;
+  hbHistory.forEach((t,i)=>{
+    const age=now-t;
+    if(age>window) return;
+    const px=(1-(age/window))*W;
+    const py=H*0.7;
+
+    if(!started){ hbCtx.moveTo(px,py); started=true; }
+
+    // Blip shape
+    hbCtx.lineTo(px, py);
+    hbCtx.lineTo(px+3, py-H*0.4);
+    hbCtx.lineTo(px+5, py+H*0.2);
+    hbCtx.lineTo(px+7, py-H*0.1);
+    hbCtx.lineTo(px+9, py);
+  });
+  hbCtx.stroke();
+
+  // Scanning line
+  const scanX=((simTime%5)/5)*W;
+  hbCtx.strokeStyle='rgba(0,255,136,0.4)';
+  hbCtx.lineWidth=1;
+  hbCtx.beginPath();
+  hbCtx.moveTo(scanX,0); hbCtx.lineTo(scanX,H); hbCtx.stroke();
+}
+
+// ── UTIL ──
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+// ── MAIN LOOP ──
+function loop(ts){
+  if(!lastT) lastT=ts;
+  const dt=(ts-lastT)/1000;
+  lastT=ts;
+
+  simulate(dt);
+  buildTargetList();
+  draw();
+
+  requestAnimationFrame(loop);
+}
+
+// ── BOOT ──
+resize();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
