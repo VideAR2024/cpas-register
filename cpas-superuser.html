@@ -155,6 +155,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
 #toast{position:fixed;bottom:44px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);color:var(--text);padding:7px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* Nameplate tooltip */
+.cpas-nameplate {
+  background: rgba(8,12,16,0.92);
+  border: 1px solid #1a2a3a;
+  padding: 4px 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+}
+.np-call { font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+.np-name { font-size: 9px; color: #4a6070; letter-spacing: 0.5px; margin-top: 1px; }
+.np-ping { font-family: 'Share Tech Mono', monospace; font-size: 9px; margin-top: 1px; }
+.np-mob  { font-size: 8px; letter-spacing: 1px; margin-top: 2px; }
+.leaflet-tooltip.cpas-nameplate { border-radius: 0; }
+
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 </style>
 </head>
@@ -319,7 +336,7 @@ const ox=oc.getContext('2d');
 function resOC(){const w=document.getElementById('map-wrap');oc.width=w.clientWidth;oc.height=w.clientHeight;}
 resOC();
 window.addEventListener('resize',()=>{resOC();map.invalidateSize();});
-map.on('move zoom',drawOC);
+map.on('move zoom',()=>{ drawOC(); });
 map.on('mousemove',e=>{
   const la=e.latlng.lat.toFixed(4),lo=Math.abs(e.latlng.lng).toFixed(4),h=e.latlng.lng<0?'W':'E';
   document.getElementById('coords').textContent=`${la}°N   ${lo}°${h}`;
@@ -344,12 +361,12 @@ const TDEFS=[
   {id:'DELTA-5', g:'sail', lat:50.773,lon:-0.035,alt:0, spd:13,hdg:87, bat:85,gps:2.9,sig:'4G LTE',ping:203},
   {id:'DELTA-6', g:'sail', lat:50.770,lon:-0.020,alt:0, spd: 9,hdg:93, bat:79,gps:3.1,sig:'4G LTE',ping:195},
   // Adur Canoe Club — close inshore, just off the beach
-  {id:'KAYAK-01',g:'kayak',lat:50.788,lon:-0.075,alt:0, spd:6, hdg:90, bat:71,gps:2.5,sig:'4G LTE',ping:142},
+  {id:'KAYAK-01',g:'kayak',lat:50.7745,lon:-0.0560,alt:0,spd:0,hdg:90,bat:90,gps:2.1,sig:'4G LTE',ping:0,pilot:'Sarah Connolly',club:'Brighton Explorers Club',equip:'Touring Kayak · Yellow',mobile:true},
   {id:'KAYAK-02',g:'kayak',lat:50.787,lon:-0.062,alt:0, spd:5, hdg:88, bat:64,gps:2.8,sig:'4G LTE',ping:138},
   {id:'KAYAK-03',g:'kayak',lat:50.787,lon:-0.048,alt:0, spd:7, hdg:92, bat:80,gps:2.3,sig:'4G LTE',ping:155},
   {id:'SUP-01',  g:'kayak',lat:50.788,lon:-0.035,alt:0, spd:4, hdg:86, bat:90,gps:2.1,sig:'4G LTE',ping:161},
   // Paramotors — flying along cliff tops / coastal edge (on land is correct for paramotors)
-  {id:'ALPHA-1', g:'para', lat:50.796,lon:-0.038,alt:138,spd:46,hdg:78,bat:91,gps:3.4,sig:'4G LTE',ping:320},
+  {id:'ALPHA-1', g:'para', lat:50.796,lon:-0.038,alt:138,spd:46,hdg:78,bat:91,gps:3.4,sig:'4G LTE',ping:320,pilot:'Mark Fletcher',club:'Telscombe Tye Flying Club',equip:'Reflex Wing · Blue/White',mobile:true},
   {id:'BRAVO-1', g:'para', lat:50.798,lon:-0.003,alt: 95,spd:42,hdg:82,bat:74,gps:3.8,sig:'VMO2',  ping:285},
   // AIS vessels — deep water, well south of coastline
   // MV Newhaven ferry: heading WSW at 247° (toward Dieppe), well offshore
@@ -362,8 +379,11 @@ const TDEFS=[
   {id:'DARK-03',g:'dark',lat:50.784,lon:-0.010,alt:0,spd:0,hdg:0,bat:null,gps:null,sig:'NONE',ping:0},
 ];
 
-let targets=TDEFS.map(t=>({...t,trail:[],vlon:(Math.random()-.5)*0.00003,vlat:(Math.random()-.5)*0.00002}));
+let targets=TDEFS.map(t=>({...t,trail:[],vlon:t.id==='KAYAK-01'?0:(Math.random()-.5)*0.00003,vlat:t.id==='KAYAK-01'?0:(Math.random()-.5)*0.00002,mobileLive:false}));
 let mkrs={},selId=null,simT=0,lastT=null,totalP=326;
+let pulseCircles=[];
+let nameplates={};
+let nameplateLayers={};
 let dkRev=false,cpaOn=false,sosOn=false,filt='ALL';
 let lay={cpas:true,ais:true,dark:true,trails:true,cpa:true};
 
@@ -469,6 +489,7 @@ function simulate(dt){
   document.getElementById('sbp').textContent=totalP;
   targets.forEach(t=>{
     if(t.g==='dark'&&!dkRev) return;
+    if(t.id==='KAYAK-01'&&!t.mobileLive) return; // wait for Sarah to start paddle
     t.vlon+=(Math.random()-.5)*0.000002; t.vlat+=(Math.random()-.5)*0.0000015;
     const spd=t.g==='ais'?0.4:t.g==='para'?0.9:0.18;
     t.vlon=Math.max(-0.00005*spd,Math.min(0.00005*spd,t.vlon));
@@ -493,7 +514,7 @@ function simulate(dt){
     if(t.bat) t.bat=Math.max(5,t.bat-(Math.random()<0.005?1:0));
     if(t.ping!=null) t.ping+=Math.random()<0.2?1:0;
   });
-  updMkrs(); drawOC(); if(selId) updPanel(); updClock(); buildList();
+  updMkrs(); drawOC(); updNameplates(); if(selId) updPanel(); updClock(); buildList();
 }
 
 // Clock
@@ -530,7 +551,76 @@ function selTarget(id){
   document.getElementById('pt').style.display='flex';
   updPanel();
   const t=targets.find(x=>x.id===id);
-  if(t) map.panTo([t.lat,t.lon]);
+  if(t){
+    map.panTo([t.lat,t.lon]);
+    locatePulse(t);
+    updNameplates();
+  }
+}
+
+// Locate pulse — 3 expanding rings on target
+function locatePulse(t){
+  // Clear old pulses
+  pulseCircles.forEach(c=>map.removeLayer(c));
+  pulseCircles=[];
+  const col = C[t.g];
+  const delays=[0,400,800];
+  delays.forEach((delay,i)=>{
+    setTimeout(()=>{
+      const c=L.circle([t.lat,t.lon],{
+        radius:30+(i*20),
+        color:col,
+        fillColor:col,
+        fillOpacity:0.08,
+        weight:1.5,
+        opacity:0.7,
+      }).addTo(map);
+      pulseCircles.push(c);
+      // Expand and fade
+      let op=0.7, r=30+(i*20);
+      const anim=setInterval(()=>{
+        op-=0.03; r+=4;
+        c.setStyle({opacity:Math.max(0,op),fillOpacity:Math.max(0,op*0.1)});
+        c.setRadius(r);
+        if(op<=0){ clearInterval(anim); map.removeLayer(c); }
+      },40);
+    }, delay);
+  });
+}
+
+// Nameplate — floating ID card above selected target
+function updNameplates(){
+  // Remove all existing tooltips
+  Object.values(nameplateLayers).forEach(nl=>{ try{ nl.unbindTooltip(); }catch(e){} });
+  nameplateLayers={};
+
+  targets.forEach(t=>{
+    const m=mkrs[t.id];
+    if(!m||!shouldShow(t)) return;
+    const col=C[t.g];
+    const isSel=(t.id===selId);
+    const hasMobile=t.mobile;
+
+    // Show nameplate on selected target always, on mobile-connected targets show smaller tag
+    if(isSel||hasMobile){
+      const isDark=t.g==='dark'&&!dkRev;
+      const pingStr=t.ping!=null?`#${Math.round(t.ping)}`:'—';
+      const mobileTag=hasMobile?`<div class="np-mob" style="color:${col}">📱 MOBILE CONNECTED</div>`:'';
+      const altStr=t.g==='para'?`${Math.round(t.alt)}m · `:'';
+      const pilotStr=t.pilot?`<div class="np-name">${t.pilot}</div>`:'';
+      const html=isSel
+        ? `<div class="np-call" style="color:${col}">${t.id}</div>${pilotStr}<div class="np-ping" style="color:${col}">${altStr}${Math.round(t.spd)}${t.g==='ais'?'kts':'km/h'} · ping ${pingStr}</div>${mobileTag}`
+        : `<div class="np-call" style="color:${col};font-size:9px">${t.id}${hasMobile?' 📱':''}</div>`;
+
+      m.bindTooltip(html, {
+        permanent: true,
+        direction: 'top',
+        offset: [0, -16],
+        className: 'cpas-nameplate',
+      });
+      nameplateLayers[t.id]=m;
+    }
+  });
 }
 
 function updPanel(){
@@ -553,6 +643,36 @@ function updPanel(){
   document.getElementById('dc2').textContent=t.cpa?Math.round(t.cpa):'—';
   document.getElementById('dsig').textContent=isDark?'NONE':t.sig;
   drawHB(t,isDark);
+  // Mobile pilot profile card
+  let mcard=document.getElementById('mobile-profile-card');
+  if(!mcard){
+    mcard=document.createElement('div');
+    mcard.id='mobile-profile-card';
+    document.getElementById('pt').appendChild(mcard);
+  }
+  if(t.mobile&&t.pilot){
+    const col=C[t.g];
+    mcard.style.cssText='margin:0;padding:10px 14px;border-top:1px solid #1a2a3a;background:rgba(0,0,0,.3);';
+    mcard.innerHTML=`
+      <div style="font-size:8px;color:#3d5566;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">📱 Mobile Profile — SAR Identity</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:36px;height:36px;border-radius:50%;border:1.5px solid ${col};display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:14px;color:${col};background:rgba(0,0,0,.4);flex-shrink:0">${t.pilot.split(' ').map(w=>w[0]).join('')}</div>
+        <div>
+          <div style="font-family:Barlow Condensed,sans-serif;font-size:15px;font-weight:700;color:#fff;letter-spacing:.5px">${t.pilot}</div>
+          <div style="font-size:9px;color:${col};letter-spacing:1.5px;text-transform:uppercase;margin-top:1px">${t.id} · CPAS REGISTERED</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1a2a3a;">
+        <div style="background:#0c1219;padding:6px 8px"><div style="font-size:7px;color:#3d5566;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">Club</div><div style="font-family:Share Tech Mono,monospace;font-size:9px;color:#ccdde8">${t.club||'—'}</div></div>
+        <div style="background:#0c1219;padding:6px 8px"><div style="font-size:7px;color:#3d5566;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">Equipment</div><div style="font-family:Share Tech Mono,monospace;font-size:9px;color:#ccdde8">${t.equip||'—'}</div></div>
+      </div>
+      <div style="margin-top:6px;padding:6px 8px;border:1px solid ${col}30;background:${col}08;">
+        <div style="font-size:8px;color:${col};letter-spacing:1.5px;text-transform:uppercase;font-family:Barlow Condensed,sans-serif;font-weight:700">● MOBILE LINK ACTIVE — ${t.sig}</div>
+      </div>`;
+    mcard.style.display='block';
+  } else {
+    mcard.style.display='none';
+  }
 }
 
 const hbc=document.getElementById('hbc'); const hbx=hbc.getContext('2d');
@@ -616,9 +736,9 @@ window.addEventListener('storage', e => {
   const {type, payload} = msg;
 
   if(type === 'ALPHA1_LIVE'){
-    // Mark Fletcher launched — make ALPHA-1 live on map
+    // Mark Fletcher launched
     const t = targets.find(x=>x.id==='ALPHA-1');
-    if(t){ t.sig='4G LTE'; }
+    if(t){ t.sig='4G LTE'; t.mobileLive=true; }
     toast('📱 MOBILE — ALPHA-1 FLIGHT ACTIVE — Mark Fletcher airborne');
     // Flash the target in the list
     busHighlight('ALPHA-1');
@@ -627,7 +747,7 @@ window.addEventListener('storage', e => {
   if(type === 'KAYAK01_LIVE'){
     // Sarah Connolly launched
     const t = targets.find(x=>x.id==='KAYAK-01');
-    if(t){ t.sig='4G LTE'; }
+    if(t){ t.sig='4G LTE'; t.mobileLive=true; t.vlon=0.00002; t.vlat=0.000005; }
     toast('📱 MOBILE — KAYAK-01 PADDLE ACTIVE — Sarah Connolly underway');
     busHighlight('KAYAK-01');
   }
