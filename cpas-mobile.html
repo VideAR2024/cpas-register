@@ -118,23 +118,24 @@ html,body{
 
 /* Hero status block */
 .hero{
-  padding:16px;
+  padding:10px 14px 8px;
   position:relative;
   overflow:hidden;
+  border-bottom:1px solid var(--border);
 }
 .hero::before{
   content:'';position:absolute;inset:0;
-  opacity:.06;
+  opacity:.04;
   background-image:repeating-linear-gradient(0deg,transparent,transparent 20px,rgba(255,255,255,.3) 20px,rgba(255,255,255,.3) 21px),
                    repeating-linear-gradient(90deg,transparent,transparent 20px,rgba(255,255,255,.3) 20px,rgba(255,255,255,.3) 21px);
 }
-.hero-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;position:relative;}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;position:relative;}
 .pilot-info{}
-.pilot-callsign{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;line-height:1;color:#fff;}
-.pilot-name{font-size:11px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.pilot-callsign{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:1px;line-height:1;color:#fff;}
+.pilot-name{font-size:11px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
 .session-block{text-align:right;}
-.session-id{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:1px;}
-.session-label{font-size:8px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.session-id{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;}
+.session-label{font-size:8px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
 
 /* State badge */
 .state-badge{
@@ -142,7 +143,7 @@ html,body{
   padding:4px 12px;
   font-family:'Barlow Condensed',sans-serif;
   font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  border:1px solid;margin-top:8px;position:relative;
+  border:1px solid;margin-top:5px;position:relative;
 }
 .state-badge .bdot{width:6px;height:6px;border-radius:50%;}
 
@@ -150,14 +151,14 @@ html,body{
 .metric-grid{
   display:grid;grid-template-columns:1fr 1fr;
   gap:1px;background:var(--border);
-  margin:0 16px 12px;
+  margin:0 16px 8px;
 }
 .metric-cell{
   background:var(--panel);
-  padding:12px 14px;
+  padding:9px 12px;
 }
 .mc-label{font-size:8px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
-.mc-val{font-family:'Share Tech Mono',monospace;font-size:22px;color:#fff;line-height:1;}
+.mc-val{font-family:'Share Tech Mono',monospace;font-size:20px;color:#fff;line-height:1;}
 .mc-unit{font-size:9px;color:var(--dim);margin-left:2px;}
 .mc-sub{font-size:9px;color:var(--dim);margin-top:2px;}
 .mc-val.warn{color:var(--warn);}
@@ -165,7 +166,7 @@ html,body{
 
 /* Section header */
 .sec-hdr{
-  padding:10px 16px 6px;
+  padding:7px 16px 5px;
   font-family:'Barlow Condensed',sans-serif;
   font-size:9px;font-weight:700;letter-spacing:3px;
   color:var(--dim);text-transform:uppercase;
@@ -175,7 +176,7 @@ html,body{
 /* Token / audit row */
 .token-row{
   display:flex;align-items:center;justify-content:space-between;
-  padding:8px 16px;
+  padding:6px 16px;
   border-bottom:1px solid rgba(255,255,255,.04);
 }
 .token-key{font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;}
@@ -209,9 +210,9 @@ html,body{
 .ping-line .pv{color:var(--text);}
 
 /* SOS button */
-.sos-wrap{padding:14px 16px;}
+.sos-wrap{padding:10px 16px;}
 .sos-btn{
-  width:100%;padding:18px;
+  width:100%;padding:12px;
   font-family:'Bebas Neue',sans-serif;
   font-size:24px;letter-spacing:4px;
   background:transparent;
@@ -250,7 +251,7 @@ html,body{
 
 /* Altitude arc */
 #alt-arc-wrap{
-  padding:16px;display:flex;flex-direction:column;align-items:center;
+  padding:8px 16px 4px;display:flex;flex-direction:column;align-items:center;
   position:relative;
 }
 #alt-canvas{display:block;}
@@ -291,16 +292,16 @@ html,body{
 
 /* Timer display */
 .timer-block{
-  text-align:center;padding:20px 16px 8px;
+  text-align:center;padding:10px 16px 6px;
 }
 .timer-label{font-size:9px;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;}
-.timer-val{font-family:'Bebas Neue',sans-serif;font-size:64px;color:#fff;letter-spacing:4px;line-height:1;}
+.timer-val{font-family:'Bebas Neue',sans-serif;font-size:52px;color:#fff;letter-spacing:4px;line-height:1;}
 .timer-sub{font-size:9px;color:var(--dim);letter-spacing:2px;margin-top:4px;}
 
 /* Launch button */
-.launch-wrap{padding:14px 16px;}
+.launch-wrap{padding:10px 16px;}
 .launch-btn{
-  width:100%;padding:20px;
+  width:100%;padding:14px;
   font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:5px;
   border:2px solid var(--pp-accent);
   background:transparent;color:var(--pp-accent);
@@ -368,7 +369,7 @@ html,body{
 
 /* Kayak launch btn */
 .kk-launch-btn{
-  width:100%;padding:18px;
+  width:100%;padding:12px;
   font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:4px;
   border:2px solid var(--kk-accent);
   background:transparent;color:var(--kk-accent);
@@ -423,8 +424,8 @@ html,body{
     <div class="hero" style="background:linear-gradient(135deg,#060d14 0%,#0a1825 100%);">
       <div class="hero-top">
         <div class="pilot-info">
-          <div class="pilot-callsign" style="color:var(--pp-accent)">MF</div>
-          <div class="pilot-name">Mark Fletcher · ALPHA-1</div>
+          <div class="pilot-callsign">Mark Fletcher</div>
+          <div class="pilot-name" style="color:var(--pp-accent);letter-spacing:2px">ALPHA-1 · MF · G-MF83</div>
         </div>
         <div class="session-block">
           <div class="session-id" id="pp-session-id">PPM-00847</div>
@@ -441,7 +442,7 @@ html,body{
 
     <!-- Altitude Arc -->
     <div id="alt-arc-wrap">
-      <canvas id="alt-canvas" width="280" height="160"></canvas>
+      <canvas id="alt-canvas" width="260" height="140"></canvas>
       <div class="alt-centre-val">
         <div class="alt-big" id="pp-alt">0</div>
         <div class="alt-unit">METRES ASL</div>
@@ -578,8 +579,8 @@ html,body{
     <div class="hero" style="background:linear-gradient(135deg,#060d10 0%,#081820 100%);">
       <div class="hero-top">
         <div class="pilot-info">
-          <div class="pilot-callsign" style="color:var(--kk-accent)">SC</div>
-          <div class="pilot-name">Sarah Connolly · KAYAK-01</div>
+          <div class="pilot-callsign">Sarah Connolly</div>
+          <div class="pilot-name" style="color:var(--kk-accent);letter-spacing:2px">KAYAK-01 · SC · KYK-00589</div>
         </div>
         <div class="session-block">
           <div class="session-id" style="color:var(--kk-accent)" id="kk-session-id">KYK-00589</div>
@@ -820,7 +821,7 @@ const altCanvas = document.getElementById('alt-canvas');
 const altCtx = altCanvas.getContext('2d');
 
 function drawAltArc(alt){
-  const W=280, H=160, cx=140, cy=155, r=120;
+  const W=260, H=140, cx=130, cy=135, r=108;
   altCtx.clearRect(0,0,W,H);
 
   // Track
