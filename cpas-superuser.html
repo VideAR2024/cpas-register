@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VIDEAR CPAS — SuperUser Ops</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet"/>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400;500&display=swap');
 :root{--bg:#080c10;--panel:#0b1017;--border:#1a2a3a;--accent:#00d4ff;--green:#00ff88;--amber:#ffaa00;--red:#ff3344;--text:#c8dde8;--dim:#4a6070;--sail:#4488ff;--kayak:#00ff88;--para:#cc44ff;--ais:#ffaa00;--dark:#ff3344;}
@@ -153,6 +153,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .sk{color:var(--dim);letter-spacing:1px;}.sv{color:var(--text);letter-spacing:1px;}.slv{color:var(--green);}
 .sr{margin-left:auto;padding:0 14px;}
 
+#pitch-control{position:absolute;top:52px;left:14px;z-index:600;background:rgba(8,12,16,.88);border:1px solid var(--border);padding:8px 10px;display:flex;flex-direction:column;align-items:center;}
 #toast{position:fixed;bottom:44px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);color:var(--text);padding:7px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
@@ -170,7 +171,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .np-name { font-size: 9px; color: #4a6070; letter-spacing: 0.5px; margin-top: 1px; }
 .np-ping { font-family: 'Share Tech Mono', monospace; font-size: 9px; margin-top: 1px; }
 .np-mob  { font-size: 8px; letter-spacing: 1px; margin-top: 2px; }
-.leaflet-tooltip.cpas-nameplate { border-radius: 0; }
+.mapboxgl-popup-content { background:rgba(8,12,16,0.92)!important; border:1px solid #1a2a3a!important; padding:6px 10px!important; border-radius:0!important; box-shadow:0 2px 12px rgba(0,0,0,.6)!important; font-family:"Barlow Condensed",sans-serif; color:#ccdde8; } .mapboxgl-popup-tip { display:none!important; }
 
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 </style>
@@ -233,8 +234,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   <div id="lmap"></div>
   <canvas id="oc"></canvas>
   <div id="vmode">
-    <div class="vmb active" onclick="setView('top',this)">TOP DOWN</div>
-    <div class="vmb" onclick="setView('chase',this)">FOLLOW CAM</div>
+    <div class="vmb active" id="vbtn-top"    onclick="setView('top')">TOP DOWN</div>
+    <div class="vmb"         id="vbtn-tilt"   onclick="setView('tilt')">3D TILT</div>
+    <div class="vmb"         id="vbtn-sat"    onclick="setView('sat')">SATELLITE</div>
+    <div class="vmb"         id="vbtn-chase"  onclick="setView('chase')">FOLLOW CAM</div>
+  </div>
+  <div id="pitch-control">
+    <div style="font-size:8px;color:var(--dim);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">PITCH</div>
+    <input type="range" id="pitch-slider" min="0" max="75" value="0" oninput="setPitch(this.value)"
+      style="width:80px;accent-color:var(--accent);cursor:pointer;">
+    <div style="font-size:8px;color:var(--dim);text-align:center;margin-top:2px" id="pitch-val">0°</div>
   </div>
   <div id="compass">
     <svg width="70" height="70" viewBox="0 0 70 70">
@@ -305,7 +314,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 </div>
 <div id="toast"></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 <script>
 // Compass ticks
 (function(){
@@ -323,12 +332,91 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   }
 })();
 
-// Leaflet map — CartoDB Dark Matter, North-up (default)
-const map=L.map('lmap',{center:[50.808,-0.032],zoom:13,zoomControl:true,attributionControl:true});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-  attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
-  subdomains:'abcd',maxZoom:19
-}).addTo(map);
+// ── MAPBOX GL JS INIT ──
+mapboxgl.accessToken = 'pk.eyJ1IjoidmlkZWFyIiwiYSI6ImNtbnN2MjMxMzBnbm0yeHIydjB0a2s3NjYifQ.2qQZV2sELuI-hsAfYN1-yA';
+
+const map = new mapboxgl.Map({
+  container: 'lmap',
+  style: 'mapbox://styles/mapbox/dark-v11',
+  center: [-0.032, 50.808],  // [lng, lat] for Mapbox
+  zoom: 12.5,
+  pitch: 0,
+  bearing: 0,
+  antialias: true,
+});
+
+// Add navigation control (zoom +/-)
+map.addControl(new mapboxgl.NavigationControl({showCompass:false}), 'top-right');
+
+// Terrain + 3D buildings added once style loads
+map.on('load', () => {
+  // Add terrain source for real elevation
+  map.addSource('mapbox-dem', {
+    type: 'raster-dem',
+    url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+    tileSize: 512,
+    maxzoom: 14,
+  });
+  map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+
+  // 3D buildings layer
+  map.addLayer({
+    id: 'cpas-3d-buildings',
+    source: 'composite',
+    'source-layer': 'building',
+    filter: ['==', 'extrude', 'true'],
+    type: 'fill-extrusion',
+    minzoom: 13,
+    paint: {
+      'fill-extrusion-color': '#0d1f2d',
+      'fill-extrusion-height': ['get', 'height'],
+      'fill-extrusion-base': ['get', 'min_height'],
+      'fill-extrusion-opacity': 0.8,
+    },
+  });
+
+  // Corridor boundary lines
+  map.addSource('corridor', {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: [
+        { type:'Feature', geometry:{ type:'LineString', coordinates:[[-0.056,50.750],[-0.056,50.830]] }, properties:{} },
+        { type:'Feature', geometry:{ type:'LineString', coordinates:[[ 0.005,50.750],[ 0.005,50.830]] }, properties:{} },
+      ]
+    }
+  });
+  map.addLayer({
+    id: 'corridor-lines',
+    type: 'line',
+    source: 'corridor',
+    paint: { 'line-color':'#00d4ff', 'line-opacity':0.15, 'line-width':1, 'line-dasharray':[4,4] }
+  });
+
+  // Initialise target markers once map is ready
+  createMkrs();
+  updNameplates();
+});
+
+// Update compass needle to match map bearing
+map.on('rotate', () => {
+  const bearing = map.getBearing();
+  document.getElementById('compass-needle') && (
+    document.getElementById('compass-needle').setAttribute('transform', `rotate(${bearing},35,35)`)
+  );
+});
+
+// Coords on mouse move
+map.on('mousemove', e => {
+  const lat = e.lngLat.lat.toFixed(4);
+  const lon = Math.abs(e.lngLat.lng).toFixed(4);
+  const hem = e.lngLat.lng < 0 ? 'W' : 'E';
+  document.getElementById('coords').textContent = lat+'°N   '+lon+'°'+hem;
+});
+
+// Redraw overlay canvas on map move
+map.on('move', () => { drawOC(); updNameplates(); });
+map.on('zoom', () => { drawOC(); updNameplates(); });
 
 // Overlay canvas for trails + arcs
 const oc=document.getElementById('oc');
@@ -387,47 +475,36 @@ let nameplateLayers={};
 let dkRev=false,cpaOn=false,sosOn=false,filt='ALL';
 let lay={cpas:true,ais:true,dark:true,trails:true,cpa:true};
 
-// Icon builder
-function mkIcon(t){
+// Icon HTML builder
+function mkIconHtml(t){
   const col=C[t.g];
   const isDark=t.g==='dark'&&!dkRev;
-  let html='';
   if(isDark){
-    html=`<div style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;">
-      <svg width="20" height="20" viewBox="-10 -10 20 20"><circle r="7" fill="none" stroke="${col}" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.5"/><text y="3" text-anchor="middle" font-size="8" fill="${col}" opacity="0.5">?</text></svg></div>`;
+    return `<svg width="20" height="20" viewBox="-10 -10 20 20"><circle r="7" fill="none" stroke="${col}" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.5"/><text y="3" text-anchor="middle" font-size="8" fill="${col}" opacity="0.5">?</text></svg>`;
   } else if(t.g==='para'){
-    html=`<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;">
-      <svg width="24" height="24" viewBox="-12 -12 24 24"><g transform="rotate(${t.hdg})"><polygon points="0,-10 7,0 0,6 -7,0" fill="${col}cc" stroke="${col}" stroke-width="1"/></g></svg></div>`;
+    return `<svg width="26" height="26" viewBox="-13 -13 26 26"><g transform="rotate(${t.hdg})"><polygon points="0,-10 7,0 0,6 -7,0" fill="${col}cc" stroke="${col}" stroke-width="1.2"/></g></svg>`;
   } else if(t.g==='ais'){
-    // Heading: 0=North, 90=East. SVG triangle points up (north) by default.
-    // rotate(hdg) spins it to the correct compass bearing. No -90 offset needed.
-    // Bow pointer line extends forward from tip of triangle.
-    html=`<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;">
-      <svg width="40" height="40" viewBox="-20 -20 40 40">
-        <g transform="rotate(${t.hdg})">
-          <polygon points="0,-10 6,8 0,5 -6,8" fill="${col}cc" stroke="${col}" stroke-width="1.5"/>
-          <line x1="0" y1="-10" x2="0" y2="-18" stroke="${col}" stroke-width="1.5" opacity="0.8"/>
-        </g>
-      </svg></div>`;
+    return `<svg width="44" height="44" viewBox="-22 -22 44 44"><g transform="rotate(${t.hdg})"><polygon points="0,-10 6,8 0,5 -6,8" fill="${col}cc" stroke="${col}" stroke-width="1.5"/><line x1="0" y1="-10" x2="0" y2="-20" stroke="${col}" stroke-width="1.5" opacity="0.8"/></g></svg>`;
   } else if(t.g==='kayak'){
-    html=`<div style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;">
-      <svg width="20" height="20" viewBox="-10 -10 20 20"><g transform="rotate(${t.hdg})"><ellipse rx="4" ry="8" fill="${col}bb" stroke="${col}" stroke-width="1"/></g></svg></div>`;
+    return `<svg width="20" height="20" viewBox="-10 -10 20 20"><g transform="rotate(${t.hdg})"><ellipse rx="4" ry="8" fill="${col}bb" stroke="${col}" stroke-width="1.2"/></g></svg>`;
   } else {
-    html=`<div style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;">
-      <svg width="18" height="18" viewBox="-9 -9 18 18"><circle r="6" fill="${col}aa" stroke="${col}" stroke-width="1.5"/><circle r="2" fill="${col}"/></svg></div>`;
+    return `<svg width="18" height="18" viewBox="-9 -9 18 18"><circle r="6" fill="${col}aa" stroke="${col}" stroke-width="1.5"/><circle r="2" fill="${col}"/></svg>`;
   }
-  return L.divIcon({html,className:'',iconSize:[24,24],iconAnchor:[12,12]});
 }
 
-// Create markers
+// Create Mapbox markers
 function createMkrs(){
   targets.forEach(t=>{
-    const m=L.marker([t.lat,t.lon],{icon:mkIcon(t),zIndexOffset:t.g==='para'?1000:0})
-      .addTo(map).on('click',()=>selTarget(t.id));
-    mkrs[t.id]=m;
+    const el=document.createElement('div');
+    el.style.cursor='pointer';
+    el.innerHTML=mkIconHtml(t);
+    el.addEventListener('click',()=>selTarget(t.id));
+    const m=new mapboxgl.Marker({element:el,anchor:'center'})
+      .setLngLat([t.lon,t.lat])
+      .addTo(map);
+    mkrs[t.id]={marker:m, el:el};
   });
 }
-createMkrs();
 
 function shouldShow(t){
   if(t.g==='dark'&&!dkRev&&!lay.dark) return false;
@@ -442,16 +519,20 @@ function shouldShow(t){
 
 function updMkrs(){
   targets.forEach(t=>{
-    const m=mkrs[t.id]; if(!m) return;
+    const entry=mkrs[t.id]; if(!entry) return;
+    const {marker,el}=entry;
     if(shouldShow(t)){
-      m.setLatLng([t.lat,t.lon]); m.setIcon(mkIcon(t));
-      if(!map.hasLayer(m)) m.addTo(map);
-    } else { if(map.hasLayer(m)) map.removeLayer(m); }
+      marker.setLngLat([t.lon,t.lat]);
+      el.innerHTML=mkIconHtml(t);
+      el.style.display='';
+    } else {
+      el.style.display='none';
+    }
   });
 }
 
 // Overlay draw
-function ll2px(lat,lon){ const p=map.latLngToContainerPoint(L.latLng(lat,lon)); return {x:p.x,y:p.y}; }
+function ll2px(lat,lon){ const p=map.project([lon,lat]); return {x:p.x,y:p.y}; }
 
 function drawOC(){
   ox.clearRect(0,0,oc.width,oc.height);
@@ -558,68 +639,64 @@ function selTarget(id){
   }
 }
 
-// Locate pulse — 3 expanding rings on target
+// Locate pulse — animated rings drawn on overlay canvas
 function locatePulse(t){
-  // Clear old pulses
-  pulseCircles.forEach(c=>map.removeLayer(c));
-  pulseCircles=[];
-  const col = C[t.g];
-  const delays=[0,400,800];
-  delays.forEach((delay,i)=>{
-    setTimeout(()=>{
-      const c=L.circle([t.lat,t.lon],{
-        radius:30+(i*20),
-        color:col,
-        fillColor:col,
-        fillOpacity:0.08,
-        weight:1.5,
-        opacity:0.7,
-      }).addTo(map);
-      pulseCircles.push(c);
-      // Expand and fade
-      let op=0.7, r=30+(i*20);
-      const anim=setInterval(()=>{
-        op-=0.03; r+=4;
-        c.setStyle({opacity:Math.max(0,op),fillOpacity:Math.max(0,op*0.1)});
-        c.setRadius(r);
-        if(op<=0){ clearInterval(anim); map.removeLayer(c); }
-      },40);
-    }, delay);
-  });
+  const col=C[t.g];
+  const startTime=Date.now();
+  const duration=2000;
+  function animPulse(){
+    const elapsed=Date.now()-startTime;
+    if(elapsed>duration) return;
+    const p=ll2px(t.lat,t.lon);
+    const progress=elapsed/duration;
+    // Draw 3 rings at different phases
+    [0,0.33,0.66].forEach(offset=>{
+      const phase=(progress+offset)%1;
+      const r=10+phase*60;
+      const alpha=1-phase;
+      ox.beginPath();
+      ox.arc(p.x,p.y,r,0,Math.PI*2);
+      ox.strokeStyle=col+''+Math.round(alpha*255).toString(16).padStart(2,'0');
+      ox.lineWidth=2;
+      ox.stroke();
+    });
+    requestAnimationFrame(animPulse);
+  }
+  animPulse();
 }
 
-// Nameplate — floating ID card above selected target
+// Nameplate — Mapbox GL popups pinned to targets
 function updNameplates(){
-  // Remove all existing tooltips
-  Object.values(nameplateLayers).forEach(nl=>{ try{ nl.unbindTooltip(); }catch(e){} });
+  // Remove existing popups
+  Object.values(nameplateLayers).forEach(p=>{ try{ p.remove(); }catch(e){} });
   nameplateLayers={};
 
   targets.forEach(t=>{
-    const m=mkrs[t.id];
-    if(!m||!shouldShow(t)) return;
+    const entry=mkrs[t.id];
+    if(!entry||!shouldShow(t)) return;
     const col=C[t.g];
     const isSel=(t.id===selId);
     const hasMobile=t.mobile;
+    if(!isSel&&!hasMobile) return;
 
-    // Show nameplate on selected target always, on mobile-connected targets show smaller tag
-    if(isSel||hasMobile){
-      const isDark=t.g==='dark'&&!dkRev;
-      const pingStr=t.ping!=null?`#${Math.round(t.ping)}`:'—';
-      const mobileTag=hasMobile?`<div class="np-mob" style="color:${col}">📱 MOBILE CONNECTED</div>`:'';
-      const altStr=t.g==='para'?`${Math.round(t.alt)}m · `:'';
-      const pilotStr=t.pilot?`<div class="np-name">${t.pilot}</div>`:'';
-      const html=isSel
-        ? `<div class="np-call" style="color:${col}">${t.id}</div>${pilotStr}<div class="np-ping" style="color:${col}">${altStr}${Math.round(t.spd)}${t.g==='ais'?'kts':'km/h'} · ping ${pingStr}</div>${mobileTag}`
-        : `<div class="np-call" style="color:${col};font-size:9px">${t.id}${hasMobile?' 📱':''}</div>`;
+    const pingStr=t.ping!=null?`#${Math.round(t.ping)}`:'—';
+    const mobileTag=hasMobile?`<div class="np-mob" style="color:${col}">📱 MOBILE</div>`:'';
+    const altStr=t.g==='para'?`${Math.round(t.alt)}m · `:'';
+    const pilotStr=t.pilot?`<div class="np-name">${t.pilot}</div>`:'';
+    const html=isSel
+      ? `<div class="np-call" style="color:${col}">${t.id}</div>${pilotStr}<div class="np-ping" style="color:${col}">${altStr}${Math.round(t.spd)}${t.g==='ais'?'kts':'km/h'} · ping ${pingStr}</div>${mobileTag}`
+      : `<div class="np-call" style="color:${col};font-size:9px">${t.id} 📱</div>`;
 
-      m.bindTooltip(html, {
-        permanent: true,
-        direction: 'top',
-        offset: [0, -16],
-        className: 'cpas-nameplate',
-      });
-      nameplateLayers[t.id]=m;
-    }
+    const popup=new mapboxgl.Popup({
+      closeButton:false, closeOnClick:false,
+      offset:[0,-14], anchor:'bottom',
+      className:'cpas-nameplate',
+      maxWidth:'200px',
+    })
+    .setLngLat([t.lon,t.lat])
+    .setHTML(html)
+    .addTo(map);
+    nameplateLayers[t.id]=popup;
   });
 }
 
@@ -705,7 +782,31 @@ function layerToggle(){
 }
 
 // View mode
-function setView(mode,el){ document.querySelectorAll('.vmb').forEach(b=>b.classList.remove('active')); el.classList.add('active'); if(mode==='chase'){ const a=targets.find(t=>t.id==='ALPHA-1'); if(a){ map.setView([a.lat,a.lon],15); toast('Follow cam — tracking ALPHA-1'); } } else { map.setView([50.808,-0.032],13); } }
+function setView(mode){
+  document.querySelectorAll('.vmb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('vbtn-'+mode).classList.add('active');
+  if(mode==='top'){
+    map.easeTo({center:[-0.032,50.808],zoom:12.5,pitch:0,bearing:0,duration:800});
+    document.getElementById('pitch-slider').value=0;
+    document.getElementById('pitch-val').textContent='0°';
+  } else if(mode==='tilt'){
+    map.easeTo({center:[-0.032,50.808],zoom:13,pitch:55,bearing:-10,duration:1200});
+    document.getElementById('pitch-slider').value=55;
+    document.getElementById('pitch-val').textContent='55°';
+  } else if(mode==='sat'){
+    map.setStyle('mapbox://styles/mapbox/satellite-streets-v12');
+    map.once('styledata',()=>{ map.easeTo({center:[-0.032,50.808],zoom:13,pitch:45,bearing:0,duration:1000}); });
+    document.getElementById('pitch-slider').value=45;
+    document.getElementById('pitch-val').textContent='45°';
+  } else if(mode==='chase'){
+    const a=targets.find(t=>t.id==='ALPHA-1');
+    if(a){ map.easeTo({center:[a.lon,a.lat],zoom:15,pitch:60,bearing:a.hdg,duration:1000}); toast('Follow cam — tracking ALPHA-1'); }
+  }
+}
+function setPitch(v){
+  map.easeTo({pitch:Number(v),duration:200});
+  document.getElementById('pitch-val').textContent=v+'°';
+}
 
 // Scenarios
 function toggleSc(){ document.getElementById('scp').classList.toggle('open'); }
@@ -718,7 +819,7 @@ function sReset(){ cpaOn=false; sosOn=false; dkRev=false; updMkrs(); drawOC(); t
 
 // Actions
 function actT(){ toast('Trail history — last 100 pings displayed'); }
-function actC(){ const t=targets.find(x=>x.id===selId); if(t){ map.setView([t.lat,t.lon],14); toast(`Map centred on ${t.id}`); } }
+function actC(){ const t=targets.find(x=>x.id===selId); if(t){ map.easeTo({center:[t.lon,t.lat],zoom:14,duration:800}); toast(`Map centred on ${t.id}`); } }
 function actA(){ toast('⚠ Alert sent to SAR coordinator'); }
 function actF(){ toast('Target flagged for review'); }
 function actE(){ toast('Session exported — OPS-2026-04-10.json'); }
@@ -758,7 +859,7 @@ window.addEventListener('storage', e => {
     selTarget(tId);
     // Pan map to target
     const t = targets.find(x=>x.id===tId);
-    if(t) map.setView([t.lat, t.lon], 14);
+    if(t) map.easeTo({center:[t.lon,t.lat],zoom:14,pitch:30,duration:800});
     toast('🆘 MOBILE SOS — ' + tId + ' — COASTGUARD ALERTED');
     busHighlight(tId);
   }
@@ -786,12 +887,13 @@ window.addEventListener('storage', e => {
   }
 
   if(type === 'KK_PING'){
-    // Update KAYAK-01 live data
     const t = targets.find(x=>x.id==='KAYAK-01');
     if(t){
       t.spd  = payload.spd  || t.spd;
       t.bat  = payload.bat  || t.bat;
       t.ping = payload.seq;
+      // Update marker position from real ping if available
+      const entry=mkrs[t.id]; if(entry) entry.marker.setLngLat([t.lon,t.lat]);
     }
     totalP++;
     document.getElementById('sbp').textContent = totalP;
@@ -809,13 +911,10 @@ window.addEventListener('storage', e => {
 
 // Flash a target row briefly to signal incoming data
 function busHighlight(id){
-  // Brief visual pulse on the marker
   const t = targets.find(x=>x.id===id);
   if(!t) return;
-  // Temporarily boost zIndex and add a pulse via the trail
-  t.trail.push([t.lat, t.lon]); // force trail redraw
+  locatePulse(t);
   drawOC();
-  // If this target is selected, update panel immediately
   if(selId===id) updPanel();
 }
 
