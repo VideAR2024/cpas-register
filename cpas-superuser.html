@@ -607,6 +607,98 @@ function actE(){ toast('Session exported — OPS-2026-04-10.json'); }
 let toastTmr;
 function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.style.opacity='1'; clearTimeout(toastTmr); toastTmr=setTimeout(()=>el.style.opacity='0',3000); }
 
+
+// ── CPAS BUS — listen for mobile events ──
+window.addEventListener('storage', e => {
+  if(e.key !== 'CPAS_BUS' || !e.newValue) return;
+  let msg;
+  try { msg = JSON.parse(e.newValue); } catch(ex){ return; }
+  const {type, payload} = msg;
+
+  if(type === 'ALPHA1_LIVE'){
+    // Mark Fletcher launched — make ALPHA-1 live on map
+    const t = targets.find(x=>x.id==='ALPHA-1');
+    if(t){ t.sig='4G LTE'; }
+    toast('📱 MOBILE — ALPHA-1 FLIGHT ACTIVE — Mark Fletcher airborne');
+    // Flash the target in the list
+    busHighlight('ALPHA-1');
+  }
+
+  if(type === 'KAYAK01_LIVE'){
+    // Sarah Connolly launched
+    const t = targets.find(x=>x.id==='KAYAK-01');
+    if(t){ t.sig='4G LTE'; }
+    toast('📱 MOBILE — KAYAK-01 PADDLE ACTIVE — Sarah Connolly underway');
+    busHighlight('KAYAK-01');
+  }
+
+  if(type === 'SOS'){
+    const tId = payload.target || 'ALPHA-1';
+    sosOn = true;
+    selTarget(tId);
+    // Pan map to target
+    const t = targets.find(x=>x.id===tId);
+    if(t) map.setView([t.lat, t.lon], 14);
+    toast('🆘 MOBILE SOS — ' + tId + ' — COASTGUARD ALERTED');
+    busHighlight(tId);
+  }
+
+  if(type === 'CPA_EVENT'){
+    cpaOn = true;
+    toast('⚡ MOBILE CPA — ALPHA-1 / MV NEWHAVEN · ' + Math.round(payload.dist) + 'm');
+    setTimeout(()=>{ cpaOn=false; }, 15000);
+    drawOC();
+  }
+
+  if(type === 'PP_PING'){
+    // Update ALPHA-1 live data from real mobile ping
+    const t = targets.find(x=>x.id==='ALPHA-1');
+    if(t){
+      t.alt  = payload.alt  || t.alt;
+      t.spd  = payload.spd  || t.spd;
+      t.hdg  = payload.hdg  || t.hdg;
+      t.bat  = payload.bat  || t.bat;
+      t.ping = payload.seq;
+    }
+    totalP++;
+    document.getElementById('sbp').textContent = totalP;
+    if(selId==='ALPHA-1') updPanel();
+  }
+
+  if(type === 'KK_PING'){
+    // Update KAYAK-01 live data
+    const t = targets.find(x=>x.id==='KAYAK-01');
+    if(t){
+      t.spd  = payload.spd  || t.spd;
+      t.bat  = payload.bat  || t.bat;
+      t.ping = payload.seq;
+    }
+    totalP++;
+    document.getElementById('sbp').textContent = totalP;
+    if(selId==='KAYAK-01') updPanel();
+  }
+
+  if(type === 'KK_MILESTONE'){
+    toast('📍 KAYAK-01 MILESTONE — ' + payload.name);
+    busHighlight('KAYAK-01');
+  }
+
+  // Rebuild list to reflect ping count updates
+  buildList();
+});
+
+// Flash a target row briefly to signal incoming data
+function busHighlight(id){
+  // Brief visual pulse on the marker
+  const t = targets.find(x=>x.id===id);
+  if(!t) return;
+  // Temporarily boost zIndex and add a pulse via the trail
+  t.trail.push([t.lat, t.lon]); // force trail redraw
+  drawOC();
+  // If this target is selected, update panel immediately
+  if(selId===id) updPanel();
+}
+
 // Loop
 function loop(ts){
   if(!lastT) lastT=ts;
