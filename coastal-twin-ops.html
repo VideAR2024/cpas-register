@@ -2,85 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>VIDEAR | Coastal Digital Twin Ops</title>
-  
+  <title>VIDEAR | Clean Coastal Twin</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;700&display=swap');
-    
     html, body, #viewDiv { padding: 0; margin: 0; height: 100%; width: 100%; background: #080c10; }
     
     #overlay {
       position: absolute; top: 20px; left: 20px; z-index: 99;
       background: rgba(11, 16, 23, 0.9); border: 1px solid #1a2a3a;
       padding: 15px; color: #c8dde8; font-family: 'Barlow Condensed', sans-serif;
-      backdrop-filter: blur(10px); width: 280px;
+      backdrop-filter: blur(10px); width: 280px; pointer-events: none;
     }
-    
-    .status-pill {
-      font-family: 'Share Tech Mono', monospace; font-size: 11px;
-      color: #00ff88; display: flex; align-items: center; gap: 5px; margin-top: 8px;
-    }
-    .dot { width: 6px; height: 6px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 5px #00ff88; }
-    
     h1 { margin: 0; font-size: 18px; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
-    .sub { font-size: 10px; color: #4a6070; letter-spacing: 1px; margin-top: 2px; }
+    .status { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: #00d4ff; margin-top: 5px; }
   </style>
 
   <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/dark/main.css" />
   <script src="https://js.arcgis.com/4.30/"></script>
 
   <script>
-    require([
-      "esri/config",
-      "esri/Map",
-      "esri/views/SceneView",
-      "esri/layers/TileLayer"
-    ], function(esriConfig, Map, SceneView, TileLayer) {
+    require(["esri/config", "esri/Map", "esri/views/SceneView"], function(esriConfig, Map, SceneView) {
 
-      // Your ArcGIS Token
       esriConfig.apiKey = "AAPTaB2f_QUvo4VmzjA0BGXhG8w..k9sDQyElBWsY8CQEY9HUldroxtOG06x4ZTHF8qv6yDs61Akac7nqUs0Cs-Zzp42O0GawXpcb7Jr83nDBUY3HEgPInVpWUHuHuyfvUnbDayboVjp0fKAqrkzn6KKKbLgJ24_fayGXX54PTiJE9N4trCntAGvMMuxzdqcb4lV8k-J3TBXa00Rp6zjMDiTxBkWiCGIZ_Ze5sabNwlZOm5yy0PQQAbhwvZJD6YHaO4xBRFohfSnO5cZGyj8noees-Ko.AT1_Nkfde0og";
 
       const map = new Map({
-        basemap: "arcgis-imagery", 
-        ground: "world-elevation" // This provides the 3D relief for the Newhaven cliffs
+        // THIS IS THE KEY: "arcgis-navigation-night" gives that crisp Mapbox-style vector look
+        basemap: "arcgis-navigation-night", 
+        ground: "world-elevation" 
       });
 
       const view = new SceneView({
         container: "viewDiv",
         map: map,
-        camera: {
-          position: {
-            x: -0.032, // Centered on your corridor longitude
-            y: 50.780, // Latitude over the water looking north
-            z: 1200    // Altitude in meters
-          },
-          tilt: 65,
-          heading: 0 // Facing North towards the coastline
-        },
+        alphaCompositingEnabled: true,
         environment: {
+          background: { type: "color", color: [8, 12, 16, 1] },
+          starsEnabled: false,
+          atmosphereEnabled: false, // Disabling atmosphere removes the "foggy" look
           lighting: {
-            directShadowsEnabled: true,
-            date: new Date("2026-04-11T11:00:00")
-          },
-          atmosphere: { quality: "high" }
+            type: "virtual" // Virtual lighting prevents "muddy" shadows on the terrain
+          }
+        },
+        camera: {
+          position: [-0.245, 50.815, 2500], // Adjusted for Shoreham/Southwick area
+          tilt: 60,
+          heading: 110
         }
       });
 
-      // Add a subtle bathymetry/water layer feel
-      const waterEffect = new TileLayer({
-        url: "https://services.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer",
-        opacity: 0.4
-      });
-      map.add(waterEffect);
+      // Remove the "mesh" look of the ground to keep it clean
+      view.on("pointer-down", function(event) { event.stopPropagation(); });
     });
   </script>
 </head>
 <body>
   <div id="overlay">
-    <h1>COASTAL TWIN OPS</h1>
-    <div class="sub">NEWHAVEN → SHOREHAM PORT SECTOR</div>
-    <div class="status-pill"><div class="dot"></div> ARCGIS SCENE ENGINE ACTIVE</div>
+    <h1>COASTAL TWIN</h1>
+    <div class="status">SYSTEM: ARCGIS ENGINE // MODE: CLEAN VECTOR</div>
   </div>
   <div id="viewDiv"></div>
 </body>
