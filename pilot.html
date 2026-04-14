@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPAS — The Dark Target Pilot | VIDEAR</title>
+<meta name="description" content="CPAS makes invisible coastal and airspace users visible to rescue services using nothing but a phone. Join the South Coast Dark Target Pilot.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1a2e;
+    --navy-mid: #132d4a;
+    --teal: #00c9a7;
+    --teal-light: #00e5c7;
+    --teal-dark: #009e82;
+    --sky: #7ec8e3;
+    --coral: #ff6b5a;
+    --sand: #f7f4ef;
+    --white: #ffffff;
+    --text-primary: #0b1a2e;
+    --text-secondary: #4a5e78;
+    --text-light: #8896a8;
+    --border: rgba(11,26,46,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-primary);
+    background: var(--white);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    transition: box-shadow 0.3s;
+  }
+  nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+  .nav-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: 0.12em;
+    color: var(--navy);
+  }
+  .nav-brand span { color: var(--teal); }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--teal-dark); }
+  .nav-cta {
+    display: inline-flex;
+    padding: 0.55rem 1.3rem;
+    background: var(--teal);
+    color: var(--white) !important;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .nav-cta:hover { background: var(--teal-dark); transform: translateY(-1px); }
+
+  @media (max-width: 700px) {
+    .nav-links { gap: 1rem; }
+    .nav-links a:not(.nav-cta) { display: none; }
+    nav { padding: 0.75rem 1.25rem; }
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 7rem 2rem 4rem;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(165deg, var(--navy) 0%, var(--navy-mid) 45%, var(--teal-dark) 100%);
+    z-index: 0;
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 75% 20%, rgba(0,229,199,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 80%, rgba(126,200,227,0.1) 0%, transparent 40%);
+  }
+  /* Wave decoration */
+  .hero-wave {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+    color: var(--white);
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.8s ease 0.1s both;
+  }
+  .hero-tag .dot {
+    width: 7px; height: 7px;
+    background: var(--teal-light);
+    border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero h1 {
+    font-weight: 800;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.8s ease 0.25s both;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--teal-light);
+  }
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    font-weight: 300;
+    color: rgba(255,255,255,0.75);
+    max-width: 560px;
+    margin: 0 auto 2.5rem;
+    animation: fadeUp 0.8s ease 0.4s both;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeUp 0.8s ease 0.55s both;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.85rem 2rem;
+    border-radius: 10px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.25s;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary {
+    background: var(--teal);
+    color: var(--white);
+  }
+  .btn-primary:hover { background: var(--teal-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,201,167,0.3); }
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    border: 1.5px solid rgba(255,255,255,0.3);
+  }
+  .btn-outline:hover { border-color: var(--teal-light); color: var(--teal-light); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SECTIONS ─── */
+  .section {
+    padding: 5rem 2rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .section-wide {
+    max-width: 100%;
+  }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.6rem;
+  }
+  .section h2 {
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: var(--navy);
+  }
+  .section-sub {
+    font-size: 1.05rem;
+    font-weight: 300;
+    color: var(--text-secondary);
+    max-width: 620px;
+    margin-bottom: 3rem;
+  }
+
+  /* ─── PROBLEM SECTION ─── */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+  @media (max-width: 700px) { .problem-grid { grid-template-columns: 1fr; } }
+
+  .problem-visual {
+    position: relative;
+    background: var(--navy);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    overflow: hidden;
+  }
+  .problem-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(0,201,167,0.08) 0%, transparent 70%);
+  }
+  .radar-ring {
+    width: 160px;
+    height: 160px;
+    border: 2px solid rgba(0,201,167,0.2);
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    position: relative;
+    animation: radarSpin 6s linear infinite;
+  }
+  .radar-ring::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 50%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--teal), transparent);
+    transform-origin: left center;
+    animation: radarSweep 3s linear infinite;
+  }
+  .radar-ring::after {
+    content: '?';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--coral);
+    animation: questionPulse 2s ease-in-out infinite;
+  }
+  @keyframes radarSweep {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes radarSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes questionPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .problem-visual p {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+    position: relative;
+  }
+
+  .problem-text h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--navy);
+  }
+  .problem-text p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+  }
+  .problem-text .stat-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: rgba(255,107,90,0.08);
+    border-left: 3px solid var(--coral);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--coral);
+    margin-top: 0.5rem;
+  }
+
+  /* ─── HOW IT WORKS ─── */
+  .how-bg {
+    background: var(--sand);
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  @media (max-width: 700px) { .steps { grid-template-columns: 1fr; } }
+
+  .step {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: var(--white);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+  }
+  .step:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+  }
+  .step-num {
+    width: 44px; height: 44px;
+    background: var(--teal);
+    color: var(--white);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 0 auto 1.2rem;
+  }
+  .step-icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.75rem;
+  }
+  .step h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--navy);
+  }
+  .step p {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .step-connector {
+    display: none;
+  }
+  @media (min-width: 701px) {
+    .step-connector {
+      display: block;
+      position: absolute;
+      right: -1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--teal);
+      font-size: 1.2rem;
+    }
+  }
+
+  /* ─── WHO'S INVOLVED ─── */
+  .discipline-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+  }
+  .d-tag {
+    padding: 0.55rem 1.1rem;
+    border-radius: 100px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    border: 1.5px solid;
+    transition: transform 0.2s;
+  }
+  .d-tag:hover { transform: scale(1.05); }
+  .d-tag.water { border-color: var(--teal); color: var(--teal-dark); background: rgba(0,201,167,0.06); }
+  .d-tag.air { border-color: var(--sky); color: var(--navy-mid); background: rgba(126,200,227,0.08); }
+  .d-tag.shore { border-color: var(--coral); color: var(--coral); background: rgba(255,107,90,0.06); }
+
+  .pilot-area {
+    background: var(--navy);
+    border-radius: 16px;
+    padding: 2.5rem;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .pilot-area-text { flex: 1; min-width: 260px; }
+  .pilot-area-text h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .pilot-area-text p {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.6;
+  }
+  .pilot-stat {
+    text-align: center;
+    padding: 1.5rem 2rem;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(0,201,167,0.2);
+    border-radius: 12px;
+  }
+  .pilot-stat .big {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--teal-light);
+  }
+  .pilot-stat .small {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.45);
+    margin-top: 0.25rem;
+  }
+
+  /* ─── NO COST ─── */
+  .no-cost {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  @media (max-width: 700px) { .no-cost { grid-template-columns: 1fr; } }
+  .no-cost-item {
+    padding: 1.5rem;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    text-align: center;
+    transition: border-color 0.3s;
+  }
+  .no-cost-item:hover { border-color: var(--teal); }
+  .no-cost-item .icon { font-size: 1.8rem; margin-bottom: 0.6rem; }
+  .no-cost-item h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .no-cost-item p { font-size: 0.82rem; color: var(--text-secondary); }
+
+  /* ─── CTA ─── */
+  .cta-section {
+    background: linear-gradient(165deg, var(--navy) 0%, var(--navy-mid) 100%);
+    padding: 5rem 2rem;
+    text-align: center;
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,229,199,0.12) 0%, transparent 60%);
+  }
+  .cta-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .cta-section h2 {
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    margin-bottom: 1rem;
+    color: var(--white);
+  }
+  .cta-section p {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 2rem;
+    font-weight: 300;
+  }
+  .cta-section .btn-primary {
+    font-size: 1.05rem;
+    padding: 1rem 2.5rem;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.4);
+    padding: 2.5rem 2rem;
+    text-align: center;
+  }
+  .footer-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+    color: var(--teal);
+    margin-bottom: 0.5rem;
+  }
+  footer a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  footer a:hover { color: var(--teal-light); }
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 1rem 0;
+    font-size: 0.82rem;
+  }
+  .footer-legal {
+    font-size: 0.72rem;
+    margin-top: 1rem;
+    color: rgba(255,255,255,0.25);
+  }
+
+  /* Wave SVG bottom of hero */
+  .wave-divider {
+    display: block;
+    width: 100%;
+    margin-top: -1px;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-brand">VIDEAR <span>CPAS</span></div>
+  <ul class="nav-links">
+    <li><a href="#problem">The Problem</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#pilot">The Pilot</a></li>
+    <li><a href="#register" class="nav-cta">Register Interest</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <svg class="wave-divider hero-wave" viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <path d="M0,60 C360,120 720,0 1080,60 C1260,90 1380,80 1440,70 L1440,120 L0,120 Z" fill="#ffffff"/>
+  </svg>
+  <div class="hero-content">
+    <div class="hero-tag"><span class="dot"></span> South Coast Pilot — 2026</div>
+    <h1>If you have a view of the sky,<br><em>you will be tracked.</em></h1>
+    <p class="hero-sub">CPAS makes invisible coastal and airspace users — kayakers, paddle boarders, sailors, swimmers, paraglider pilots — visible to rescue services. Using nothing but a phone.</p>
+    <div class="hero-actions">
+      <a href="#register" class="btn btn-primary">Register Your Club</a>
+      <a href="#how" class="btn btn-outline">How It Works</a>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<div class="section" id="problem">
+  <div class="section-label">The Dark Target Problem</div>
+  <div class="problem-grid">
+    <div class="problem-visual">
+      <div class="radar-ring"></div>
+      <p>Thousands of people on water and in low-level airspace are completely invisible to rescue services every day.</p>
+    </div>
+    <div class="problem-text">
+      <h3>When you leave shore, you disappear</h3>
+      <p>Every time a kayaker launches, a paddle boarder heads out, or a paraglider takes flight, they become a <strong>Dark Target</strong> — invisible to the coastguard, mountain rescue, and every other emergency service.</p>
+      <p>When something goes wrong, rescue crews are searching blind. It costs critical time, it puts SAR crews at risk, and it costs lives.</p>
+      <p>Existing solutions require expensive hardware, paid subscriptions, or manual check-in. Most recreational users have neither.</p>
+      <div class="stat-callout">CPAS requires no new hardware — just the phone in your pocket</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-bg" id="how">
+  <div class="section">
+    <div class="section-label">How CPAS Works</div>
+    <h2>Three steps. Zero hardware.</h2>
+    <p class="section-sub">CPAS — Common Position Awareness System — is a patented technology that turns any mobile phone into a position beacon.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-icon">📱</div>
+        <h3>Your phone pings</h3>
+        <p>When you head out on the water or into the air, your phone sends a lightweight position ping. No app to download. No subscription.</p>
+        <span class="step-connector">→</span>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-icon">📡</div>
+        <h3>CPAS tracks you</h3>
+        <p>Your position appears on a live 3D Digital Twin map visible to rescue services. Updated in real time. Adaptive ping rates based on your activity.</p>
+        <span class="step-connector">→</span>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-icon">🆘</div>
+        <h3>Help finds you</h3>
+        <p>If something goes wrong, rescue crews know exactly where you are. No searching blind. No wasted time. Faster response, better outcomes.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHO'S INVOLVED -->
+<div class="section" id="pilot">
+  <div class="section-label">The Dark Target Pilot</div>
+  <h2>17+ clubs across five disciplines</h2>
+  <p class="section-sub">The South Coast pilot brings together clubs from Newhaven to Shoreham — sailing, kayaking, SUP, paragliding, open water swimming and fishing — in the UK's first community-powered position awareness trial.</p>
+
+  <div class="discipline-tags">
+    <span class="d-tag water">🚣 Kayaking</span>
+    <span class="d-tag water">🏄 SUP</span>
+    <span class="d-tag water">⛵ Sailing</span>
+    <span class="d-tag water">🏊 Open Water Swimming</span>
+    <span class="d-tag shore">🎣 Fishing Vessels</span>
+    <span class="d-tag air">🪂 Paragliding</span>
+    <span class="d-tag air">🛩️ Paramotors</span>
+  </div>
+
+  <div class="pilot-area">
+    <div class="pilot-area-text">
+      <h3>Newhaven — Shoreham Corridor</h3>
+      <p>The pilot covers one of the UK's most active coastal corridors for recreational water and air users. Clubs along this stretch are the first to test CPAS in real conditions — proving that a phone ping can replace thousands of pounds of tracking hardware.</p>
+    </div>
+    <div class="pilot-stat">
+      <div class="big">17+</div>
+      <div class="small">Partner Clubs</div>
+    </div>
+  </div>
+</div>
+
+<!-- NO COST -->
+<div class="how-bg">
+  <div class="section">
+    <div class="section-label">What It Costs</div>
+    <h2>Nothing. That's the point.</h2>
+    <p class="section-sub">CPAS is designed so that cost is never a barrier to safety.</p>
+    <div class="no-cost">
+      <div class="no-cost-item">
+        <div class="icon">📱</div>
+        <h4>No new hardware</h4>
+        <p>Works with the phone already in your pocket or dry bag.</p>
+      </div>
+      <div class="no-cost-item">
+        <div class="icon">💳</div>
+        <h4>No subscription</h4>
+        <p>No monthly fee. No premium tier. Safety shouldn't have a paywall.</p>
+      </div>
+      <div class="no-cost-item">
+        <div class="icon">⚙️</div>
+        <h4>No setup</h4>
+        <p>Register once. After that, your phone does the rest automatically.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section" id="register">
+  <div class="cta-inner">
+    <div class="section-label" style="color:var(--teal-light); margin-bottom:1rem;">Join the Pilot</div>
+    <h2>Is your club on the South Coast?</h2>
+    <p>Whether you're a sailing club, kayak group, SUP community, paragliding club, swimming group, or fishing association — if your members go where rescue services can't see them, we'd like to hear from you.</p>
+    <a href="mailto:info@videar.tech?subject=CPAS%20Dark%20Target%20Pilot%20-%20Club%20Interest" class="btn btn-primary">Register Your Club's Interest</a>
+    <p style="margin-top:1.5rem; font-size:0.82rem; color:rgba(255,255,255,0.35);">Or email us directly: info@videar.tech</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">VIDEAR CPAS</div>
+  <div class="footer-links">
+    <a href="https://www.videar.tech" target="_blank">www.videar.tech</a>
+    <a href="#problem">The Problem</a>
+    <a href="#how">How It Works</a>
+    <a href="#pilot">The Pilot</a>
+  </div>
+  <div class="footer-legal">
+    VIDEAR Ltd · Patent GB2629638B · Common Position Awareness System<br>
+    #DarkTargetPilot · #MakeTheInvisibleVisible
+  </div>
+</footer>
+
+<script>
+// Sticky nav shadow
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
