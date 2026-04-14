@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Club Partner Guide — CPAS Dark Target Pilot | VIDEAR</title>
+<meta name="description" content="Everything your club needs to participate in the CPAS Dark Target Pilot. Templates, checklist, and step-by-step guide.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1a2e;
+    --navy-mid: #132d4a;
+    --teal: #00c9a7;
+    --teal-light: #00e5c7;
+    --teal-dark: #009e82;
+    --sky: #7ec8e3;
+    --coral: #ff6b5a;
+    --amber: #ffb347;
+    --sand: #f7f4ef;
+    --white: #ffffff;
+    --text-primary: #0b1a2e;
+    --text-secondary: #4a5e78;
+    --text-light: #8896a8;
+    --border: rgba(11,26,46,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-primary);
+    background: var(--white);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+  .nav-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600; font-size: 1.05rem;
+    letter-spacing: 0.12em; color: var(--navy);
+  }
+  .nav-brand span { color: var(--teal); }
+  .nav-links { display: flex; align-items: center; gap: 1.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.85rem; font-weight: 500;
+    color: var(--text-secondary); text-decoration: none; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--teal-dark); }
+  .nav-cta {
+    display: inline-flex; padding: 0.5rem 1.2rem;
+    background: var(--teal); color: var(--white) !important;
+    border-radius: 8px; font-weight: 600; font-size: 0.82rem;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--teal-dark); }
+  @media (max-width: 700px) {
+    .nav-links a:not(.nav-cta) { display: none; }
+    nav { padding: 0.75rem 1.25rem; }
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(165deg, var(--navy) 0%, var(--navy-mid) 100%);
+    padding: 7rem 2rem 4rem;
+    text-align: center; color: var(--white);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 30%, rgba(0,229,199,0.1) 0%, transparent 60%);
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 1rem; background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15); border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 1.5rem; animation: fadeUp 0.8s ease 0.1s both;
+  }
+  .hero h1 {
+    font-weight: 800; font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.15; margin-bottom: 1rem;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+  .hero h1 em { font-style: normal; color: var(--teal-light); }
+  .hero p {
+    font-size: 1.05rem; font-weight: 300;
+    color: rgba(255,255,255,0.7); max-width: 540px; margin: 0 auto 2rem;
+    animation: fadeUp 0.8s ease 0.35s both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SECTIONS */
+  .section { padding: 4rem 2rem; max-width: 800px; margin: 0 auto; }
+  .section-sand { background: var(--sand); }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 0.5rem;
+  }
+  .section h2 {
+    font-weight: 700; font-size: clamp(1.5rem, 3.5vw, 2rem);
+    line-height: 1.2; margin-bottom: 1rem; color: var(--navy);
+  }
+  .section-intro {
+    font-size: 1rem; font-weight: 300;
+    color: var(--text-secondary); margin-bottom: 2.5rem; max-width: 600px;
+  }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 2.5rem; }
+  .timeline::before {
+    content: ''; position: absolute; left: 10px; top: 0; bottom: 0;
+    width: 3px; border-radius: 3px;
+    background: linear-gradient(to bottom, var(--teal), var(--coral), var(--amber));
+  }
+  .tl-item {
+    position: relative; margin-bottom: 2rem;
+    padding: 1.5rem; background: var(--white);
+    border: 1.5px solid var(--border); border-radius: 14px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .tl-item:hover { border-color: var(--teal); box-shadow: 0 6px 20px rgba(0,0,0,0.04); }
+  .tl-item::before {
+    content: ''; position: absolute; left: -2.05rem; top: 1.6rem;
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 3px solid var(--teal); background: var(--white);
+  }
+  .tl-item:nth-child(2)::before { border-color: var(--coral); }
+  .tl-item:nth-child(3)::before { border-color: var(--amber); }
+  .tl-phase {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+  .tl-phase.c1 { color: var(--teal); }
+  .tl-phase.c2 { color: var(--coral); }
+  .tl-phase.c3 { color: var(--amber); }
+  .tl-item h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .tl-item p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+
+  /* CHECKLIST */
+  .checklist { margin-top: 1rem; }
+  .check-item {
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    padding: 1rem 1.2rem; margin-bottom: 0.6rem;
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 12px; transition: border-color 0.2s;
+  }
+  .section-sand .check-item { background: var(--white); }
+  .check-item:hover { border-color: var(--teal); }
+  .check-icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: rgba(0,201,167,0.1); color: var(--teal);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.9rem; flex-shrink: 0; margin-top: 0.1rem;
+  }
+  .check-item h4 { font-size: 0.92rem; font-weight: 600; margin-bottom: 0.15rem; }
+  .check-item p { font-size: 0.82rem; color: var(--text-secondary); }
+
+  /* POST TEMPLATES */
+  .post-card {
+    background: var(--navy); border-radius: 14px;
+    padding: 1.5rem; margin-bottom: 1.2rem; position: relative;
+    overflow: hidden;
+  }
+  .post-card .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 0.25rem 0.7rem; border-radius: 100px;
+    background: rgba(0,229,199,0.12); color: var(--teal-light);
+    border: 1px solid rgba(0,229,199,0.2); margin-bottom: 0.8rem;
+  }
+  .post-card .post-text {
+    font-size: 0.88rem; line-height: 1.65;
+    color: rgba(255,255,255,0.82); white-space: pre-wrap;
+  }
+  .copy-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.45rem 1rem; margin-top: 1rem;
+    background: rgba(0,229,199,0.12); border: 1px solid rgba(0,229,199,0.25);
+    border-radius: 8px; color: var(--teal-light);
+    font-family: 'Outfit', sans-serif; font-size: 0.78rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .copy-btn:hover { background: rgba(0,229,199,0.22); border-color: var(--teal-light); }
+  .copy-btn.copied { background: rgba(0,229,199,0.3); }
+
+  /* CTA */
+  .cta-band {
+    background: linear-gradient(135deg, var(--teal-dark), var(--teal));
+    padding: 3.5rem 2rem; text-align: center; color: var(--white);
+  }
+  .cta-band h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.6rem; }
+  .cta-band p { font-size: 0.95rem; color: rgba(255,255,255,0.8); margin-bottom: 1.5rem; }
+  .btn-white {
+    display: inline-flex; padding: 0.85rem 2.2rem;
+    background: var(--white); color: var(--teal-dark);
+    border-radius: 10px; font-weight: 700; font-size: 1rem;
+    text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+
+  /* HASHTAG BANNER */
+  .hashtag-bar {
+    text-align: center; padding: 2rem;
+    background: var(--sand); border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .hashtag-bar .primary {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600; font-size: 1.4rem; color: var(--teal);
+  }
+  .hashtag-bar .secondary {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem; color: var(--text-light); margin-top: 0.4rem;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy); color: rgba(255,255,255,0.4);
+    padding: 2.5rem 2rem; text-align: center;
+  }
+  .footer-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600; font-size: 1rem; letter-spacing: 0.15em;
+    color: var(--teal); margin-bottom: 0.4rem;
+  }
+  footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+  footer a:hover { color: var(--teal-light); }
+  .footer-links {
+    display: flex; justify-content: center; gap: 1.5rem;
+    margin: 0.8rem 0; font-size: 0.8rem;
+  }
+  .footer-legal { font-size: 0.7rem; margin-top: 0.8rem; color: rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-brand">VIDEAR <span>CPAS</span></div>
+  <ul class="nav-links">
+    <li><a href="pilot.html">What is CPAS?</a></li>
+    <li><a href="#templates">Post Templates</a></li>
+    <li><a href="#REGISTER_FORM_URL" class="nav-cta">Register Your Club</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Club Partner Guide</div>
+    <h1>Your club is part of <em>something big</em></h1>
+    <p>Everything you need to participate in the CPAS Dark Target Pilot. Templates, timelines, and a simple checklist — designed to take under five minutes.</p>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<div class="section">
+  <div class="section-label">Campaign Timeline</div>
+  <h2>Three beats. Three posts. That's it.</h2>
+  <div class="section-intro">The campaign runs in three simple phases. Each one just needs a single social media post from your club. We've written them for you.</div>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-phase c1">Beat 1 — Now → Week 1</div>
+      <h3>Announce you're in</h3>
+      <p>Post that your club has joined the Dark Target Pilot. Use the template below — just swap in your club name and discipline. Tag @VIDEAR and one other participating club.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-phase c2">Beat 2 — Weeks 2–3</div>
+      <h3>Explain how it works</h3>
+      <p>Share the "How CPAS Works" post. Your members will want to know what it actually does. The template covers it in plain language — no jargon, no tech-speak.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-phase c3">Beat 3 — During the study</div>
+      <h3>Share a member story</h3>
+      <p>Ask one willing member for a 1-2 sentence quote about why being trackable matters to them. Pair it with a phone photo. Authenticity beats polish every time.</p>
+    </div>
+  </div>
+</div>
+
+<!-- HASHTAG -->
+<div class="hashtag-bar">
+  <div class="primary">#DarkTargetPilot</div>
+  <div class="secondary">#CPAS &nbsp; #MakeTheInvisibleVisible &nbsp; #SafetyInAPing</div>
+</div>
+
+<!-- POST TEMPLATES -->
+<div class="section" id="templates">
+  <div class="section-label">Ready-to-Post Templates</div>
+  <h2>Copy. Customise. Post.</h2>
+  <div class="section-intro">Swap in your club name and discipline. Hit the copy button. Paste into Facebook, Instagram, or X. Done in 90 seconds.</div>
+
+  <div class="post-card">
+    <div class="tag">Beat 1 — Facebook / Instagram</div>
+    <div class="post-text" id="post1">🟢 Big news for [CLUB NAME] members.
+
+We've joined the CPAS Dark Target Pilot — a pioneering safety trial along the South Coast that will make [kayakers/paddlers/sailors/swimmers/pilots] visible to rescue services in real time.
+
+No extra gadgets. No subscriptions. Just your phone.
+
+Right now, when our members head out on the water [or into the air], they can disappear from radar entirely. CPAS changes that with a simple position ping that tells rescue services: "I'm here."
+
+We're proud to be one of 17+ clubs across sailing, kayaking, SUP, paragliding, swimming and fishing taking part.
+
+Your safety just got smarter. More details coming soon.
+
+🔗 https://videar2024.github.io/cpas-register/pilot.html
+
+#DarkTargetPilot #CPAS #MakeTheInvisibleVisible
+@VIDEAR @[TAG ANOTHER PARTICIPATING CLUB]</div>
+    <button class="copy-btn" onclick="copyPost('post1',this)">📋 Copy to clipboard</button>
+  </div>
+
+  <div class="post-card">
+    <div class="tag">Beat 1 — X / Twitter (Short)</div>
+    <div class="post-text" id="post2">🟢 [CLUB NAME] is in.
+
+We've joined the #DarkTargetPilot — making our [paddlers/sailors/swimmers] visible to rescue services using nothing but a phone.
+
+17+ South Coast clubs. One mission: make the invisible visible.
+
+🔗 https://videar2024.github.io/cpas-register/pilot.html
+#CPAS @VIDEAR</div>
+    <button class="copy-btn" onclick="copyPost('post2',this)">📋 Copy to clipboard</button>
+  </div>
+
+  <div class="post-card">
+    <div class="tag">Beat 2 — How It Works</div>
+    <div class="post-text" id="post3">Ever wondered what happens if you get into trouble on the water — and nobody knows where you are?
+
+That's the Dark Target problem. And it's more common than you think.
+
+CPAS (Common Position Awareness System) solves it:
+
+📱 Your phone sends a position ping
+📡 Rescue services see you on a live map
+🆘 If you need help, they know exactly where you are
+
+No hardware to buy. No app to subscribe to. It works with the phone already in your pocket.
+
+[CLUB NAME] is part of the pilot trial this [season]. Watch this space.
+
+🔗 https://videar2024.github.io/cpas-register/pilot.html
+
+#DarkTargetPilot #CPAS #SafetyInAPing
+@VIDEAR</div>
+    <button class="copy-btn" onclick="copyPost('post3',this)">📋 Copy to clipboard</button>
+  </div>
+
+  <div class="post-card">
+    <div class="tag">Beat 3 — Member Testimonial</div>
+    <div class="post-text" id="post4">💬 "[First name], [role/activity] at [CLUB NAME]"
+
+"I [kayak/paddle/sail/swim/fly] out of [location] regularly. Knowing that if something goes wrong, rescue services can see exactly where I am — without me having to do anything — that's a game changer.
+
+Before CPAS, I was a dark target. Now I'm visible."
+
+Hear more from our members as the #DarkTargetPilot continues.
+
+🔗 https://videar2024.github.io/cpas-register/pilot.html
+
+#CPAS #MakeTheInvisibleVisible @VIDEAR</div>
+    <button class="copy-btn" onclick="copyPost('post4',this)">📋 Copy to clipboard</button>
+  </div>
+</div>
+
+<!-- CHECKLIST -->
+<div class="section-sand">
+  <div class="section" id="checklist">
+    <div class="section-label">Club Checklist</div>
+    <h2>Your five-minute action list</h2>
+    <div class="section-intro">Everything here is designed to take under five minutes. No design skills needed, no content to write from scratch.</div>
+
+    <div class="checklist">
+      <div class="check-item">
+        <div class="check-icon">1</div>
+        <div>
+          <h4>Register your club</h4>
+          <p>Fill in the short registration form so we know you're in. Takes 60 seconds.</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">2</div>
+        <div>
+          <h4>Post the Beat 1 announcement</h4>
+          <p>Copy the template above, swap in your club name, post to your Facebook page or Instagram.</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">3</div>
+        <div>
+          <h4>Use #DarkTargetPilot on every post</h4>
+          <p>This is how we track momentum and show collective scale to partners and funders.</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">4</div>
+        <div>
+          <h4>Tag @VIDEAR + one other participating club</h4>
+          <p>Creates a visible chain. When funders and press look, they see a network, not a single company.</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">5</div>
+        <div>
+          <h4>Pin the post to your page</h4>
+          <p>New visitors see it immediately. Small action, big visibility.</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">6</div>
+        <div>
+          <h4>Add a line to your next newsletter</h4>
+          <p>"We've joined the CPAS Dark Target Pilot — a new safety system that makes our members visible to rescue services via their phones. More info at videar.tech."</p>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">7</div>
+        <div>
+          <h4>Encourage members to sign up individually</h4>
+          <p>Share the individual sign-up link with your members so they can register for the pilot directly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-band">
+  <h2>Ready to register your club?</h2>
+  <p>One form. 60 seconds. You're in the pilot.</p>
+  <a href="#REGISTER_FORM_URL" class="btn-white">Register Your Club</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">VIDEAR CPAS</div>
+  <div class="footer-links">
+    <a href="https://www.videar.tech" target="_blank">www.videar.tech</a>
+    <a href="pilot.html">What is CPAS?</a>
+    <a href="join.html">Individual Sign-Up</a>
+  </div>
+  <div class="footer-legal">
+    VIDEAR Ltd · Patent GB2629638B · Common Position Awareness System<br>
+    #DarkTargetPilot · #MakeTheInvisibleVisible
+  </div>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
+
+function copyPost(id, btn) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '✅ Copied!';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '📋 Copy to clipboard'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
