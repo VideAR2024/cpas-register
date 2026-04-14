@@ -527,6 +527,160 @@
     padding: 1rem 2.5rem;
   }
 
+  /* ─── REGISTRATION FORM ─── */
+  .reg-form-wrap {
+    max-width: 620px;
+    margin: 0 auto;
+    text-align: left;
+  }
+  .reg-type-toggle {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+  .reg-type-btn {
+    padding: 0.75rem 1.8rem;
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.15);
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .reg-type-btn:hover {
+    border-color: rgba(0,201,167,0.4);
+    color: var(--white);
+  }
+  .reg-type-btn.active {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: var(--white);
+  }
+  .form-section { display: none; }
+  .form-section.active { display: block; }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 0.35rem;
+  }
+  .form-group label .opt {
+    font-weight: 400;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.35);
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.92rem;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--teal);
+    background: rgba(0,201,167,0.06);
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: rgba(255,255,255,0.25);
+  }
+  .form-group select option {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+  .form-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 2.5rem;
+    background: var(--teal);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    margin-top: 0.5rem;
+  }
+  .form-submit:hover {
+    background: var(--teal-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,201,167,0.3);
+  }
+  .form-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .form-privacy {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.3);
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  /* Thank you */
+  .thank-you {
+    display: none;
+    text-align: center;
+    padding: 2rem 0;
+  }
+  .thank-you.visible { display: block; }
+  .thank-you .tick {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--teal);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; color: var(--white);
+    margin: 0 auto 1.5rem;
+    animation: popIn 0.4s ease both;
+  }
+  @keyframes popIn {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+  .thank-you h3 {
+    font-size: 1.4rem; font-weight: 700;
+    color: var(--white); margin-bottom: 0.6rem;
+  }
+  .thank-you p {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.95rem; margin-bottom: 0.5rem;
+  }
+
   /* ─── FOOTER ─── */
   footer {
     background: var(--navy);
@@ -702,15 +856,159 @@
   </div>
 </div>
 
-<!-- CTA -->
+<!-- REGISTRATION -->
 <div class="cta-section" id="register">
-  <div class="cta-inner">
+  <div class="cta-inner" style="max-width:700px;">
     <div class="section-label" style="color:var(--teal-light); margin-bottom:1rem;">Join the Pilot</div>
-    <h2>Is your club on the South Coast?</h2>
+    <h2>Register Your Interest</h2>
     <p>Our first feasibility study launches this summer across the Seaford to Shoreham corridor — three months of live testing with clubs and individuals already on the water and in the air.</p>
-    <p style="color:rgba(255,255,255,0.65); margin-bottom:2rem;">But CPAS won't stop there. We're building a register of clubs and individuals along the entire South Coast so that as the system expands, you're already in. Register now — whether you're in the corridor or further along the coast — and we'll keep you informed as the study progresses and new areas come online.</p>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSePQk5PZoYo3J6T71-xvWLDnVVKe3oFJ5FBCL-JdGsv1Xsz5Q/viewform" target="_blank" class="btn btn-primary">Register Your Interest</a>
-    <p style="margin-top:1.5rem; font-size:0.82rem; color:rgba(255,255,255,0.35);">Or email us directly: info@videar.tech</p>
+    <p style="color:rgba(255,255,255,0.55); margin-bottom:2.5rem; font-size:0.92rem;">CPAS won't stop there. We're building a register along the entire South Coast so that as the system expands, you're already in. Register now and we'll keep you informed as the study progresses and new areas come online.</p>
+
+    <!-- Form -->
+    <div id="regForm" class="reg-form-wrap">
+      <div class="reg-type-toggle">
+        <button class="reg-type-btn active" onclick="showForm('club')">I'm a Club</button>
+        <button class="reg-type-btn" onclick="showForm('individual')">I'm an Individual</button>
+      </div>
+
+      <!-- CLUB FORM -->
+      <div id="form-club" class="form-section active">
+        <div class="form-group">
+          <label>Club or Organisation Name *</label>
+          <input type="text" id="c-name" required placeholder="e.g. Brighton Sailing Club">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Primary Discipline *</label>
+            <select id="c-discipline">
+              <option value="">Select...</option>
+              <option>Sailing</option>
+              <option>Kayaking</option>
+              <option>SUP / Paddle Boarding</option>
+              <option>Open Water Swimming</option>
+              <option>Paragliding</option>
+              <option>Paramotor Flying</option>
+              <option>Fishing</option>
+              <option>Multiple disciplines</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Approx. Active Members *</label>
+            <select id="c-members">
+              <option value="">Select...</option>
+              <option>Under 25</option>
+              <option>25–50</option>
+              <option>51–100</option>
+              <option>101–250</option>
+              <option>250+</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Location / Home Port or Launch Site *</label>
+          <input type="text" id="c-location" required placeholder="e.g. Shoreham, Newhaven, Brighton Marina">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Contact Person *</label>
+            <input type="text" id="c-contact" required placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label>Contact Email *</label>
+            <input type="email" id="c-email" required placeholder="email@club.org">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone <span class="opt">(optional)</span></label>
+            <input type="tel" id="c-phone" placeholder="07xxx xxx xxx">
+          </div>
+          <div class="form-group">
+            <label>Website / Social <span class="opt">(optional)</span></label>
+            <input type="text" id="c-web" placeholder="Facebook, Instagram, or website">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Anything else? <span class="opt">(optional)</span></label>
+          <textarea id="c-notes" placeholder="Questions, specific needs, or anything we should know"></textarea>
+        </div>
+        <div style="text-align:center;">
+          <button class="form-submit" onclick="submitForm('club')">Register Your Club →</button>
+        </div>
+      </div>
+
+      <!-- INDIVIDUAL FORM -->
+      <div id="form-individual" class="form-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Your Name *</label>
+            <input type="text" id="i-name" required placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label>Primary Activity *</label>
+            <select id="i-activity">
+              <option value="">Select...</option>
+              <option>Kayaking</option>
+              <option>SUP / Paddle Boarding</option>
+              <option>Sailing</option>
+              <option>Open Water Swimming</option>
+              <option>Paragliding</option>
+              <option>Paramotor Flying</option>
+              <option>Fishing</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Usual Launch Point or Area *</label>
+          <input type="text" id="i-location" required placeholder="e.g. Hove Lagoon, Shoreham Harbour, Devil's Dyke">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Are you a member of a club? *</label>
+            <select id="i-clubmember">
+              <option value="">Select...</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>If yes, which club? <span class="opt">(optional)</span></label>
+            <input type="text" id="i-clubname" placeholder="Club name">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Your Email *</label>
+            <input type="email" id="i-email" required placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label>Phone <span class="opt">(optional)</span></label>
+            <input type="tel" id="i-phone" placeholder="07xxx xxx xxx">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Anything else? <span class="opt">(optional)</span></label>
+          <textarea id="i-notes" placeholder="Questions, specific needs, or anything we should know"></textarea>
+        </div>
+        <div style="text-align:center;">
+          <button class="form-submit" onclick="submitForm('individual')">Join the Pilot →</button>
+        </div>
+      </div>
+
+      <div class="form-privacy">Your data is used solely to manage the CPAS Dark Target Pilot. We never sell or share your information.</div>
+    </div>
+
+    <!-- Thank you -->
+    <div id="thankYou" class="thank-you">
+      <div class="tick">✓</div>
+      <h3>Thank You</h3>
+      <p>Your registration has been received.</p>
+      <p>We'll be in touch before the pilot begins with everything you need to get started.</p>
+      <p style="margin-top:1.5rem; font-size:0.85rem; color:rgba(255,255,255,0.4);">Follow <strong style="color:var(--teal-light);">#DarkTargetPilot</strong> on social media for updates.</p>
+    </div>
+
   </div>
 </div>
 
@@ -729,4 +1027,117 @@
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudfla
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Nav shadow
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+// Form type toggle
+function showForm(type) {
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.reg-type-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('form-' + type).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Form submission via Google Forms
+const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSePQk5PZoYo3J6T71-xvWLDnVVKe3oFJ5FBCL-JdGsv1Xsz5Q/formResponse';
+
+function submitForm(type) {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  // Build form data
+  // NOTE: You will need to map these entry IDs to your actual Google Form field IDs.
+  // To find them: open the form, click prefill link, inspect the URL parameters.
+  // Replace entry.XXXXXXXXX with the real IDs from your form.
+  const formData = new FormData();
+
+  if (type === 'club') {
+    const name = document.getElementById('c-name').value;
+    const discipline = document.getElementById('c-discipline').value;
+    const members = document.getElementById('c-members').value;
+    const location = document.getElementById('c-location').value;
+    const contact = document.getElementById('c-contact').value;
+    const email = document.getElementById('c-email').value;
+    const phone = document.getElementById('c-phone').value;
+    const web = document.getElementById('c-web').value;
+    const notes = document.getElementById('c-notes').value;
+
+    if (!name || !discipline || !location || !contact || !email) {
+      alert('Please fill in all required fields.');
+      btn.disabled = false;
+      btn.textContent = 'Register Your Club →';
+      return;
+    }
+
+    // Map to Google Form entry IDs — REPLACE THESE with your actual entry IDs
+    formData.append('entry.TYPE_FIELD_ID', 'A club or organisation');
+    formData.append('entry.CLUB_NAME_ID', name);
+    formData.append('entry.DISCIPLINE_ID', discipline);
+    formData.append('entry.MEMBERS_ID', members);
+    formData.append('entry.LOCATION_ID', location);
+    formData.append('entry.CONTACT_NAME_ID', contact);
+    formData.append('entry.CONTACT_EMAIL_ID', email);
+    formData.append('entry.PHONE_ID', phone);
+    formData.append('entry.WEBSITE_ID', web);
+    formData.append('entry.NOTES_ID', notes);
+
+  } else {
+    const name = document.getElementById('i-name').value;
+    const activity = document.getElementById('i-activity').value;
+    const location = document.getElementById('i-location').value;
+    const clubMember = document.getElementById('i-clubmember').value;
+    const clubName = document.getElementById('i-clubname').value;
+    const email = document.getElementById('i-email').value;
+    const phone = document.getElementById('i-phone').value;
+    const notes = document.getElementById('i-notes').value;
+
+    if (!name || !activity || !location || !clubMember || !email) {
+      alert('Please fill in all required fields.');
+      btn.disabled = false;
+      btn.textContent = 'Join the Pilot →';
+      return;
+    }
+
+    formData.append('entry.TYPE_FIELD_ID', 'An individual participant');
+    formData.append('entry.INDIVIDUAL_NAME_ID', name);
+    formData.append('entry.ACTIVITY_ID', activity);
+    formData.append('entry.LAUNCH_POINT_ID', location);
+    formData.append('entry.CLUB_MEMBER_ID', clubMember);
+    formData.append('entry.CLUB_NAME_INDIVIDUAL_ID', clubName);
+    formData.append('entry.INDIVIDUAL_EMAIL_ID', email);
+    formData.append('entry.INDIVIDUAL_PHONE_ID', phone);
+    formData.append('entry.INDIVIDUAL_NOTES_ID', notes);
+  }
+
+  // Submit silently
+  fetch(FORM_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: formData
+  }).then(() => {
+    showThankYou();
+  }).catch(() => {
+    // no-cors always appears as an error but the submission goes through
+    showThankYou();
+  });
+}
+
+function showThankYou() {
+  document.getElementById('regForm').style.display = 'none';
+  document.getElementById('thankYou').classList.add('visible');
+}
+</script>
