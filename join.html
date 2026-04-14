@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join the Pilot — CPAS Dark Target Pilot | VIDEAR</title>
+<meta name="description" content="Register as an individual participant in the CPAS Dark Target Pilot. Kayakers, paddle boarders, sailors, swimmers, pilots — make yourself visible.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1a2e;
+    --navy-mid: #132d4a;
+    --teal: #00c9a7;
+    --teal-light: #00e5c7;
+    --teal-dark: #009e82;
+    --sky: #7ec8e3;
+    --coral: #ff6b5a;
+    --sand: #f7f4ef;
+    --white: #ffffff;
+    --text-primary: #0b1a2e;
+    --text-secondary: #4a5e78;
+    --text-light: #8896a8;
+    --border: rgba(11,26,46,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-primary);
+    background: var(--white);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+  .nav-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600; font-size: 1.05rem;
+    letter-spacing: 0.12em; color: var(--navy);
+  }
+  .nav-brand span { color: var(--teal); }
+  .nav-links { display: flex; align-items: center; gap: 1.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.85rem; font-weight: 500;
+    color: var(--text-secondary); text-decoration: none; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--teal-dark); }
+  .nav-cta {
+    display: inline-flex; padding: 0.5rem 1.2rem;
+    background: var(--teal); color: var(--white) !important;
+    border-radius: 8px; font-weight: 600; font-size: 0.82rem;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--teal-dark); }
+  @media (max-width: 700px) {
+    .nav-links a:not(.nav-cta) { display: none; }
+    nav { padding: 0.75rem 1.25rem; }
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(165deg, var(--navy) 0%, var(--teal-dark) 100%);
+    padding: 7rem 2rem 4rem;
+    text-align: center; color: var(--white);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 40% 40%, rgba(0,229,199,0.12) 0%, transparent 55%);
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 620px; margin: 0 auto; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 1rem; background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15); border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 1.5rem; animation: fadeUp 0.8s ease 0.1s both;
+  }
+  .hero-tag .dot {
+    width: 7px; height: 7px; background: var(--teal-light);
+    border-radius: 50%; animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .hero h1 {
+    font-weight: 800; font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.15; margin-bottom: 1rem;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+  .hero h1 em { font-style: normal; color: var(--teal-light); }
+  .hero p {
+    font-size: 1.05rem; font-weight: 300;
+    color: rgba(255,255,255,0.7); max-width: 500px; margin: 0 auto 2rem;
+    animation: fadeUp 0.8s ease 0.35s both;
+  }
+  .hero .btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.9rem 2.2rem; border-radius: 10px;
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem;
+    text-decoration: none; transition: all 0.25s;
+    background: var(--white); color: var(--teal-dark);
+    animation: fadeUp 0.8s ease 0.5s both;
+  }
+  .hero .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CONTENT */
+  .section { padding: 4rem 2rem; max-width: 760px; margin: 0 auto; }
+  .section-sand { background: var(--sand); }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 0.5rem;
+  }
+  .section h2 {
+    font-weight: 700; font-size: clamp(1.5rem, 3.5vw, 2rem);
+    line-height: 1.2; margin-bottom: 1rem; color: var(--navy);
+  }
+  .section p.intro {
+    font-size: 1rem; font-weight: 300;
+    color: var(--text-secondary); margin-bottom: 2rem; max-width: 560px;
+  }
+
+  /* WHY JOIN */
+  .reasons {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 600px) { .reasons { grid-template-columns: 1fr; } }
+  .reason {
+    padding: 1.5rem; border: 1.5px solid var(--border);
+    border-radius: 14px; transition: border-color 0.3s;
+  }
+  .reason:hover { border-color: var(--teal); }
+  .reason .icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  .reason h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .reason p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.55; }
+
+  /* HOW IT WORKS SIMPLE */
+  .simple-steps {
+    display: flex; gap: 1.5rem; flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+  .simple-step {
+    flex: 1; min-width: 180px;
+    padding: 1.5rem; background: var(--white);
+    border: 1.5px solid var(--border); border-radius: 14px;
+    text-align: center;
+  }
+  .simple-step .num {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--teal); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+    margin: 0 auto 0.8rem;
+  }
+  .simple-step h4 { font-size: 0.92rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .simple-step p { font-size: 0.82rem; color: var(--text-secondary); }
+
+  /* ACTIVITIES */
+  .activity-tags {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    margin: 1.5rem 0;
+  }
+  .a-tag {
+    padding: 0.5rem 1rem; border-radius: 100px;
+    font-size: 0.82rem; font-weight: 500; border: 1.5px solid;
+  }
+  .a-tag.w { border-color: var(--teal); color: var(--teal-dark); background: rgba(0,201,167,0.06); }
+  .a-tag.a { border-color: var(--sky); color: var(--navy-mid); background: rgba(126,200,227,0.08); }
+  .a-tag.s { border-color: var(--coral); color: var(--coral); background: rgba(255,107,90,0.06); }
+
+  /* CTA */
+  .cta-section {
+    background: var(--navy); padding: 4rem 2rem;
+    text-align: center; color: var(--white);
+    position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,229,199,0.1) 0%, transparent 60%);
+  }
+  .cta-inner {
+    position: relative; z-index: 1; max-width: 520px; margin: 0 auto;
+  }
+  .cta-section h2 { font-weight: 700; font-size: 1.5rem; margin-bottom: 0.6rem; color: var(--white); }
+  .cta-section p { font-size: 0.95rem; color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; }
+  .btn-teal {
+    display: inline-flex; padding: 0.9rem 2.5rem;
+    background: var(--teal); color: var(--white);
+    border-radius: 10px; font-weight: 700; font-size: 1rem;
+    text-decoration: none; transition: all 0.25s;
+  }
+  .btn-teal:hover { background: var(--teal-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,201,167,0.3); }
+  .cta-note {
+    font-size: 0.78rem; color: rgba(255,255,255,0.3); margin-top: 1rem;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy); color: rgba(255,255,255,0.4);
+    padding: 2.5rem 2rem; text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .footer-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600; font-size: 1rem; letter-spacing: 0.15em;
+    color: var(--teal); margin-bottom: 0.4rem;
+  }
+  footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+  footer a:hover { color: var(--teal-light); }
+  .footer-links {
+    display: flex; justify-content: center; gap: 1.5rem;
+    margin: 0.8rem 0; font-size: 0.8rem;
+  }
+  .footer-legal { font-size: 0.7rem; margin-top: 0.8rem; color: rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-brand">VIDEAR <span>CPAS</span></div>
+  <ul class="nav-links">
+    <li><a href="pilot.html">What is CPAS?</a></li>
+    <li><a href="clubs.html">Club Guide</a></li>
+    <li><a href="#signup" class="nav-cta">Sign Up</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag"><span class="dot"></span> Open to all South Coast users</div>
+    <h1>Stop being a <em>Dark Target</em></h1>
+    <p>Join the CPAS pilot and make yourself visible to rescue services — using nothing but the phone already in your pocket.</p>
+    <a href="#signup" class="btn">Join the Pilot</a>
+  </div>
+</div>
+
+<!-- WHY JOIN -->
+<div class="section">
+  <div class="section-label">Why Sign Up?</div>
+  <h2>Because right now, nobody can see you</h2>
+  <p class="intro">The moment you leave shore or launch into the air, you vanish from every tracking system. If something goes wrong, rescue crews are searching blind. CPAS changes that.</p>
+
+  <div class="reasons">
+    <div class="reason">
+      <div class="icon">📍</div>
+      <h3>You become visible</h3>
+      <p>Rescue services can see your position in real time on a live map. No more searching blind.</p>
+    </div>
+    <div class="reason">
+      <div class="icon">📱</div>
+      <h3>No extra kit</h3>
+      <p>No hardware to buy, no gadgets to charge, no subscription. Just your phone.</p>
+    </div>
+    <div class="reason">
+      <div class="icon">⚡</div>
+      <h3>Faster rescue</h3>
+      <p>When seconds count, knowing your exact position means help arrives faster.</p>
+    </div>
+    <div class="reason">
+      <div class="icon">🤝</div>
+      <h3>Help prove it works</h3>
+      <p>Your participation helps build the evidence that could make this a national safety standard.</p>
+    </div>
+  </div>
+</div>
+
+<!-- WHO CAN JOIN -->
+<div class="section-sand">
+  <div class="section">
+    <div class="section-label">Who Can Join?</div>
+    <h2>If you go where rescue services can't see you</h2>
+    <p class="intro">The pilot is open to anyone who uses the South Coast's waters or low-level airspace — whether you're part of a club or paddle out solo.</p>
+
+    <div class="activity-tags">
+      <span class="a-tag w">🚣 Kayaking</span>
+      <span class="a-tag w">🏄 SUP / Paddle Boarding</span>
+      <span class="a-tag w">⛵ Sailing</span>
+      <span class="a-tag w">🏊 Open Water Swimming</span>
+      <span class="a-tag s">🎣 Fishing</span>
+      <span class="a-tag a">🪂 Paragliding</span>
+      <span class="a-tag a">🛩️ Paramotor Flying</span>
+    </div>
+
+    <p style="font-size:0.9rem; color:var(--text-secondary);">Not in a club? No problem. Individual participants are just as welcome. You don't need to be a member of anything — you just need to be someone who goes out there.</p>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section">
+  <div class="section-label">What Happens When You Sign Up</div>
+  <h2>Three steps. That's all.</h2>
+
+  <div class="simple-steps">
+    <div class="simple-step">
+      <div class="num">1</div>
+      <h4>Register</h4>
+      <p>Fill in a short form — your name, activity, and where you usually launch. Takes 60 seconds.</p>
+    </div>
+    <div class="simple-step">
+      <div class="num">2</div>
+      <h4>Get set up</h4>
+      <p>We'll contact you with simple instructions before the pilot begins. Nothing complicated.</p>
+    </div>
+    <div class="simple-step">
+      <div class="num">3</div>
+      <h4>Head out</h4>
+      <p>Go kayaking, sailing, swimming, flying — whatever you do. Your phone pings your position automatically.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section" id="signup">
+  <div class="cta-inner">
+    <div class="section-label" style="color:var(--teal-light); margin-bottom:1rem;">Register as a Participant</div>
+    <h2>Make yourself visible</h2>
+    <p>One form. 60 seconds. You're in the pilot — and rescue services can find you if they ever need to.</p>
+    <a href="#REGISTER_FORM_URL" class="btn-teal">Sign Up Now</a>
+    <div class="cta-note">Your data is only used for the pilot. We never share your information.</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">VIDEAR CPAS</div>
+  <div class="footer-links">
+    <a href="https://www.videar.tech" target="_blank">www.videar.tech</a>
+    <a href="pilot.html">What is CPAS?</a>
+    <a href="clubs.html">Club Guide</a>
+  </div>
+  <div class="footer-legal">
+    VIDEAR Ltd · Patent GB2629638B · Common Position Awareness System<br>
+    #DarkTargetPilot · #MakeTheInvisibleVisible
+  </div>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
+</script>
+</body>
+</html>
