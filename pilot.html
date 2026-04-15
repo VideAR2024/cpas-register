@@ -1060,9 +1060,6 @@ function submitForm(type) {
   btn.textContent = 'Submitting...';
 
   // Build form data
-  // NOTE: You will need to map these entry IDs to your actual Google Form field IDs.
-  // To find them: open the form, click prefill link, inspect the URL parameters.
-  // Replace entry.XXXXXXXXX with the real IDs from your form.
   const formData = new FormData();
 
   if (type === 'club') {
@@ -1083,17 +1080,17 @@ function submitForm(type) {
       return;
     }
 
-    // Map to Google Form entry IDs — REPLACE THESE with your actual entry IDs
-    formData.append('entry.TYPE_FIELD_ID', 'A club or organisation');
-    formData.append('entry.CLUB_NAME_ID', name);
-    formData.append('entry.DISCIPLINE_ID', discipline);
-    formData.append('entry.MEMBERS_ID', members);
-    formData.append('entry.LOCATION_ID', location);
-    formData.append('entry.CONTACT_NAME_ID', contact);
-    formData.append('entry.CONTACT_EMAIL_ID', email);
-    formData.append('entry.PHONE_ID', phone);
-    formData.append('entry.WEBSITE_ID', web);
-    formData.append('entry.NOTES_ID', notes);
+    // Map to Google Form entry IDs
+    formData.append('entry.1847162392', 'A club or organisation');
+    formData.append('entry.2078927842', name);
+    formData.append('entry.1098111331', discipline);
+    formData.append('entry.1783106132', members);
+    formData.append('entry.1101685176', location);
+    formData.append('entry.803680199', contact);
+    formData.append('entry.1774545377', email);
+    formData.append('entry.1989336756', phone);
+    formData.append('entry.721525544', web);
+    formData.append('entry.534439924', notes);
 
   } else {
     const name = document.getElementById('i-name').value;
@@ -1112,15 +1109,15 @@ function submitForm(type) {
       return;
     }
 
-    formData.append('entry.TYPE_FIELD_ID', 'An individual participant');
-    formData.append('entry.INDIVIDUAL_NAME_ID', name);
-    formData.append('entry.ACTIVITY_ID', activity);
-    formData.append('entry.LAUNCH_POINT_ID', location);
-    formData.append('entry.CLUB_MEMBER_ID', clubMember);
-    formData.append('entry.CLUB_NAME_INDIVIDUAL_ID', clubName);
-    formData.append('entry.INDIVIDUAL_EMAIL_ID', email);
-    formData.append('entry.INDIVIDUAL_PHONE_ID', phone);
-    formData.append('entry.INDIVIDUAL_NOTES_ID', notes);
+    formData.append('entry.1847162392', 'An individual participant');
+    formData.append('entry.1817371749', name);
+    formData.append('entry.1049081535', activity);
+    formData.append('entry.212309223', location);
+    formData.append('entry.1441564077', clubMember);
+    formData.append('entry.1026088297', clubName);
+    formData.append('entry.420714837', email);
+    formData.append('entry.978899476', phone);
+    formData.append('entry.1351262404', notes);
   }
 
   // Submit silently
