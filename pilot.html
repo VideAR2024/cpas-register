@@ -1091,6 +1091,7 @@ function submitForm(type) {
     formData.append('entry.1989336756', phone);
     formData.append('entry.721525544', web);
     formData.append('entry.534439924', notes);
+    formData.append('entry.774100597', 'Confirmed');
 
   } else {
     const name = document.getElementById('i-name').value;
@@ -1118,19 +1119,39 @@ function submitForm(type) {
     formData.append('entry.420714837', email);
     formData.append('entry.978899476', phone);
     formData.append('entry.1351262404', notes);
+    formData.append('entry.774100597', 'Confirmed');
   }
 
-  // Submit silently
-  fetch(FORM_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: formData
-  }).then(() => {
+  // Submit via hidden iframe (more reliable than fetch with no-cors)
+  const iframe = document.createElement('iframe');
+  iframe.name = 'hidden_iframe_' + Date.now();
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = FORM_URL;
+  form.target = iframe.name;
+  form.style.display = 'none';
+
+  for (const [key, value] of formData.entries()) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
+    input.value = value;
+    form.appendChild(input);
+  }
+
+  document.body.appendChild(form);
+  form.submit();
+
+  // Show thank you after a short delay to allow submission
+  setTimeout(() => {
     showThankYou();
-  }).catch(() => {
-    // no-cors always appears as an error but the submission goes through
-    showThankYou();
-  });
+    // Clean up
+    document.body.removeChild(form);
+    document.body.removeChild(iframe);
+  }, 1500);
 }
 
 function showThankYou() {
