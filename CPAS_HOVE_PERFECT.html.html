@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPAS UAM — Flawless Coastal Safety Demo</title>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet"/>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;700&display=swap');
+:root{--bg:#f0f4f8;--panel:#ffffff;--border:#d1d9e1;--accent:#007bff;--red:#ff0000;--green:#00ff00;--orange:#ff8800;--text:#212529;--dim:#6c757d;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;height:100vh;overflow:hidden;}
+#app{display:grid;grid-template-rows:48px 1fr 28px;grid-template-columns:280px 1fr 300px;height:100vh;}
+#topbar{grid-column:1/-1;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 15px;}
+#map{grid-column:2;position:relative;}
+#sidebar, #rpanel{background:var(--panel);padding:20px;display:flex;flex-direction:column;gap:20px;border-right:1px solid var(--border);overflow-y:auto;}
+#rpanel{grid-column:3;border-right:none;border-left:1px solid var(--border);}
+.hud-box{background:#f8f9fa;border:1px solid var(--border);padding:15px;border-radius:6px;}
+.tel-val{font-family:'Share Tech Mono',monospace;font-size:28px;color:var(--text);}
+
+/* Keypad Styling */
+.keypad-container { display: grid; gap: 10px; margin-top: 10px; }
+.btn-keypad {
+    width: 100%; padding: 12px; border: 2px solid var(--border); background: white; 
+    cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-weight: bold; 
+    font-size: 14px; text-transform: uppercase; text-align: center; border-radius: 4px;
+    transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.btn-keypad:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.btn-mission-1 { border-bottom: 4px solid var(--red); }
+.btn-mission-2 { border-bottom: 4px solid var(--red); }
+.btn-reset { border-bottom: 4px solid var(--accent); background: #f0f8ff; color: var(--accent); }
+
+/* Drone 3D Lift Logic */
+.drone-container { width: 1px; height: 1px; position: relative; }
+.drone-body { 
+    width: 16px; height: 16px; background: #222; 
+    border-radius: 50%; border: 2px solid white; box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    position: absolute; top: -8px; left: -8px;
+    transition: transform 0.1s linear;
+    z-index: 10;
+}
+.drone-shadow { 
+    width: 20px; height: 10px; background: rgba(0,0,0,0.6); 
+    border-radius: 50%; filter: blur(3px); pointer-events: none;
+    position: absolute; top: -5px; left: -10px;
+    transition: transform 0.1s linear, opacity 0.1s linear;
+}
+</style>
+</head>
+<body>
+<div id="app">
+    <div id="topbar">
+        <div style="font-weight:bold;font-size:18px;">CPAS <span style="color:var(--accent)">AR PATENT ENGINE</span></div>
+        <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--accent);">LOCATION: HOVE LAWNS VERIFIED</div>
+    </div>
+    
+    <div id="sidebar">
+        <div>
+            <div style="font-size:10px;color:var(--dim);text-transform:uppercase;">VERTIPORT BASE</div>
+            <div style="font-weight:bold;font-size:14px;color:var(--orange);">KING ALFRED WEST (Lawns)</div>
+        </div>
+        
+        <div class="hud-box">
+            <div style="font-size:12px;font-weight:bold;color:var(--dim);margin-bottom:5px;text-align:center;">COMMAND KEYPAD</div>
+            <div class="keypad-container">
+                <button class="btn-keypad btn-mission-1" onclick="startMission(1)">[1] Launch Hospital</button>
+                <button class="btn-keypad btn-mission-2" onclick="startMission(2)">[2] Launch Marina</button>
+                <button class="btn-keypad btn-reset" onclick="resetToBase()">[5] Start Afresh (Reset)</button>
+            </div>
+        </div>
+
+        <div style="font-size:11px;line-height:1.6;color:var(--dim);">
+            <strong style="color:var(--red)">RED PATH:</strong> FUTURE MISSION (INTENT)<br>
+            <strong style="color:var(--green)">GREEN PATH:</strong> PAST MISSION (VERIFIED)<br><br>
+            <strong style="color:var(--orange)">ORANGE CUBE:</strong> 100m+ SEA EXCLUSION
+        </div>
+    </div>
+
+    <div id="map"><div id="mapbox-container" style="width:100%;height:100%;"></div></div>
+    
+    <div id="rpanel">
+        <div class="hud-box">
+            <div style="font-size:10px;color:var(--dim);">ALTITUDE (FT) - MAX 160FT / 50M</div>
+            <div id="tel-alt" class="tel-val">0</div>
+        </div>
+        <div class="hud-box">
+            <div style="font-size:10px;color:var(--dim);">GROUND SPEED (KTS)</div>
+            <div id="tel-spd" class="tel-val">0</div>
+        </div>
+        <div style="font-size:11px;padding:10px;border:1px solid var(--border);background:#fff9db;border-radius:4px;">
+            <strong>DEMO CONTROLS:</strong><br>
+            [T] Toggle Chase Cam<br>
+            [ESC] Reset Camera View
+        </div>
+    </div>
+</div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoidmlkZWFyIiwiYSI6ImNtbnN2MjMxMzBnbm0yeHIydjB0a2s3NjYifQ.2qQZV2sELuI-hsAfYN1-yA';
+
+const BASE_VERTIPORT = [-0.1880, 50.8262]; 
+const OVER_SEA_WP = [-0.1880, 50.8240]; // Flies out >100m into the sea first
+const DEST_HOSPITAL = [-0.1170, 50.8190];
+const DEST_MARINA = [-0.1030, 50.8130];
+
+// SAFETY CORRIDORS
+const PATH_1 = [BASE_VERTIPORT, OVER_SEA_WP, [-0.1300, 50.8170], [-0.1170, 50.8160], DEST_HOSPITAL];
+const PATH_2 = [BASE_VERTIPORT, OVER_SEA_WP, [-0.1100, 50.8100], [-0.1030, 50.8100], DEST_MARINA];
+
+const map = new mapboxgl.Map({
+    container: 'mapbox-container',
+    style: 'mapbox://styles/mapbox/streets-v12',
+    center: [-0.1880, 50.8250], 
+    zoom: 15.5, pitch: 65, bearing: 60
+});
+
+let isFlying = false, followCam = false, progress = 0, currentPath = PATH_1;
+
+// --------------------------------------------------------
+// UNIFIED 3D DRONE + SHADOW MARKER
+// --------------------------------------------------------
+const droneContainer = document.createElement('div');
+droneContainer.className = 'drone-container';
+
+const shadowEl = document.createElement('div');
+shadowEl.className = 'drone-shadow';
+droneContainer.appendChild(shadowEl);
+
+const bodyEl = document.createElement('div');
+bodyEl.className = 'drone-body';
+droneContainer.appendChild(bodyEl);
+
+const droneMkr = new mapboxgl.Marker({element: droneContainer, offset: [0,0]}).setLngLat(BASE_VERTIPORT).addTo(map);
+
+// --------------------------------------------------------
+// CONSTANT SPEED PATH INTERPOLATION LOGIC
+// --------------------------------------------------------
+function getPointOnLine(line, t) {
+    let totalLen = 0;
+    const segs = [];
+    for (let i = 0; i < line.length - 1; i++) {
+        const dx = line[i+1][0] - line[i][0];
+        const dy = line[i+1][1] - line[i][1];
+        const d = Math.hypot(dx, dy);
+        segs.push({d, dx, dy});
+        totalLen += d;
+    }
+    const targetD = totalLen * t;
+    let curD = 0;
+    for (let i = 0; i < segs.length; i++) {
+        if (curD + segs[i].d >= targetD) {
+            const f = (targetD - curD) / segs[i].d;
+            return { pt: [line[i][0] + segs[i].dx * f, line[i][1] + segs[i].dy * f], idx: i };
+        }
+        curD += segs[i].d;
+    }
+    return { pt: line[line.length-1], idx: line.length-2 };
+}
+
+function startMission(id) {
+    if (isFlying) return; // Prevent double clicks while flying
+    currentPath = (id === 1) ? PATH_1 : PATH_2;
+    progress = 0;
+    isFlying = true;
+}
+
+function resetToBase() {
+    isFlying = false; 
+    progress = 0;
+    followCam = false;
+    
+    // Reset Drone Physical State
+    droneMkr.setLngLat(BASE_VERTIPORT);
+    bodyEl.style.transform = `translateY(0px)`;
+    shadowEl.style.transform = `scale(1)`;
+    shadowEl.style.opacity = '0.6';
+    
+    // Reset Telemetry UI
+    document.getElementById('tel-alt').textContent = '0';
+    document.getElementById('tel-spd').textContent = '0';
+    
+    // Reset Corridors
+    if(map.getSource('past-src')) map.getSource('past-src').setData({'type': 'LineString', 'coordinates': [BASE_VERTIPORT, BASE_VERTIPORT]});
+    if(map.getSource('future-src')) map.getSource('future-src').setData({'type': 'LineString', 'coordinates': currentPath});
+    
+    // Fly Camera smoothly back to Vertiport Base
+    map.flyTo({ center: [-0.1880, 50.8250], zoom: 15.5, pitch: 65, bearing: 60, duration: 1500 });
+}
+
+map.on('load', () => {
+    // 3D ORANGE VERTIPORT ZONE (Extended >100m South into the water)
+    map.addSource('vertiport-3d', {
+        'type': 'geojson',
+        'data': { 'type': 'Feature', 'geometry': { 'type': 'Polygon', 'coordinates': [[
+            [-0.1894, 50.8270], // NW (Edge of lawns)
+            [-0.1866, 50.8270], // NE (Edge of lawns)
+            [-0.1866, 50.8235], // SE (Deep into the sea)
+            [-0.1894, 50.8235], // SW (Deep into the sea)
+            [-0.1894, 50.8270]
+        ]]}}
+    });
+    map.addLayer({ 'id': 'vertiport-extrusion', 'type': 'fill-extrusion', 'source': 'vertiport-3d', 'paint': { 'fill-extrusion-color': '#ff8800', 'fill-extrusion-height': 120, 'fill-extrusion-opacity': 0.40 } });
+
+    // Destination UI Markers
+    new mapboxgl.Marker({color: '#ff8800'}).setLngLat(BASE_VERTIPORT).addTo(map);
+    new mapboxgl.Marker({color: '#ff0000'}).setLngLat(DEST_HOSPITAL).addTo(map);
+    new mapboxgl.Marker({color: '#ff0000'}).setLngLat(DEST_MARINA).addTo(map);
+
+    // Corridor Setup
+    map.addSource('future-src', { 'type': 'geojson', 'data': {'type': 'LineString', 'coordinates': currentPath} });
+    map.addLayer({ 'id': 'future-layer', 'type': 'line', 'source': 'future-src', 'paint': { 'line-color': '#ff0000', 'line-width': 6, 'line-opacity': 0.5 } });
+
+    map.addSource('past-src', { 'type': 'geojson', 'data': {'type': 'LineString', 'coordinates': []} });
+    map.addLayer({ 'id': 'past-layer', 'type': 'line', 'source': 'past-src', 'paint': { 'line-color': '#00ff00', 'line-width': 6, 'line-opacity': 0.7 } });
+
+    function frame() {
+        if (isFlying) {
+            progress += 0.0006;
+            
+            // Fix: Keep the loop alive by safely clamping progress instead of killing the frame loop
+            if (progress >= 1) { 
+                progress = 1;
+                isFlying = false; 
+            }
+
+            const loc = getPointOnLine(currentPath, progress);
+            const taxiPos = loc.pt;
+            droneMkr.setLngLat(taxiPos);
+
+            // ALTITUDE CAP: Max 50m (approx 164 ft)
+            const altFt = Math.round(Math.sin(progress * Math.PI) * 164); 
+            
+            // VISUAL 3D LIFT & DROP SHADOW RECALIBRATED FOR 50M
+            const liftPixels = altFt / 2; 
+            bodyEl.style.transform = `translateY(-${liftPixels}px)`;
+            
+            shadowEl.style.transform = `scale(${1 + (altFt/150)})`;
+            shadowEl.style.opacity = Math.max(0.15, 0.6 - (altFt/400));
+
+            // Patent Corridor Splitting Logic
+            const pastCoords = currentPath.slice(0, loc.idx + 1);
+            pastCoords.push(taxiPos);
+            map.getSource('past-src').setData({'type': 'LineString', 'coordinates': pastCoords});
+
+            const futureCoords = [taxiPos, ...currentPath.slice(loc.idx + 1)];
+            map.getSource('future-src').setData({'type': 'LineString', 'coordinates': futureCoords});
+
+            document.getElementById('tel-alt').textContent = altFt;
+            document.getElementById('tel-spd').textContent = (progress < 0.05 || progress > 0.95) ? '35' : '110';
+
+            if (followCam && isFlying) {
+                map.easeTo({ center: taxiPos, bearing: 105, pitch: 70, zoom: 15.5, duration: 0 });
+            }
+        }
+        
+        // This requestAnimationFrame is now permanently active, waiting for the next launch!
+        requestAnimationFrame(frame);
+    }
+    frame(); // Kick off the perpetual engine
+});
+
+document.addEventListener('keydown', e => {
+    if (e.key === '1') startMission(1);
+    if (e.key === '2') startMission(2);
+    if (e.key === '5') resetToBase();
+    if (e.key.toLowerCase() === 't') followCam = !followCam;
+    if (e.key === 'Escape') resetToBase(); 
+});
+</script>
+</body>
+</html>
