@@ -260,8 +260,8 @@ let lastPingTime = null;
 // ── INIT ─────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   // Extract session_id from URL path: /track/KYK-00589-290426-001
-  const parts = window.location.pathname.split('/');
-  sessionId = parts[parts.length - 1];
+  const urlParams = new URLSearchParams(window.location.search);
+  sessionId = urlParams.get('session_id');
 
   if (!sessionId || sessionId === 'track') {
     showError('No session reference found in this link.');
