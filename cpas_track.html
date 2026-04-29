@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CPAS · Live Tracking</title>
+<script src='https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css' rel='stylesheet'/>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #0a0f14; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #fff; }
+
+  #app { display: flex; flex-direction: column; height: 100vh; }
+
+  /* Header */
+  #header {
+    background: #000;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #0F6E56;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  #header-left { display: flex; align-items: center; gap: 10px; }
+  #logo-mark {
+    width: 28px; height: 28px;
+  }
+  #brand { line-height: 1.2; }
+  #brand-name { font-size: 13px; font-weight: 600; color: #5DCAA5; letter-spacing: 0.05em; }
+  #brand-sub  { font-size: 9px; color: #444; letter-spacing: 0.12em; }
+  #status-pill {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+    padding: 4px 10px; border-radius: 20px;
+    background: #0d1a14; border: 1px solid #0F6E56; color: #5DCAA5;
+    transition: all 0.3s;
+  }
+  #status-pill.overdue { background: #1a0505; border-color: #A32D2D; color: #F09595; }
+  #status-pill.loading { border-color: #444; color: #555; }
+
+  /* Info strip */
+  #info-strip {
+    background: #060d0a;
+    padding: 8px 16px;
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #0d1a14;
+    flex-shrink: 0;
+    overflow-x: auto;
+  }
+  .info-cell {
+    flex: 1;
+    min-width: 70px;
+    padding: 0 8px;
+    border-right: 1px solid #111;
+  }
+  .info-cell:first-child { padding-left: 0; }
+  .info-cell:last-child  { border-right: none; }
+  .info-label { font-size: 9px; color: #444; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; font-family: monospace; }
+  .info-value { font-size: 13px; font-weight: 500; color: #9FE1CB; font-family: monospace; }
+  .info-value.warn { color: #FAC775; }
+  .info-value.danger { color: #F09595; }
+
+  /* Map */
+  #map { flex: 1; width: 100%; }
+
+  /* Bottom card */
+  #bottom-card {
+    background: #000;
+    border-top: 1px solid #0F6E56;
+    padding: 12px 16px;
+    flex-shrink: 0;
+  }
+  #user-name { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 2px; }
+  #user-detail { font-size: 11px; color: #555; font-family: monospace; margin-bottom: 10px; }
+
+  #ping-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #0a0f0c;
+    border: 1px solid #0F6E5633;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+  }
+  #hb-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #1D9E75; flex-shrink: 0;
+    animation: hbpulse 2s ease infinite;
+  }
+  @keyframes hbpulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  #hb-dot.stale { background: #FAC775; }
+  #hb-dot.lost  { background: #E24B4A; animation: none; }
+  #ping-text { font-size: 11px; color: #9FE1CB; flex: 1; font-family: monospace; }
+  #ping-time { font-size: 10px; color: #444; font-family: monospace; }
+
+  #sos-notice {
+    display: none;
+    background: #1a0505;
+    border: 1px solid #A32D2D;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #F09595;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  #emergency-btn {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 12px;
+    color: #555;
+    font-size: 12px;
+    font-family: monospace;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  #emergency-btn.active {
+    border-color: #A32D2D;
+    color: #F09595;
+    background: #1a0505;
+  }
+
+  /* Loading overlay */
+  #loading {
+    position: absolute;
+    inset: 0;
+    background: #0a0f14;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 100;
+  }
+  #loading svg { animation: spin 2s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading p { font-size: 13px; color: #444; font-family: monospace; letter-spacing: 0.08em; }
+
+  #error-screen {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: #0a0f14;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    z-index: 100;
+    padding: 32px;
+    text-align: center;
+  }
+  #error-screen h2 { font-size: 16px; color: #F09595; }
+  #error-screen p  { font-size: 13px; color: #555; font-family: monospace; line-height: 1.7; }
+
+  .mapboxgl-ctrl-logo { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <circle cx="16" cy="16" r="13" stroke="#0F6E56" stroke-width="2"/>
+    <path d="M16 3 A13 13 0 0 1 29 16" stroke="#5DCAA5" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>
+  <p>LOCATING SESSION...</p>
+</div>
+
+<div id="error-screen">
+  <h2>Session not found</h2>
+  <p id="error-msg">This tracking link may have expired or the session reference is incorrect.</p>
+</div>
+
+<div id="app" style="display:none;">
+  <div id="header">
+    <div id="header-left">
+      <svg id="logo-mark" viewBox="0 0 28 28" fill="none">
+        <path d="M14 3C8 3 3 8 3 14Q3 10 14 8Q25 10 25 14C25 8 20 3 14 3Z" fill="#1A2744"/>
+        <path d="M3 14C3 20 8 25 14 25Q8 23 7 14Q8 5 14 3C8 3 3 8 3 14Z" fill="#185FA5"/>
+        <path d="M14 3Q20 3 23 8Q26 13 14 8Q3 13 5 8Q8 3 14 3Z" fill="#5DCAA5" opacity="0.9"/>
+      </svg>
+      <div id="brand">
+        <div id="brand-name">CPAS</div>
+        <div id="brand-sub">LIVE TRACKING</div>
+      </div>
+    </div>
+    <div id="status-pill" class="loading">CONNECTING</div>
+  </div>
+
+  <div id="info-strip">
+    <div class="info-cell">
+      <div class="info-label">Session</div>
+      <div class="info-value" id="inf-session">—</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Activity</div>
+      <div class="info-value" id="inf-activity">—</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Departed</div>
+      <div class="info-value" id="inf-depart">—</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">ETA</div>
+      <div class="info-value" id="inf-eta">—</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-label">Pings</div>
+      <div class="info-value" id="inf-pings">—</div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <div id="bottom-card">
+    <div id="user-name">Loading...</div>
+    <div id="user-detail">CPAS · Live session</div>
+
+    <div id="ping-row">
+      <div id="hb-dot"></div>
+      <div id="ping-text">Waiting for position...</div>
+      <div id="ping-time">—</div>
+    </div>
+
+    <div id="sos-notice">
+      SOS ACTIVATED — Emergency services have been notified.
+      Last confirmed position is shown on map.
+      Do NOT call 999 unless you have new information.
+    </div>
+
+    <button id="emergency-btn" onclick="callEmergency()">
+      IF CONCERNED · CALL 999 AND QUOTE SESSION REF
+    </button>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const MAPBOX_TOKEN = 'pk.eyJ1IjoidmlkZWFyIiwiYSI6ImNtbnN2MjMxMzBnbm0yeHIydjB0a2s3NjYifQ.2qQZV2sELuI-hsAfYN1-yA';
+// Replace with your actual API Gateway URL once created:
+const API_BASE = 'https://fpu9b25b17.execute-api.eu-west-2.amazonaws.com/prod';
+const POLL_INTERVAL = 30000; // 30 seconds
+const STALE_THRESHOLD = 120; // seconds before amber warning
+const LOST_THRESHOLD  = 300; // seconds before red lost state
+
+// ── STATE ───────────────────────────────────────────────────────────────────
+let map, marker, trailSource;
+let sessionId = null;
+let pollTimer = null;
+let lastPingTime = null;
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // Extract session_id from URL path: /track/KYK-00589-290426-001
+  const parts = window.location.pathname.split('/');
+  sessionId = parts[parts.length - 1];
+
+  if (!sessionId || sessionId === 'track') {
+    showError('No session reference found in this link.');
+    return;
+  }
+
+  initMap();
+  fetchSession();
+  pollTimer = setInterval(fetchSession, POLL_INTERVAL);
+});
+
+function initMap() {
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+  map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v11',
+    center: [-0.06, 50.78], // Newhaven-Shoreham corridor default
+    zoom: 11,
+    attributionControl: false
+  });
+
+  map.on('load', () => {
+    // Trail line source
+    map.addSource('trail', {
+      type: 'geojson',
+      data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } }
+    });
+    map.addLayer({
+      id: 'trail-line',
+      type: 'line',
+      source: 'trail',
+      paint: {
+        'line-color': '#1D9E75',
+        'line-width': 2.5,
+        'line-opacity': 0.8
+      }
+    });
+
+    trailSource = map.getSource('trail');
+  });
+}
+
+async function fetchSession() {
+  try {
+    const res = await fetch(`${API_BASE}/read_pings?session_id=${encodeURIComponent(sessionId)}`);
+
+    if (res.status === 404) {
+      showError('Session not found. This link may have expired.');
+      return;
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+    renderSession(data);
+
+  } catch (e) {
+    console.error('Poll error:', e);
+    setStatus('ERROR', true);
+  }
+}
+
+function renderSession(data) {
+  // Hide loading
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+
+  const pings = data.pings || [];
+  const status = data.status || 'ACTIVE';
+
+  // Update info strip
+  document.getElementById('inf-session').textContent = sessionId.substring(0, 12) + '...';
+  document.getElementById('inf-activity').textContent = data.activity || '—';
+  document.getElementById('inf-depart').textContent = data.depart_name || '—';
+  document.getElementById('inf-eta').textContent = data.eta ? data.eta.substring(11,16) + ' UTC' : '—';
+  document.getElementById('inf-pings').textContent = pings.length;
+
+  // User name
+  document.getElementById('user-name').textContent = data.first_name || 'Active session';
+  document.getElementById('user-detail').textContent = `${data.cpas_id || ''} · ${data.activity || 'CPAS session'}`;
+
+  // Status pill
+  if (status === 'ACTIVE') {
+    setStatus('ACTIVE', false);
+  } else if (status === 'OVERDUE') {
+    setStatus('OVERDUE', true);
+    document.getElementById('emergency-btn').classList.add('active');
+  } else if (status === 'SOS') {
+    setStatus('SOS', true);
+    document.getElementById('sos-notice').style.display = 'block';
+    document.getElementById('emergency-btn').classList.add('active');
+  } else if (status === 'CLOSED') {
+    setStatus('RETURNED SAFE', false);
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  }
+
+  if (pings.length === 0) return;
+
+  // Draw trail
+  const coords = pings.map(p => [parseFloat(p.lon), parseFloat(p.lat)]);
+  if (trailSource) {
+    trailSource.setData({
+      type: 'Feature',
+      geometry: { type: 'LineString', coordinates: coords }
+    });
+  }
+
+  // Move/create marker at latest ping
+  const latest = pings[pings.length - 1];
+  const lngLat = [parseFloat(latest.lon), parseFloat(latest.lat)];
+
+  if (!marker) {
+    // Custom triangle marker
+    const el = document.createElement('div');
+    el.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24">
+      <polygon points="12,2 22,20 2,20" fill="#1D9E75" stroke="#5DCAA5" stroke-width="1.5"/>
+    </svg>`;
+    el.style.cursor = 'pointer';
+    marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+      .setLngLat(lngLat)
+      .addTo(map);
+
+    // Fly to first position
+    map.flyTo({ center: lngLat, zoom: 13, duration: 1500 });
+  } else {
+    marker.setLngLat(lngLat);
+  }
+
+  // Heartbeat status
+  lastPingTime = new Date(latest.timestamp);
+  const ageSeconds = (Date.now() - lastPingTime.getTime()) / 1000;
+  const timeStr = lastPingTime.toISOString().substring(11, 19) + ' UTC';
+
+  const dot = document.getElementById('hb-dot');
+  const txt = document.getElementById('ping-text');
+
+  if (ageSeconds < STALE_THRESHOLD) {
+    dot.className = '';
+    txt.style.color = '#9FE1CB';
+    txt.textContent = `Heartbeat active · position confirmed`;
+  } else if (ageSeconds < LOST_THRESHOLD) {
+    dot.className = 'stale';
+    txt.style.color = '#FAC775';
+    txt.textContent = `Signal intermittent · last seen ${Math.round(ageSeconds/60)} min ago`;
+  } else {
+    dot.className = 'lost';
+    txt.style.color = '#F09595';
+    txt.textContent = `Signal lost · showing last known position`;
+  }
+  document.getElementById('ping-time').textContent = timeStr;
+}
+
+function setStatus(text, isAlert) {
+  const pill = document.getElementById('status-pill');
+  pill.textContent = text;
+  pill.className = isAlert ? 'overdue' : '';
+}
+
+function callEmergency() {
+  window.location.href = 'tel:999';
+}
+
+function showError(msg) {
+  document.getElementById('loading').style.display = 'none';
+  const err = document.getElementById('error-screen');
+  err.style.display = 'flex';
+  document.getElementById('error-msg').textContent = msg;
+}
+</script>
+</body>
+</html>
