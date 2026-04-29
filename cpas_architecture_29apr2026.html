@@ -1,0 +1,170 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{font-family:var(--font-sans,sans-serif);font-size:12px;overflow-x:auto;padding:8px 0 16px}
+.arch{display:grid;grid-template-columns:200px 220px 240px 200px;gap:0;min-width:860px;border:0.5px solid var(--color-border-tertiary);border-radius:8px;overflow:hidden}
+.lane-hdr{background:#085041;color:#9FE1CB;font-size:10px;font-weight:500;letter-spacing:0.08em;padding:8px 10px;text-align:center;border-right:0.5px solid #0F6E5655}
+.lane-hdr:last-child{border-right:none}
+.phase-bar{grid-column:1/-1;padding:5px 12px;font-size:10px;font-weight:500;letter-spacing:0.06em;display:flex;align-items:center;gap:8px}
+.phase-bar.reg{background:#085041cc;color:#5DCAA5}
+.phase-bar.launch{background:#0C447Ccc;color:#85B7EB}
+.phase-bar.act{background:#3B6D11cc;color:#C0DD97}
+.phase-bar.live{background:#854F0Bcc;color:#FAC775}
+.phase-bar.deact{background:#3C3489cc;color:#CECBF6}
+.phase-bar.next{background:#44444188;color:#D3D1C7}
+.col{padding:6px;border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;gap:6px;vertical-align:top}
+.col:last-child{border-right:none}
+.row4{grid-column:1/-1;display:grid;grid-template-columns:200px 220px 240px 200px}
+.card{border-radius:6px;padding:7px 9px;border:0.5px solid}
+.card-title{font-size:11px;font-weight:500;margin:0 0 2px;line-height:1.3}
+.card-sub{font-size:10px;opacity:0.8;line-height:1.4}
+.pill{display:inline-block;font-size:8px;font-weight:600;letter-spacing:0.08em;padding:2px 6px;border-radius:10px;margin-bottom:4px}
+.live-p{background:#1D9E75;color:#E1F5EE}
+.test-p{background:#BA7517;color:#FAEEDA}
+.plan-p{background:#3C3489;color:#EEEDFE}
+.sms-p{background:#993C1D;color:#FAECE7}
+.c-teal{background:#E1F5EE;border-color:#0F6E56;color:#085041}
+.c-blue{background:#E6F1FB;border-color:#185FA5;color:#042C53}
+.c-amber{background:#FAEEDA;border-color:#BA7517;color:#412402}
+.c-red{background:#FCEBEB;border-color:#A32D2D;color:#501313}
+.c-purple{background:#EEEDFE;border-color:#534AB7;color:#26215C}
+.c-gray{background:var(--color-background-secondary);border-color:var(--color-border-secondary);color:var(--color-text-primary)}
+.legend{display:flex;flex-wrap:wrap;gap:8px;padding:8px 4px 0;align-items:center}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--color-text-secondary)}
+.stack-bar{grid-column:1/-1;background:var(--color-background-secondary);padding:7px 12px;font-size:9px;color:var(--color-text-secondary);font-family:var(--font-mono,monospace);letter-spacing:0.03em;line-height:1.7;border-top:0.5px solid var(--color-border-tertiary)}
+</style>
+
+<div class="wrap">
+
+<div class="legend">
+  <div class="legend-item"><span class="pill live-p">LIVE</span> Confirmed working today</div>
+  <div class="legend-item"><span class="pill test-p">TESTING</span> Built today — in test</div>
+  <div class="legend-item"><span class="pill plan-p">PLANNED</span> Not yet built</div>
+  <div class="legend-item"><span class="pill sms-p">SMS PENDING</span> Needs sandbox exit</div>
+</div>
+
+<div style="height:8px"></div>
+
+<div class="arch">
+
+<div class="lane-hdr">User / Registration</div>
+<div class="lane-hdr">Flutter app (on-device)</div>
+<div class="lane-hdr">Firebase + AWS cloud</div>
+<div class="lane-hdr">RNLI / SUI / nominees</div>
+
+<div class="phase-bar reg" style="grid-column:1/-1">Phase A — Registration (one-time · desktop browser)</div>
+<div class="row4">
+  <div class="col">
+    <div class="card c-teal"><span class="pill live-p">LIVE</span><div class="card-title">Registration portal</div><div class="card-sub">videar2024.github.io · 7 steps · PayPal · QR code</div></div>
+    <div class="card c-teal"><span class="pill live-p">LIVE</span><div class="card-title">7-step registration</div><div class="card-sub">Identity · KYC · Activity · Token ×3 · Medical ID · PayPal · Review · CPAS ID</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-gray" style="opacity:0.4"><div class="card-sub" style="font-style:italic">n/a this phase</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-blue"><span class="pill test-p">TESTING</span><div class="card-title">Firebase Auth + Firestore</div><div class="card-sub">Profile · nominees · activity type stored</div></div>
+    <div class="card c-amber"><span class="pill live-p">LIVE</span><div class="card-title">PayPal subscription</div><div class="card-sub">Browser payment · 0% app commission</div></div>
+    <div class="card c-red"><span class="pill sms-p">SMS PENDING</span><div class="card-title">Nominee consent SMS</div><div class="card-sub">Fires on first nominee add · needs sandbox exit</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-gray" style="opacity:0.4"><div class="card-sub" style="font-style:italic">n/a this phase</div></div>
+  </div>
+</div>
+
+<div class="phase-bar launch" style="grid-column:1/-1">Phase B — First app launch (QR sync)</div>
+<div class="row4">
+  <div class="col">
+    <div class="card c-blue"><span class="pill live-p">LIVE</span><div class="card-title">QR code issued</div><div class="card-sub">Scanned by phone · app download triggered</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-blue"><span class="pill live-p">LIVE</span><div class="card-title">App install</div><div class="card-sub">TestFlight (iOS) · Pixel 6 sideload (Android)</div></div>
+    <div class="card c-blue"><span class="pill test-p">TESTING</span><div class="card-title">First launch · Firebase sync</div><div class="card-sub">Profile loads · camera photo → C-ID card · Medical ID prompt</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-blue"><span class="pill test-p">TESTING</span><div class="card-title">Firebase profile sync</div><div class="card-sub">Auth · Firestore · Firebase Storage (C-ID photo)</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-gray" style="opacity:0.4"><div class="card-sub" style="font-style:italic">n/a this phase</div></div>
+  </div>
+</div>
+
+<div class="phase-bar act" style="grid-column:1/-1">Phase C — Session activation</div>
+<div class="row4">
+  <div class="col">
+    <div class="card c-teal"><span class="pill live-p">LIVE</span><div class="card-title">3 nominees notified</div><div class="card-sub">SMS via url_launcher · user's plan · £0 to VIDEAR</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-teal"><span class="pill live-p">LIVE</span><div class="card-title">Home screen — ACTIVATE</div><div class="card-sub">Session info · nominees shown · activity pill</div></div>
+    <div class="card c-teal"><span class="pill live-p">LIVE</span><div class="card-title">url_launcher → native SMS</div><div class="card-sub">Pre-filled · session ref · tracking URL · user taps Send</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-blue"><span class="pill test-p">TESTING</span><div class="card-title">cpas_sessions — DynamoDB</div><div class="card-sub">session_id · ETA · status · depart · nominees</div></div>
+    <div class="card c-blue"><span class="pill live-p">LIVE</span><div class="card-title">MQTT connection opens</div><div class="card-sub">SSL/TLS 8883 · a2cv1cjsbnn9u4-ats · eu-west-2</div></div>
+    <div class="card c-blue"><span class="pill test-p">TESTING</span><div class="card-title">API Gateway · write_ping</div><div class="card-sub">POST /write_ping · fpu9b25b17 · Lambda → DynamoDB</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-gray" style="opacity:0.4"><div class="card-sub" style="font-style:italic">n/a this phase</div></div>
+  </div>
+</div>
+
+<div class="phase-bar live" style="grid-column:1/-1">Phase D — Live session (heartbeat · SAR escalation)</div>
+<div class="row4">
+  <div class="col">
+    <div class="card c-gray" style="opacity:0.4"><div class="card-sub" style="font-style:italic">n/a this phase</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-amber"><span class="pill live-p">LIVE</span><div class="card-title">Live tracking screen</div><div class="card-sub">Map · session timer · HB pulse · SOS hold 3s · deactivate</div></div>
+    <div class="card c-amber"><span class="pill live-p">LIVE</span><div class="card-title">Heartbeat ping · 30s</div><div class="card-sub">lat · lon · alt · heading · speed · JSON → MQTT → API</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-amber"><span class="pill test-p">TESTING</span><div class="card-title">cpas_pings — DynamoDB</div><div class="card-sub">Breadcrumb trail · session_id keyed · confirmed live today</div></div>
+    <div class="card c-amber"><span class="pill test-p">TESTING</span><div class="card-title">API Gateway · read_pings</div><div class="card-sub">GET /read_pings · returns trail + session status</div></div>
+    <div class="card c-red"><span class="pill test-p">TESTING</span><div class="card-title">Lambda watchdog · ETA monitor</div><div class="card-sub">EventBridge 5 min · grace +15 min · confirmed firing today</div></div>
+    <div class="card c-red"><span class="pill sms-p">SMS PENDING</span><div class="card-title">AWS SNS overdue alert</div><div class="card-sub">Email working today · SMS needs debit card + sandbox exit</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-teal"><span class="pill live-p">LIVE</span><div class="card-title">RNLI SUI — cpas-demo.html</div><div class="card-sub">Mapbox GL JS · simulated targets · live DynamoDB = next build</div></div>
+    <div class="card c-purple"><span class="pill test-p">TESTING</span><div class="card-title">Nominee tracking page</div><div class="card-sub">cpas_track.html · Mapbox · 30s poll · day/night toggle</div></div>
+    <div class="card c-red"><span class="pill plan-p">PLANNED</span><div class="card-title">RNLI / Coastguard SAR</div><div class="card-sub">Nominee calls 999 · SAR ACTIVE flag · drift cone fires</div></div>
+  </div>
+</div>
+
+<div class="phase-bar deact" style="grid-column:1/-1">Phase E — Safe return / deactivation</div>
+<div class="row4">
+  <div class="col">
+    <div class="card c-purple"><span class="pill live-p">LIVE</span><div class="card-title">Safe return SMS</div><div class="card-sub">url_launcher · user's plan · £0 to VIDEAR</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-purple"><span class="pill live-p">LIVE</span><div class="card-title">Deactivate — two-step</div><div class="card-sub">Confirms before closing · prevents accidental sign-off</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-purple"><span class="pill test-p">TESTING</span><div class="card-title">Session closed · CLOSED status</div><div class="card-sub">DynamoDB updated · tracking URL expires</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-purple"><span class="pill plan-p">PLANNED</span><div class="card-title">SUI — user de-listed</div><div class="card-sub">Triangle removed · session archived · trail retained</div></div>
+  </div>
+</div>
+
+<div class="phase-bar next" style="grid-column:1/-1">Next build priorities — immediate</div>
+<div class="row4">
+  <div class="col">
+    <div class="card c-gray"><span class="pill sms-p">SMS PENDING</span><div class="card-title">AWS sandbox exit</div><div class="card-sub">Add debit card · request production access · 24hr approval · ~4p/SMS UK</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-gray"><span class="pill plan-p">PLANNED</span><div class="card-title">Flutter write_ping call</div><div class="card-sub">Pixel 6 calls API on each HB · real triangle on tracking page</div></div>
+    <div class="card c-gray"><span class="pill plan-p">PLANNED</span><div class="card-title">MQTT latency test</div><div class="card-sub">Foreground · background · screen-off · Low Power Mode</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-gray"><span class="pill plan-p">PLANNED</span><div class="card-title">SUI live DynamoDB feed</div><div class="card-sub">Replace simulated targets · poll read_pings every 10s</div></div>
+  </div>
+  <div class="col">
+    <div class="card c-gray"><span class="pill plan-p">PLANNED</span><div class="card-title">Drone demo — 7 May</div><div class="card-sub">Zone polygon · R-ID card · flight path · NATS deconfliction</div></div>
+  </div>
+</div>
+
+<div class="stack-bar" style="grid-column:1/-1">
+  Flutter (iOS+Android) &nbsp;·&nbsp; Mapbox GL JS (SUI + tracking) &nbsp;·&nbsp; Firebase Auth / Firestore / Storage &nbsp;·&nbsp; AWS IoT Core eu-west-2 (a2cv1cjsbnn9u4-ats · port 8883) &nbsp;·&nbsp; DynamoDB: cpas_pings + cpas_sessions &nbsp;·&nbsp; Lambda: cpas-write-ping · cpas-read-pings · cpas-overdue-watchdog &nbsp;·&nbsp; API Gateway: fpu9b25b17 (POST /write_ping · GET /read_pings) &nbsp;·&nbsp; SNS: cpas-overdue-alerts (arn:eu-west-2:132597214799) &nbsp;·&nbsp; EventBridge: cpas-overdue-check rate(5 min) &nbsp;·&nbsp; PayPal Business &nbsp;·&nbsp; url_launcher SMS &nbsp;·&nbsp; Patent GB2629638B
+</div>
+
+</div>
+</div>
