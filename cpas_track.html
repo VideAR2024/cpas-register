@@ -8,9 +8,9 @@
 <link href='https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css' rel='stylesheet'/>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; background: #0a0f14; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #fff; }
+  html, body { height: 100%; max-height: 100vh; overflow: hidden; background: #0a0f14; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #fff; }
 
-  #app { display: flex; flex-direction: column; height: 100vh; }
+  #app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
   /* Header */
   #header {
@@ -63,10 +63,10 @@
   .info-value.danger { color: #F09595; }
 
   /* Map */
-  #map { flex: 1; width: 100%; }
+  #map { flex: 1; width: 100%; min-height: 0; }
 
   /* Bottom card */
-  #bottom-card {
+  #bottom-card { flex-shrink: 0;
     background: #000;
     border-top: 1px solid #0F6E56;
     padding: 12px 16px;
@@ -192,7 +192,10 @@
         <div id="brand-sub">LIVE TRACKING</div>
       </div>
     </div>
-    <div id="status-pill" class="loading">CONNECTING</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button id="daynight-btn" onclick="toggleDayNight()" style="font-family:monospace;font-size:10px;font-weight:600;letter-spacing:0.08em;padding:4px 10px;border-radius:4px;border:0.5px solid #0F6E56;background:#0d1a14;color:#5DCAA5;cursor:pointer;">DAY</button>
+      <div id="status-pill" class="loading">CONNECTING</div>
+    </div>
   </div>
 
   <div id="info-strip">
@@ -421,6 +424,32 @@ function setStatus(text, isAlert) {
 
 function callEmergency() {
   window.location.href = 'tel:999';
+}
+
+let isDark = true;
+function toggleDayNight() {
+  isDark = !isDark;
+  const btn = document.getElementById('daynight-btn');
+  if (map) {
+    map.setStyle(isDark ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/navigation-day-v1');
+    map.once('style.load', () => {
+      if (map.getSource('trail')) return;
+      map.addSource('trail', {
+        type: 'geojson',
+        data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } }
+      });
+      map.addLayer({
+        id: 'trail-line',
+        type: 'line',
+        source: 'trail',
+        paint: { 'line-color': '#1D9E75', 'line-width': 2.5, 'line-opacity': 0.8 }
+      });
+      trailSource = map.getSource('trail');
+    });
+  }
+  btn.textContent = isDark ? 'DAY' : 'NIGHT';
+  btn.style.background = isDark ? '#0d1a14' : '#E1F5EE';
+  btn.style.color = isDark ? '#5DCAA5' : '#085041';
 }
 
 function showError(msg) {
