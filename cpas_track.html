@@ -2,462 +2,555 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>CPAS · Live Tracking</title>
-<script src='https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js'></script>
-<link href='https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css' rel='stylesheet'/>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet"/>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; margin: 0; padding: 0; background: #0a0f14; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #fff; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#08080e; font-family: -apple-system, 'Segoe UI', sans-serif; color:#fff; }
 
-  #app { display: flex; flex-direction: column; height: 100vh; }
+/* ── LOADING SCREEN ── */
+#loading {
+  position:fixed; inset:0; background:#08080e;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  z-index:1000; gap:20px;
+}
+.load-logo { font-size:28px; font-weight:700; letter-spacing:.25em; color:#fff; }
+.load-sub { font-size:9px; letter-spacing:.18em; color:#333; text-transform:uppercase; margin-top:-14px; }
+.load-spinner {
+  width:36px; height:36px; border-radius:50%;
+  border:2px solid #1a1a2e; border-top-color:#00c8aa;
+  animation:spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.load-status { font-size:11px; color:#444; letter-spacing:.08em; text-align:center; }
+.load-session { font-size:9px; color:#333; font-family:'Courier New',monospace; margin-top:-12px; }
 
-  /* Header */
-  #header {
-    background: #000;
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #0F6E56;
-    flex-shrink: 0;
-    z-index: 10;
-  }
-  #header-left { display: flex; align-items: center; gap: 10px; }
-  #logo-mark {
-    width: 28px; height: 28px;
-  }
-  #brand { line-height: 1.2; }
-  #brand-name { font-size: 13px; font-weight: 600; color: #5DCAA5; letter-spacing: 0.05em; }
-  #brand-sub  { font-size: 9px; color: #444; letter-spacing: 0.12em; }
-  #status-pill {
-    font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
-    padding: 4px 10px; border-radius: 20px;
-    background: #0d1a14; border: 1px solid #0F6E56; color: #5DCAA5;
-    transition: all 0.3s;
-  }
-  #status-pill.overdue { background: #1a0505; border-color: #A32D2D; color: #F09595; }
-  #status-pill.loading { border-color: #444; color: #555; }
+/* ── ERROR SCREEN ── */
+#error-screen {
+  position:fixed; inset:0; background:#08080e;
+  display:none; flex-direction:column;
+  align-items:center; justify-content:center;
+  z-index:1000; gap:16px; padding:32px;
+}
+.err-icon { font-size:36px; opacity:.4; }
+.err-title { font-size:15px; font-weight:600; color:#cc4444; text-align:center; }
+.err-msg { font-size:12px; color:#555; text-align:center; line-height:1.7; max-width:280px; }
+.err-retry {
+  margin-top:8px; padding:12px 24px;
+  background:transparent; border:1px solid #333;
+  color:#888; font-size:11px; letter-spacing:.1em;
+  text-transform:uppercase; cursor:pointer; border-radius:6px;
+}
+.err-retry:hover { border-color:#00c8aa; color:#00c8aa; }
 
-  /* Info strip */
-  #info-strip {
-    background: #060d0a;
-    padding: 4px 16px;
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid #0d1a14;
-    flex-shrink: 0;
-    overflow-x: auto;
-  }
-  .info-cell {
-    flex: 1;
-    min-width: 70px;
-    padding: 0 8px;
-    border-right: 1px solid #111;
-  }
-  .info-cell:first-child { padding-left: 0; }
-  .info-cell:last-child  { border-right: none; }
-  .info-label { font-size: 9px; color: #444; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; font-family: monospace; }
-  .info-value { font-size: 13px; font-weight: 500; color: #9FE1CB; font-family: monospace; }
-  .info-value.warn { color: #FAC775; }
-  .info-value.danger { color: #F09595; }
+/* ── MAP ── */
+#map { position:fixed; inset:0; }
 
-  /* Map */
-  #map { flex: 1; width: 100%; min-height: 0; overflow: hidden; }
+/* ── TOP BAR ── */
+#topbar {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  background:rgba(8,8,14,0.92); backdrop-filter:blur(8px);
+  border-bottom:1px solid #111120;
+  padding:10px 14px;
+  display:none;
+}
+.tb-row1 { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+.tb-logo { font-size:11px; font-weight:700; letter-spacing:.18em; color:#fff; }
+.tb-session { font-size:8px; font-family:'Courier New',monospace; color:#333; }
+.tb-live { display:flex; align-items:center; gap:5px; font-size:9px; color:#00c8aa; letter-spacing:.1em; text-transform:uppercase; }
+.tb-live-dot { width:6px; height:6px; border-radius:50%; background:#00c8aa; animation:livepulse 1.5s infinite; }
+@keyframes livepulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.tb-row2 { display:flex; align-items:center; gap:8px; }
+.tb-name { font-size:16px; font-weight:700; color:#fff; }
+.tb-activity {
+  font-size:9px; background:#0a1510; border:1px solid #00c8aa33;
+  color:#00c8aa; padding:2px 7px; border-radius:4px; letter-spacing:.06em;
+}
+.tb-eta { font-size:10px; color:#666; margin-left:auto; font-family:'Courier New',monospace; }
 
-  /* Bottom card */
-  #bottom-card { flex-shrink: 0;
-    background: #000;
-    border-top: 1px solid #0F6E56;
-    padding: 12px 16px;
-    flex-shrink: 0;
-  }
-  #user-name { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 1px; }
-  #user-detail { font-size: 11px; color: #555; font-family: monospace; margin-bottom: 10px; }
+/* ── STATUS CARD ── */
+#status-card {
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
+  background:rgba(8,8,14,0.92); backdrop-filter:blur(8px);
+  border-top:1px solid #111120;
+  padding:12px 14px; display:none;
+}
+.sc-row { display:flex; gap:0; margin-bottom:10px; }
+.sc-stat {
+  flex:1; text-align:center; padding:8px 4px;
+  background:#0a0a14; border:1px solid #111120;
+}
+.sc-stat:first-child { border-radius:7px 0 0 7px; }
+.sc-stat:last-child { border-radius:0 7px 7px 0; }
+.sc-val { font-size:15px; font-weight:700; color:#00c8aa; font-family:'Courier New',monospace; }
+.sc-lbl { font-size:7px; color:#444; text-transform:uppercase; letter-spacing:.08em; margin-top:2px; }
+.sc-ping { font-size:9px; color:#444; text-align:center; letter-spacing:.06em; }
+.sc-ping span { color:#666; }
 
-  #ping-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #0a0f0c;
-    border: 1px solid #0F6E5633;
-    border-radius: 8px;
-    padding: 6px 10px;
-    margin-bottom: 6px;
-  }
-  #hb-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: #1D9E75; flex-shrink: 0;
-    animation: hbpulse 2s ease infinite;
-  }
-  @keyframes hbpulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  #hb-dot.stale { background: #FAC775; }
-  #hb-dot.lost  { background: #E24B4A; animation: none; }
-  #ping-text { font-size: 11px; color: #9FE1CB; flex: 1; font-family: monospace; }
-  #ping-time { font-size: 10px; color: #444; font-family: monospace; }
+/* ── FIND ME BUTTON (failover) ── */
+#find-btn {
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  z-index:200; display:none;
+  background:#0a1510; border:1px solid #00c8aa44;
+  color:#00c8aa; padding:14px 24px; border-radius:8px;
+  font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+  cursor:pointer; text-align:center; line-height:1.6;
+}
 
-  #sos-notice {
-    display: none;
-    background: #1a0505;
-    border: 1px solid #A32D2D;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 12px;
-    color: #F09595;
-    line-height: 1.6;
-    margin-bottom: 10px;
-  }
+/* ── USER MARKER ── */
+.user-marker {
+  width:0; height:0;
+  border-left:9px solid transparent;
+  border-right:9px solid transparent;
+  border-bottom:20px solid #00c8aa;
+  filter:drop-shadow(0 0 8px rgba(0,200,170,0.7));
+  cursor:pointer;
+  position:relative;
+}
+.user-marker-wrap { position:relative; }
+.user-pulse {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-30%);
+  width:40px; height:40px; border-radius:50%;
+  border:1.5px solid #00c8aa;
+  animation:markerpulse 2s ease-out infinite;
+  pointer-events:none;
+}
+@keyframes markerpulse {
+  0% { transform:translate(-50%,-30%) scale(0.5); opacity:0.8; }
+  100% { transform:translate(-50%,-30%) scale(2.2); opacity:0; }
+}
 
-  #emergency-btn {
-    display: block;
-    width: 100%;
-    background: transparent;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 9px;
-    color: #555;
-    font-size: 12px;
-    font-family: monospace;
-    letter-spacing: 0.06em;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.2s;
-  }
-  #emergency-btn.active {
-    border-color: #A32D2D;
-    color: #F09595;
-    background: #1a0505;
-  }
+/* ── LOST SIGNAL STATE ── */
+.user-marker.lost { border-bottom-color:#ff8c00; filter:drop-shadow(0 0 8px rgba(255,140,0,0.6)); }
+.user-pulse.lost { border-color:#ff8c00; }
+#signal-lost-banner {
+  position:fixed; top:80px; left:50%; transform:translateX(-50%);
+  z-index:200; display:none;
+  background:rgba(255,140,0,0.12); border:1px solid #ff8c0055;
+  color:#ff8c00; padding:8px 16px; border-radius:6px;
+  font-size:10px; letter-spacing:.08em; text-align:center;
+  white-space:nowrap;
+}
 
-  /* Loading overlay */
-  #loading {
-    position: absolute;
-    inset: 0;
-    background: #0a0f14;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    z-index: 100;
-  }
-  #loading svg { animation: spin 2s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  #loading p { font-size: 13px; color: #444; font-family: monospace; letter-spacing: 0.08em; }
+/* ── SOS STATE ── */
+#sos-banner {
+  position:fixed; top:80px; left:0; right:0;
+  z-index:300; display:none;
+  background:rgba(200,0,30,0.15); border-bottom:2px solid #cc001e;
+  color:#ff3344; padding:10px 16px;
+  font-size:11px; letter-spacing:.12em; text-align:center;
+  text-transform:uppercase; font-weight:700;
+  animation:sosblink 1s infinite;
+}
+@keyframes sosblink { 0%,100%{opacity:1} 50%{opacity:.6} }
 
-  #error-screen {
-    display: none;
-    position: absolute;
-    inset: 0;
-    background: #0a0f14;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    z-index: 100;
-    padding: 32px;
-    text-align: center;
-  }
-  #error-screen h2 { font-size: 16px; color: #F09595; }
-  #error-screen p  { font-size: 13px; color: #555; font-family: monospace; line-height: 1.7; }
-
-  .mapboxgl-ctrl-logo { display: none !important; }
+/* ── RECENTER BUTTON ── */
+#recenter {
+  position:fixed; right:14px; bottom:100px; z-index:200;
+  width:40px; height:40px; border-radius:50%;
+  background:rgba(8,8,14,0.9); border:1px solid #1a1a2e;
+  display:none; align-items:center; justify-content:center;
+  cursor:pointer; font-size:16px;
+}
+#recenter:hover { border-color:#00c8aa44; }
 </style>
 </head>
 <body>
 
+<!-- LOADING -->
 <div id="loading">
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-    <circle cx="16" cy="16" r="13" stroke="#0F6E56" stroke-width="2"/>
-    <path d="M16 3 A13 13 0 0 1 29 16" stroke="#5DCAA5" stroke-width="2.5" stroke-linecap="round"/>
-  </svg>
-  <p>LOCATING SESSION...</p>
+  <div class="load-logo">C P A S</div>
+  <div class="load-sub">Common Position Awareness System</div>
+  <div class="load-spinner"></div>
+  <div class="load-status" id="load-status">Connecting to session…</div>
+  <div class="load-session" id="load-session"></div>
 </div>
 
+<!-- ERROR -->
 <div id="error-screen">
-  <h2>Session not found</h2>
-  <p id="error-msg">This tracking link may have expired or the session reference is incorrect.</p>
+  <div class="err-icon">📡</div>
+  <div class="err-title" id="err-title">Session not found</div>
+  <div class="err-msg" id="err-msg">This tracking link may have expired, or the session hasn't started yet. Check with the person who sent you this link.</div>
+  <button class="err-retry" onclick="retryFetch()">Try again</button>
 </div>
 
-<div id="app" style="display:none;">
-  <div id="header">
-    <div id="header-left">
-      <svg id="logo-mark" viewBox="0 0 28 28" fill="none">
-        <path d="M14 3C8 3 3 8 3 14Q3 10 14 8Q25 10 25 14C25 8 20 3 14 3Z" fill="#1A2744"/>
-        <path d="M3 14C3 20 8 25 14 25Q8 23 7 14Q8 5 14 3C8 3 3 8 3 14Z" fill="#185FA5"/>
-        <path d="M14 3Q20 3 23 8Q26 13 14 8Q3 13 5 8Q8 3 14 3Z" fill="#5DCAA5" opacity="0.9"/>
-      </svg>
-      <div id="brand">
-        <div id="brand-name">CPAS</div>
-        <div id="brand-sub">LIVE TRACKING</div>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <button id="daynight-btn" onclick="toggleDayNight()" style="font-family:monospace;font-size:10px;font-weight:600;letter-spacing:0.08em;padding:4px 10px;border-radius:4px;border:0.5px solid #0F6E56;background:#0d1a14;color:#5DCAA5;cursor:pointer;">DAY</button>
-      <div id="status-pill" class="loading">CONNECTING</div>
-    </div>
+<!-- MAP (hidden until data ready) -->
+<div id="map"></div>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="tb-row1">
+    <div class="tb-logo">C P A S</div>
+    <div class="tb-live"><div class="tb-live-dot"></div>LIVE</div>
   </div>
-
-  <div id="info-strip">
-    <div class="info-cell">
-      <div class="info-label">Session</div>
-      <div class="info-value" id="inf-session">—</div>
-    </div>
-    <div class="info-cell">
-      <div class="info-label">Activity</div>
-      <div class="info-value" id="inf-activity">—</div>
-    </div>
-    <div class="info-cell">
-      <div class="info-label">Departed</div>
-      <div class="info-value" id="inf-depart">—</div>
-    </div>
-    <div class="info-cell">
-      <div class="info-label">ETA</div>
-      <div class="info-value" id="inf-eta">—</div>
-    </div>
-    <div class="info-cell">
-      <div class="info-label">Pings</div>
-      <div class="info-value" id="inf-pings">—</div>
-    </div>
+  <div class="tb-row2">
+    <div class="tb-name" id="tb-name">—</div>
+    <div class="tb-activity" id="tb-activity">—</div>
+    <div class="tb-eta" id="tb-eta"></div>
   </div>
+  <div class="tb-session" id="tb-session"></div>
+</div>
 
-  <div id="map"></div>
+<!-- SIGNAL LOST -->
+<div id="signal-lost-banner">⚠ Signal delayed — showing last known position</div>
 
-  <div id="bottom-card">
-    <div id="user-name">Loading...</div>
-    <div id="user-detail">CPAS · Live session</div>
+<!-- SOS BANNER -->
+<div id="sos-banner">🆘 SOS ACTIVATED — Contact emergency services: 999</div>
 
-    <div id="ping-row">
-      <div id="hb-dot"></div>
-      <div id="ping-text">Waiting for position...</div>
-      <div id="ping-time">—</div>
-    </div>
+<!-- FIND ME (failover) -->
+<div id="find-btn" onclick="centreOnUser()">📍 Tap to centre on<br><strong id="find-name">user</strong></div>
 
-    <div id="sos-notice">
-      SOS ACTIVATED — Emergency services have been notified.
-      Last confirmed position is shown on map.
-      Do NOT call 999 unless you have new information.
-    </div>
+<!-- RECENTER -->
+<div id="recenter" onclick="centreOnUser()">⊕</div>
 
-    <button id="emergency-btn" onclick="callEmergency()">
-      IF CONCERNED · CALL 999 AND QUOTE SESSION REF
-    </button>
+<!-- STATUS CARD -->
+<div id="status-card">
+  <div class="sc-row">
+    <div class="sc-stat"><div class="sc-val" id="sc-spd">—</div><div class="sc-lbl">km/h</div></div>
+    <div class="sc-stat"><div class="sc-val" id="sc-hdg">—</div><div class="sc-lbl">Heading</div></div>
+    <div class="sc-stat"><div class="sc-val" id="sc-acc">—</div><div class="sc-lbl">Accuracy</div></div>
+    <div class="sc-stat"><div class="sc-val" id="sc-src">—</div><div class="sc-lbl">Signal</div></div>
   </div>
+  <div class="sc-ping">Last ping: <span id="sc-ping-time">—</span> &nbsp;·&nbsp; Ref: <span id="sc-ref">—</span></div>
 </div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────────────────────
-const MAPBOX_TOKEN = 'pk.eyJ1IjoidmlkZWFyIiwiYSI6ImNtbnN2MjMxMzBnbm0yeHIydjB0a2s3NjYifQ.2qQZV2sELuI-hsAfYN1-yA';
-// Replace with your actual API Gateway URL once created:
-const API_BASE = 'https://fpu9b25b17.execute-api.eu-west-2.amazonaws.com/prod';
-const POLL_INTERVAL = 30000; // 30 seconds
-const STALE_THRESHOLD = 120; // seconds before amber warning
-const LOST_THRESHOLD  = 300; // seconds before red lost state
+// ══════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════
+const API      = 'https://fpu9b25b17.execute-api.eu-west-2.amazonaws.com/prod/read_pings';
+const MB_TOKEN = 'pk.eyJ1IjoidmlkZWFyIiwiYSI6ImNtbnN2MjMxMzBnbm0yeHIydjB0a2s3NjYifQ.2qQZV2sELuI-hsAfYN1-yA';
+const POLL_MS  = 30000; // 30 seconds
+const LOST_THRESHOLD_MS = 90000; // amber after 90s no ping
 
-// ── STATE ───────────────────────────────────────────────────────────────────
-let map, marker, trailSource;
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let map = null;
+let marker = null;
+let markerEl = null;
 let sessionId = null;
+let lastPing = null;
 let pollTimer = null;
-let lastPingTime = null;
+let mapReady = false;
+let userHasPanned = false;
+let retryCount = 0;
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  // Extract session_id from URL path: /track/KYK-00589-290426-001
-  const urlParams = new URLSearchParams(window.location.search);
-  sessionId = urlParams.get('session') || urlParams.get('session_id');
+// ══════════════════════════════════════════
+//  STEP 1 — PARSE SESSION ID FROM URL
+//  This must happen before anything else.
+// ══════════════════════════════════════════
+function getSessionId() {
+  const params = new URLSearchParams(window.location.search);
+  // Support both ?session= and ?s= (short form for SMS character limit)
+  return params.get('session') || params.get('s') || null;
+}
 
-  if (!sessionId || sessionId === 'track') {
-    showError('No session reference found in this link.');
+// ══════════════════════════════════════════
+//  STEP 2 — FETCH PINGS FROM API GATEWAY
+// ══════════════════════════════════════════
+async function fetchPings(sid) {
+  const url = `${API}?session_id=${encodeURIComponent(sid)}`;
+  const resp = await fetch(url, {
+    method: 'GET',
+    headers: { 'Accept': 'application/json' },
+    // No-cache — we always want fresh data
+    cache: 'no-store'
+  });
+  if (!resp.ok) throw new Error(`API ${resp.status}: ${resp.statusText}`);
+  const data = await resp.json();
+  // API returns { pings: [...] } or just an array
+  return Array.isArray(data) ? data : (data.pings || data.items || []);
+}
+
+// ══════════════════════════════════════════
+//  STEP 3 — INIT MAPBOX AT USER COORDINATES
+//  Only called once, after first successful fetch.
+// ══════════════════════════════════════════
+function initMap(lat, lon) {
+  mapboxgl.accessToken = MB_TOKEN;
+  map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/standard',
+    center: [lon, lat],   // ← ALWAYS user's actual position, never hardcoded
+    zoom: 14.5,
+    pitch: 0,
+    bearing: 0,
+    attributionControl: false
+  });
+  map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-left');
+
+  // Night mode — better for OLED, easier on Token holder's eyes
+  map.on('style.load', () => {
+    map.setConfigProperty('basemap', 'lightPreset', 'night');
+    mapReady = true;
+  });
+
+  // Track if user has panned away — if so, don't auto-recentre
+  map.on('dragstart', () => { userHasPanned = true; document.getElementById('recenter').style.display = 'flex'; });
+
+  return map;
+}
+
+// ══════════════════════════════════════════
+//  CREATE OR UPDATE THE USER TRIANGLE
+// ══════════════════════════════════════════
+function setMarker(lat, lon, heading, isSOS, isLost) {
+  if (!markerEl) {
+    const wrap = document.createElement('div');
+    wrap.className = 'user-marker-wrap';
+    const pulse = document.createElement('div');
+    pulse.className = 'user-pulse';
+    wrap.appendChild(pulse);
+    const tri = document.createElement('div');
+    tri.className = 'user-marker';
+    wrap.appendChild(tri);
+    markerEl = { wrap, tri, pulse };
+
+    marker = new mapboxgl.Marker({ element: wrap, anchor: 'center' })
+      .setLngLat([lon, lat])
+      .addTo(map);
+  } else {
+    marker.setLngLat([lon, lat]);
+  }
+
+  // Rotate triangle to heading
+  markerEl.tri.style.transform = `rotate(${heading || 0}deg)`;
+
+  // State colours
+  if (isSOS) {
+    markerEl.tri.style.borderBottomColor = '#cc001e';
+    markerEl.tri.style.filter = 'drop-shadow(0 0 10px rgba(200,0,30,0.9))';
+    markerEl.pulse.style.borderColor = '#cc001e';
+  } else if (isLost) {
+    markerEl.tri.className = 'user-marker lost';
+    markerEl.pulse.className = 'user-pulse lost';
+  } else {
+    markerEl.tri.className = 'user-marker';
+    markerEl.pulse.className = 'user-pulse';
+  }
+}
+
+// ══════════════════════════════════════════
+//  UPDATE UI WITH PING DATA
+// ══════════════════════════════════════════
+function updateUI(ping, allPings) {
+  const lat    = parseFloat(ping.lat || ping.latitude);
+  const lon    = parseFloat(ping.lon || ping.longitude);
+  const spd    = ping.speed_kmh   !== undefined ? Math.round(ping.speed_kmh)   : '—';
+  const hdg    = ping.heading     !== undefined ? Math.round(ping.heading) + '°' : '—';
+  const acc    = ping.accuracy_m  !== undefined ? Math.round(ping.accuracy_m) + 'm' : '—';
+  const src    = ping.source      || '4G';
+  const ts     = ping.timestamp   || ping.ts;
+  const isSOS  = ping.sos === true || ping.sos === 'true';
+
+  // Age of last ping
+  const pingAge = ts ? Date.now() - new Date(ts).getTime() : 0;
+  const isLost  = pingAge > LOST_THRESHOLD_MS;
+
+  // Stat cards
+  document.getElementById('sc-spd').textContent  = spd;
+  document.getElementById('sc-hdg').textContent  = hdg;
+  document.getElementById('sc-acc').textContent  = acc;
+  document.getElementById('sc-src').textContent  = src;
+
+  // Ping time — human readable
+  if (ts) {
+    const d = new Date(ts);
+    const mins = Math.floor(pingAge / 60000);
+    const timeStr = mins < 1 ? 'just now' : `${mins}m ago`;
+    document.getElementById('sc-ping-time').textContent = timeStr;
+  }
+  document.getElementById('sc-ref').textContent = sessionId;
+
+  // Session name / activity from first ping metadata
+  const firstName = ping.first_name || ping.name || sessionId.split('-')[0];
+  const activity  = ping.activity   || deriveActivity(sessionId);
+  document.getElementById('tb-name').textContent     = firstName;
+  document.getElementById('tb-activity').textContent = activity;
+  document.getElementById('tb-session').textContent  = sessionId;
+  document.getElementById('find-name').textContent   = firstName;
+
+  // ETA if present
+  if (ping.eta || ping.return_time) {
+    document.getElementById('tb-eta').textContent = 'ETA ' + (ping.eta || ping.return_time);
+  }
+
+  // Signal lost banner
+  document.getElementById('signal-lost-banner').style.display = isLost ? 'block' : 'none';
+
+  // SOS banner
+  document.getElementById('sos-banner').style.display = isSOS ? 'block' : 'none';
+
+  // Update marker position and state
+  setMarker(lat, lon, ping.heading, isSOS, isLost);
+
+  // Fly to user — only if they haven't panned away
+  if (!userHasPanned && map) {
+    map.easeTo({ center: [lon, lat], duration: 800 });
+  }
+
+  lastPing = ping;
+}
+
+// Derive activity label from session ID prefix
+function deriveActivity(sid) {
+  const prefix = (sid || '').split('-')[0].toUpperCase();
+  const map = { KYK:'Kayak', SUP:'SUP', SWM:'Swimming', SAL:'Sailing',
+                LBT:'Leisure Boat', HWK:'Hill Walk', HIK:'Hiking',
+                CWK:'Coastal Walk', MTB:'Mountain Bike', CYC:'Cyclist',
+                PPM:'Paramotor', GLR:'Glider', DRN:'Drone', ROW:'Rowing' };
+  return map[prefix] || prefix;
+}
+
+// ══════════════════════════════════════════
+//  MAIN POLL FUNCTION
+//  Called every 30 seconds after first load.
+// ══════════════════════════════════════════
+async function poll() {
+  try {
+    const pings = await fetchPings(sessionId);
+
+    if (!pings || pings.length === 0) {
+      // No pings yet — session may just be starting
+      if (!mapReady) {
+        showError(
+          'Session not yet active',
+          `The session ${sessionId} exists but no location data has arrived yet. This page will keep checking — leave it open.`,
+          true // show retry
+        );
+      }
+      scheduleNextPoll();
+      return;
+    }
+
+    // Sort by timestamp descending, take the freshest ping
+    const sorted = pings.sort((a, b) => {
+      const ta = new Date(a.timestamp || a.ts || 0).getTime();
+      const tb = new Date(b.timestamp || b.ts || 0).getTime();
+      return tb - ta;
+    });
+    const latest = sorted[0];
+    const lat = parseFloat(latest.lat || latest.latitude);
+    const lon = parseFloat(latest.lon || latest.longitude);
+
+    if (isNaN(lat) || isNaN(lon)) {
+      throw new Error('Ping data missing valid coordinates');
+    }
+
+    // ── FIRST SUCCESSFUL PING: init map at real coordinates ──
+    if (!mapReady && !map) {
+      setLoadStatus('Got position — loading map…');
+      initMap(lat, lon);
+      map.on('load', () => {
+        hideLoading();
+        showUI();
+        updateUI(latest, sorted);
+        retryCount = 0;
+      });
+    } else if (mapReady) {
+      // Subsequent polls — just update
+      updateUI(latest, sorted);
+      retryCount = 0;
+    }
+
+  } catch (err) {
+    console.error('CPAS poll error:', err);
+    retryCount++;
+    if (!mapReady) {
+      if (retryCount >= 3) {
+        showError(
+          'Cannot reach tracking service',
+          `Error: ${err.message}. Please check your connection and try again.`,
+          true
+        );
+      } else {
+        setLoadStatus(`Retrying… (${retryCount}/3)`);
+      }
+    }
+    // If map is already showing, fail silently and show lost signal
+    if (mapReady) {
+      document.getElementById('signal-lost-banner').style.display = 'block';
+    }
+  }
+
+  scheduleNextPoll();
+}
+
+function scheduleNextPoll() {
+  clearTimeout(pollTimer);
+  pollTimer = setTimeout(poll, POLL_MS);
+}
+
+// ══════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════
+function setLoadStatus(msg) {
+  document.getElementById('load-status').textContent = msg;
+}
+
+function hideLoading() {
+  document.getElementById('loading').style.display = 'none';
+}
+
+function showUI() {
+  document.getElementById('topbar').style.display = 'block';
+  document.getElementById('status-card').style.display = 'block';
+}
+
+function showError(title, msg, showRetry) {
+  document.getElementById('loading').style.display = 'none';
+  const es = document.getElementById('error-screen');
+  es.style.display = 'flex';
+  document.getElementById('err-title').textContent = title;
+  document.getElementById('err-msg').textContent   = msg;
+  document.querySelector('.err-retry').style.display = showRetry ? 'inline-block' : 'none';
+}
+
+function retryFetch() {
+  document.getElementById('error-screen').style.display = 'none';
+  document.getElementById('loading').style.display = 'flex';
+  retryCount = 0;
+  setLoadStatus('Reconnecting…');
+  poll();
+}
+
+function centreOnUser() {
+  if (!lastPing || !map) return;
+  const lat = parseFloat(lastPing.lat || lastPing.latitude);
+  const lon = parseFloat(lastPing.lon || lastPing.longitude);
+  userHasPanned = false;
+  document.getElementById('recenter').style.display = 'none';
+  map.flyTo({ center: [lon, lat], zoom: 14.5, duration: 1000 });
+}
+
+// ══════════════════════════════════════════
+//  ENTRY POINT
+// ══════════════════════════════════════════
+window.addEventListener('load', () => {
+  // Step 1 — get session ID. If missing, error immediately.
+  sessionId = getSessionId();
+
+  if (!sessionId) {
+    showError(
+      'No session ID in link',
+      'This tracking link is incomplete. Ask the person tracking to resend the link from the CPAS app.',
+      false
+    );
     return;
   }
 
-  initMap();
-  fetchSession();
-  pollTimer = setInterval(fetchSession, POLL_INTERVAL);
+  // Show session ID in loading screen so user can see what's loading
+  document.getElementById('load-session').textContent = sessionId;
+  setLoadStatus('Fetching location data…');
+
+  // Step 2 — fetch immediately, map init follows inside poll()
+  poll();
 });
-
-function initMap() {
-  mapboxgl.accessToken = MAPBOX_TOKEN;
-  map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/dark-v11',
-    center: [-0.06, 50.78], // Newhaven-Shoreham corridor default
-    zoom: 11,
-    attributionControl: false
-  });
-
-  map.on('load', () => {
-    // Trail line source
-    map.addSource('trail', {
-      type: 'geojson',
-      data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } }
-    });
-    map.addLayer({
-      id: 'trail-line',
-      type: 'line',
-      source: 'trail',
-      paint: {
-        'line-color': '#1D9E75',
-        'line-width': 2.5,
-        'line-opacity': 0.8
-      }
-    });
-
-    trailSource = map.getSource('trail');
-  });
-}
-
-async function fetchSession() {
-  try {
-    const res = await fetch(`${API_BASE}/read_pings?session_id=${encodeURIComponent(sessionId)}`);
-
-    if (res.status === 404) {
-      showError('Session not found. This link may have expired.');
-      return;
-    }
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const data = await res.json();
-    renderSession(data);
-
-  } catch (e) {
-    console.error('Poll error:', e);
-    setStatus('ERROR', true);
-  }
-}
-
-function renderSession(data) {
-  // Hide loading
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-
-  const pings = data.pings || [];
-  const status = data.status || 'ACTIVE';
-
-  // Update info strip
-  document.getElementById('inf-session').textContent = sessionId.substring(0, 12) + '...';
-  document.getElementById('inf-activity').textContent = data.activity || '—';
-  document.getElementById('inf-depart').textContent = data.depart_name || '—';
-  document.getElementById('inf-eta').textContent = data.eta ? data.eta.substring(11,16) + ' UTC' : '—';
-  document.getElementById('inf-pings').textContent = pings.length;
-
-  // User name
-  document.getElementById('user-name').textContent = data.first_name || 'Active session';
-  document.getElementById('user-detail').textContent = `${data.cpas_id || ''} · ${data.activity || 'CPAS session'}`;
-
-  // Status pill
-  if (status === 'ACTIVE') {
-    setStatus('ACTIVE', false);
-  } else if (status === 'OVERDUE') {
-    setStatus('OVERDUE', true);
-    document.getElementById('emergency-btn').classList.add('active');
-  } else if (status === 'SOS') {
-    setStatus('SOS', true);
-    document.getElementById('sos-notice').style.display = 'block';
-    document.getElementById('emergency-btn').classList.add('active');
-  } else if (status === 'CLOSED') {
-    setStatus('RETURNED SAFE', false);
-    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-  }
-
-  if (pings.length === 0) return;
-
-  // Draw trail
-  const coords = pings.map(p => [parseFloat(p.lon), parseFloat(p.lat)]);
-  if (trailSource) {
-    trailSource.setData({
-      type: 'Feature',
-      geometry: { type: 'LineString', coordinates: coords }
-    });
-  }
-
-  // Move/create marker at latest ping
-  const latest = pings[pings.length - 1];
-  const lngLat = [parseFloat(latest.lon), parseFloat(latest.lat)];
-
-  if (!marker) {
-    // Custom triangle marker
-    const el = document.createElement('div');
-    el.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24">
-      <polygon points="12,2 22,20 2,20" fill="#1D9E75" stroke="#5DCAA5" stroke-width="1.5"/>
-    </svg>`;
-    el.style.cursor = 'pointer';
-    marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
-      .setLngLat(lngLat)
-      .addTo(map);
-
-    // Fly to first position
-    map.flyTo({ center: lngLat, zoom: 13, duration: 1500 });
-  } else {
-    marker.setLngLat(lngLat);
-  }
-
-  // Heartbeat status
-  lastPingTime = new Date(latest.timestamp);
-  const ageSeconds = (Date.now() - lastPingTime.getTime()) / 1000;
-  const timeStr = lastPingTime.toISOString().substring(11, 19) + ' UTC';
-
-  const dot = document.getElementById('hb-dot');
-  const txt = document.getElementById('ping-text');
-
-  if (ageSeconds < STALE_THRESHOLD) {
-    dot.className = '';
-    txt.style.color = '#9FE1CB';
-    txt.textContent = `Heartbeat active · position confirmed`;
-  } else if (ageSeconds < LOST_THRESHOLD) {
-    dot.className = 'stale';
-    txt.style.color = '#FAC775';
-    txt.textContent = `Signal intermittent · last seen ${Math.round(ageSeconds/60)} min ago`;
-  } else {
-    dot.className = 'lost';
-    txt.style.color = '#F09595';
-    txt.textContent = `Signal lost · showing last known position`;
-  }
-  document.getElementById('ping-time').textContent = timeStr;
-}
-
-function setStatus(text, isAlert) {
-  const pill = document.getElementById('status-pill');
-  pill.textContent = text;
-  pill.className = isAlert ? 'overdue' : '';
-}
-
-function callEmergency() {
-  window.location.href = 'tel:999';
-}
-
-let isDark = true;
-function toggleDayNight() {
-  isDark = !isDark;
-  const btn = document.getElementById('daynight-btn');
-  if (map) {
-    map.setStyle(isDark ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/navigation-day-v1');
-    map.once('style.load', () => {
-      if (map.getSource('trail')) return;
-      map.addSource('trail', {
-        type: 'geojson',
-        data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } }
-      });
-      map.addLayer({
-        id: 'trail-line',
-        type: 'line',
-        source: 'trail',
-        paint: { 'line-color': '#1D9E75', 'line-width': 2.5, 'line-opacity': 0.8 }
-      });
-      trailSource = map.getSource('trail');
-    });
-  }
-  btn.textContent = isDark ? 'DAY' : 'NIGHT';
-  btn.style.background = isDark ? '#0d1a14' : '#E1F5EE';
-  btn.style.color = isDark ? '#5DCAA5' : '#085041';
-}
-
-function showError(msg) {
-  document.getElementById('loading').style.display = 'none';
-  const err = document.getElementById('error-screen');
-  err.style.display = 'flex';
-  document.getElementById('error-msg').textContent = msg;
-}
 </script>
 </body>
 </html>
