@@ -734,7 +734,7 @@ function addTerrain(){
 map.on('load',()=>{
   map.setConfigProperty('basemap','lightPreset','night');
   addTerrain();
-  map.addSprite('cpas', 'https://videar.tech/sprites/cpas-sprites');
+  map.addSprite('cpas', 'https://videar.tech/sprites/cpas-sprites', {}, (err) => {   if(err) console.error('Sprite load error:', err); });
   function targetsGeoJSON() {
     return {
       type: 'FeatureCollection',
