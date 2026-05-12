@@ -729,6 +729,7 @@ function addTerrain(){
 map.on('load',()=>{
   map.setConfigProperty('basemap','lightPreset','night');
   addTerrain();
+  map.addSprite('cpas', 'https://videar.tech/sprites/cpas-sprites');
   createMkrs();
   buildList();
   updClock();
