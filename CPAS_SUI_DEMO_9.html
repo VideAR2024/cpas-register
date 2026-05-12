@@ -701,6 +701,7 @@ function simulate(dt) {
     }
   });
 
+  if(window._refreshSymbols) window._refreshSymbols();
   if(map.loaded()) map.triggerRepaint();
 }
 
