@@ -837,7 +837,7 @@ map.on('load',()=>{
   function connectAisStream() {
     const ws = new WebSocket('wss://cpas-ais-proxy.mike-63d.workers.dev');
 
-   
+   ws.onopen = () => {
       console.log('AISstream connected');
       document.getElementById('ais-ws-status').textContent = 'AIS LIVE';
       document.getElementById('ais-ws-status').style.color = 'var(--green)';
