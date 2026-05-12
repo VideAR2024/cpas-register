@@ -499,18 +499,14 @@ const targets=[
 }));
 window._targets=targets;
 
-function mkIcon(t) {
-  const lost=t.hb==='lost'; const col=lost?'#ff3344':C[t.g]||'#00d4ff'; const fl=lost?'animation:blink 0.8s infinite':'';
-  if(t.g==='para') {
-    const hdgRad=t.hdg*Math.PI/180;
-    const sx=Math.sin(hdgRad)*8, sy=-Math.cos(hdgRad)*8, ex=Math.sin(hdgRad)*15, ey=-Math.cos(hdgRad)*15;  
-    return `<svg width="32" height="32" viewBox="-16 -16 32 32" style="${fl}"><circle r="8" fill="${col}44" stroke="${col}" stroke-width="2"/><line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/></svg>`;
-  }
-  if(t.g==='ais') return `<svg width="44" height="44" viewBox="-22 -22 44 44"><g transform="rotate(${Math.round(t.hdg)})"><polygon points="0,-10 6,8 0,5 -6,8" fill="${col}cc" stroke="${col}" stroke-width="1.5"/><line x1="0" y1="-10" x2="0" y2="-20" stroke="${col}" stroke-width="1.5" opacity=".8"/></g></svg>`;
-  if(t.g==='kayak') return `<svg width="28" height="28" viewBox="-14 -14 28 28" style="${fl}"><g transform="rotate(${Math.round(t.hdg)})"><polygon points="0,-11 7,7 0,4 -7,7" fill="${col}cc" stroke="${col}" stroke-width="1.5"/></g></svg>`;
-  if(t.g==='swim') return `<svg width="20" height="20" viewBox="-10 -10 20 20" style="${fl}"><circle r="7" fill="${col}66" stroke="${col}" stroke-width="1.5"/><text y="3" text-anchor="middle" font-size="9" fill="${col}" font-family="sans-serif">~</text></svg>`;
-  if(t.g==='sail') return `<svg width="22" height="22" viewBox="-11 -11 22 22" style="${fl}"><g transform="rotate(${Math.round(t.hdg)})"><polygon points="0,-10 6,8 0,5 -6,8" fill="${col}bb" stroke="${col}" stroke-width="1.2"/></g></svg>`;
-  return `<svg width="20" height="20" viewBox="-10 -10 20 20" style="${fl}"><polygon points="0,-9 7,6 0,3 -7,6" fill="${col}cc" stroke="${col}" stroke-width="1.5"/></svg>`;
+function spriteIcon(t) {
+  if(t.hb==='lost') return 'cpas:sos-alert';
+  if(t.g==='para')  return 'cpas:aerial-registered';
+  if(t.g==='kayak') return 'cpas:paddle-registered';
+  if(t.g==='sail')  return 'cpas:vessel-leisure';
+  if(t.g==='swim')  return 'cpas:paddle-anonymous';
+  if(t.g==='ais')   return 'cpas:vessel-ais';
+  return 'cpas:aerial-anonymous';
 }
 
 function createMkrs() {
