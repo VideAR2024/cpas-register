@@ -527,8 +527,7 @@ function createMkrs() {
 
     const iconWrap=document.createElement('div');
     iconWrap.className='icon-wrap';
-    iconWrap.style.cssText='position:relative;z-index:6;display:flex;align-items:center;justify-content:center;';
-    iconWrap.innerHTML=mkIcon(t);
+    iconWrap.style.cssText='position:relative;z-index:6;display:flex;align-items:center;justify-content:center;width:0;height:0;';
     el.appendChild(iconWrap);
 
     if(KEY_NUM[t.id]) {
