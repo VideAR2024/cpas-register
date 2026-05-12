@@ -835,14 +835,9 @@ map.on('load',()=>{
   const _liveAis = {}; // keyed by MMSI
 
   function connectAisStream() {
-    const ws = new WebSocket('wss://stream.aisstream.io/v0/stream');
+    const ws = new WebSocket('wss://cpas-ais-proxy.mike-63d.workers.dev');
 
-    ws.onopen = () => {
-      ws.send(JSON.stringify({
-        APIKey: '39a12acd29bb98dbf02f71534368b61d1620f5f5',
-        BoundingBoxes: [AIS_BBOX],
-        FilterMessageTypes: ['PositionReport']
-      }));
+   
       console.log('AISstream connected');
       document.getElementById('ais-ws-status').textContent = 'AIS LIVE';
       document.getElementById('ais-ws-status').style.color = 'var(--green)';
