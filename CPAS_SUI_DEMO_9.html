@@ -725,6 +725,60 @@ map.on('load',()=>{
   map.setConfigProperty('basemap','lightPreset','night');
   addTerrain();
   map.addSprite('cpas', 'https://videar.tech/sprites/cpas-sprites');
+  function targetsGeoJSON() {
+    return {
+      type: 'FeatureCollection',
+      features: targets
+        .filter(t => t.g !== 'nomark')
+        .map(t => ({
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [t.lon, t.lat] },
+          properties: {
+            id:   t.id,
+            group: t.g,
+            hdg:  t.hdg,
+            hb:   t.hb || 'ok',
+            icon: spriteIcon(t)
+          }
+        }))
+    };
+  }
+
+  map.addSource('cpas-targets', { type: 'geojson', data: targetsGeoJSON() });
+
+  map.addLayer({
+    id: 'cpas-symbols',
+    type: 'symbol',
+    source: 'cpas-targets',
+    layout: {
+      'icon-image':              ['get', 'icon'],
+      'icon-size':               0.55,
+      'icon-rotate':             ['get', 'hdg'],
+      'icon-rotation-alignment': 'map',
+      'icon-pitch-alignment':    'map',
+      'icon-allow-overlap':      true,
+      'icon-ignore-placement':   true
+    }
+  });
+
+  map.addLayer({
+    id: 'cpas-sos-pulse',
+    type: 'circle',
+    source: 'cpas-targets',
+    filter: ['==', ['get', 'hb'], 'lost'],
+    paint: {
+      'circle-radius':       18,
+      'circle-color':        'transparent',
+      'circle-stroke-color': '#C8001E',
+      'circle-stroke-width': 1.5,
+      'circle-opacity':      0.7
+    }
+  });
+
+  window._refreshSymbols = function() {
+    const src = map.getSource('cpas-targets');
+    if(src) src.setData(targetsGeoJSON());
+  };
   createMkrs();
   buildList();
   updClock();
